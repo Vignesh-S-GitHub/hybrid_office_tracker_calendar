@@ -3,8 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 // Synthetic 2027 data exercises a published rollover and coinciding holidays.
 // This module mock is isolated to tests and never enters the production bundle.
 vi.mock("../data/india-holidays.json", async (original) => {
-  const { default: document } =
-    await original<{ default: typeof import("../data/india-holidays.json") }>();
+  const { default: document } = await original<{
+    default: typeof import("../data/india-holidays.json");
+  }>();
   const base = document.catalogs.find((catalog) => catalog.year === 2026)!;
   const future = {
     ...base,

@@ -103,30 +103,31 @@ describe("All India Holidays - 2026", () => {
     expect(statistics(data, "1900-10", "2026-10-15").Holiday).toBe(0);
     expect(statistics(data, "2026-10", "2026-10-15").WFO).toBe(0);
   });
-  it("excludes official holidays from suggestions even when all weekdays are allowed", () => {
-    const data = emptyData();
-    data.settings.workingDays = [0, 1, 2, 3, 4, 5, 6];
-    data.settings.maxPerWeek = 7;
-    data.settings.preferredDays = [];
-    data.settings.avoidConsecutive = false;
-    data.settings.monthlyTarget = 31;
-    for (const month of [
-      "2026-01",
-      "2026-03",
-      "2026-04",
-      "2026-05",
-      "2026-06",
-      "2026-08",
-      "2026-10",
-      "2026-11",
-      "2026-12",
-    ]) {
+  it.each([
+    "2026-01",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-08",
+    "2026-10",
+    "2026-11",
+    "2026-12",
+  ])(
+    "excludes official holidays from %s suggestions when all weekdays are allowed",
+    (month) => {
+      const data = emptyData();
+      data.settings.workingDays = [0, 1, 2, 3, 4, 5, 6];
+      data.settings.maxPerWeek = 7;
+      data.settings.preferredDays = [];
+      data.settings.avoidConsecutive = false;
+      data.settings.monthlyTarget = 31;
       const plan = planMonth(data, month, "2026-01-01");
       expect(plan.recommendations.every((row) => !holidayFor(row.date))).toBe(
         true,
       );
-    }
-  });
+    },
+  );
   it("does not offer WFH rescheduling on an official holiday", () => {
     const data = emptyData();
     data.settings.protectWFH = false;
