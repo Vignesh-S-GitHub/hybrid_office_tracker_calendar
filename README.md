@@ -1,0 +1,140 @@
+# 📅 Hybrid Office Tracker
+
+**Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, built to run entirely in your browser.
+
+| Calendar                   | Dashboard                     | Smart planner                 | Your data                   |
+| -------------------------- | ----------------------------- | ----------------------------- | --------------------------- |
+| WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | LocalStorage + JSON backups |
+
+## What it does
+
+- Responsive desktop calendar with a summary beside it, and fixed bottom navigation on mobile.
+- Edit any date, attach notes, and save one attendance status per day.
+- Keep **completed**, **planned**, and **suggested** office days separate. Past plans never silently become completed attendance.
+- Track monthly targets, save month-specific overrides, and review previous months without losing data.
+- Plan office days around working weekdays, preferred weekdays, holidays, leave, weekly limits, and existing commitments.
+- Review clear feasibility alerts, accept or exclude individual suggestions, apply a complete plan, and regenerate suggestions.
+- Filter history by status or search dates and notes.
+- Choose light, dark, or system appearance; configure calendar week start, weekend visibility, and starting month.
+- Export and restore validated JSON backups, with confirmation before replacement or reset.
+- Install as a PWA and use it offline after the first successful production visit and service-worker activation.
+
+No backend, login, analytics, external fonts, AI API, calendar API, or paid service. Fresh installs have **no sample attendance records**.
+
+## Stack
+
+React · TypeScript · Vite · Tailwind CSS · Lucide React · date-fns · Vitest · React Testing Library · Workbox through vite-plugin-pwa. Dependency versions are resolved in `package-lock.json`.
+
+## Run locally
+
+Install **Node.js 24 LTS** with npm. In the repository root:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the local address Vite prints, normally `http://127.0.0.1:5173/`.
+
+```sh
+npm run lint
+npm test
+npm run build
+npm run preview
+```
+
+`build` type-checks the TypeScript project before generating `dist/`. `preview` serves the production build. The service worker is intentionally disabled during development; test offline operation with the production preview or deployed HTTPS site.
+
+## Using the tracker
+
+1. In **Settings**, set the default monthly target and normal working weekdays.
+2. Set an override for a specific month when its target differs. A month’s target is saved when its first record or accepted plan is added, so later default changes do not alter that month.
+3. Select a calendar date, add optional notes, and choose WFO, WFH, leave, or holiday. Office and home dates in the future are plans.
+4. Review the **Smart WFO Planner** and accept suggestions individually or together.
+5. After an office day, open it and explicitly choose **Completed**, then **Work from office**.
+6. Export regular backups from the summary or Settings.
+
+Solid green means completed WFO. Dashed green means an accepted WFO plan. Green outlines with a suggestion marker are unaccepted recommendations. Suggestions are derived from your data, and are never attendance records until accepted.
+
+## Planning rules and calculations
+
+The scheduler enumerates eligible subsets of each Monday–Sunday week and uses dynamic programming across weeks. It first maximizes the number of days that can be scheduled, then favors preferred weekdays, spacing, and balanced weekly attendance. Identical data, preferences, and local dates produce identical suggestions.
+
+**Hard limits:** no past dates, no dates outside the selected month, configured working weekdays only, no existing attendance records, no rejected suggestions, and the weekly maximum including all saved WFO records in that week, even across month boundaries.
+
+**Flexible preferences:** preferred weekdays and avoiding consecutive office days. When the target cannot be met with those preferences, the planner can suggest other working weekdays or consecutive days and explains the flexibility. It never exceeds the weekly maximum automatically. If hard capacity is insufficient, it shows the capacity and suggests reviewing preferences or unavailable dates.
+
+WFH plans are always excluded from automatic suggestions. Turning off **Keep existing WFH plans** reveals a separate review list. Replacing WFH with WFO requires confirmation. Existing leave and holiday records are never automatically replaced.
+
+| Metric               | Definition                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| Completed WFO        | Explicitly completed WFO records on or before today                                        |
+| Planned WFO          | Accepted WFO plans dated today or later                                                    |
+| Overdue plans        | Past WFO plans still awaiting confirmation; excluded from completed and projected totals   |
+| Still to schedule    | `max(0, target − completed WFO − planned WFO)`                                             |
+| Actual progress      | Completed WFO divided by target                                                            |
+| Projected progress   | Completed WFO plus accepted future/current WFO plans, divided by target                    |
+| Breakdown percentage | Each recorded status divided by all recorded statuses in the month; WFO/WFH plans excluded |
+
+Progress bars cap at 100%; numeric percentages may exceed 100% and extra office days are shown. A zero target is treated as complete. Future leave and holiday entries describe unavailable dates and appear in their monthly counts. Suggestions never contribute to projected progress. Historical months receive no recommendations. The app checks the local date every 30 seconds and when visibility changes.
+
+## Storage, privacy, backup and restore
+
+The versioned JSON object is stored under LocalStorage key `hybrid-office-tracker`. Calendar dates use local `YYYY-MM-DD` strings and are never converted to UTC; update timestamps record when an entry was changed.
+
+Schema version 2 contains `settings`, `monthlyTargets`, `attendance`, and `rejected`. Records have `status`, `phase`, `notes`, and `updatedAt`. Version 1 imports migrate future WFO/WFH into plans and preserve historical monthly targets. Migration never silently completes a planned record.
+
+**Backup:** choose Export JSON. The file includes all records, targets, excluded suggestions, and supported settings. Keep it somewhere safe: notes in exported JSON are readable text.
+
+**Restore:** choose Import data, select the backup, and review the replacement confirmation. The app validates the schema version, actual calendar dates, status and phase values, targets, weekday settings, notes, and timestamps before allowing replacement. Invalid files leave current data untouched. Files are limited to 5 MB. Restore replaces rather than merges data.
+
+Corrupt saved data is preserved rather than overwritten. The warning offers a raw recovery export; restore a valid backup or explicitly reset in Settings before editing. Storage quota/permission failures show a persistent warning; export the current in-memory state before leaving. Open tabs receive storage changes from other tabs; simultaneous edits use the last saved state.
+
+Data belongs to this **browser profile and origin**. Local development, production preview, and GitHub Pages use different origins and do not share records. Browsers can evict site data; private browsing may remove data when closed. There is no cloud sync or automatic cloud backup.
+
+## Deploy on GitHub Pages
+
+The official Actions workflow is `.github/workflows/deploy.yml`. It runs lint, tests, an audit, and a type-checked production build before deployment. Pull requests run checks without publishing. Actions are pinned to verified release commit hashes, with Dependabot updates configured.
+
+1. Push this repository to `main`.
+2. Open **Repository Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**.
+3. Open **Actions → Check and deploy to GitHub Pages**, then run the workflow if needed.
+4. Wait for the deploy job to succeed and open the URL shown by the `github-pages` environment.
+
+GitHub provides `GITHUB_REPOSITORY` during Actions, and Vite derives the repository subpath automatically. No GitHub username is embedded in the deployment config. For a user/organization root site or custom domain, set the repository Actions variable `VITE_BASE_PATH` to `/` and pass it as the build environment override as shown below.
+
+To test repository hosting locally in PowerShell:
+
+```powershell
+$env:VITE_BASE_PATH = '/hybrid_office_tracker_calendar/'
+npm run build
+npm run preview
+# Open http://127.0.0.1:4173/hybrid_office_tracker_calendar/
+Remove-Item Env:VITE_BASE_PATH
+```
+
+For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Dashboard, History, or Settings does not need server-side routing.
+
+The PWA manifest, icons, service-worker scope, assets, and navigation fallback follow the same base path. Updates display an **Update now** prompt; they do not clear LocalStorage. Android install availability depends on browser support and a valid HTTPS deployment. Downloading a ZIP or opening `index.html` directly does not provide the production app experience.
+
+## Project map
+
+```text
+src/
+  components/     Calendar editor, planner, reusable cards and dialogs
+  hooks/          Persistence, cross-tab updates, local-day refresh
+  lib/            Dates, validation/storage, statistics, deterministic planner
+  pages/          Calendar, Dashboard, History, Settings
+  test/           UI interaction tests and browser mocks
+  types.ts        Versioned data model
+  App.tsx         Navigation and application actions
+  index.css       Responsive light/dark design system
+public/           App icons
+.github/          Pages workflow and dependency updates
+```
+
+## Verification and limitations
+
+Automated tests cover leap years, real date validation, month lengths, status replacement, planned/completed separation, target overrides, weekly constraints including month boundaries, preferred weekdays, consecutive-day handling, capacity alerts, replanning, migration, storage failures, corrupt data recovery, backup validation/export, navigation, theme, and reset confirmation.
+
+The planner is a personal aid; it cannot infer employer policies, verify real attendance, or import public holidays automatically. Enter leave and holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
