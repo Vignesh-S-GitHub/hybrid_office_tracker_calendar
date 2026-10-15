@@ -1,5 +1,6 @@
 import type { TrackerData } from "../types";
 import { dateKey } from "./dates";
+import { calendarAttendance } from "./holidays";
 
 export const targetFor = (data: TrackerData, month: string) =>
   data.monthlyTargets[month] ?? data.settings.monthlyTarget;
@@ -12,7 +13,7 @@ export function statistics(
   let planned = 0,
     overdue = 0,
     plannedWFH = 0;
-  for (const [date, record] of Object.entries(data.attendance)) {
+  for (const [date, record] of Object.entries(calendarAttendance(data))) {
     if (!date.startsWith(month)) continue;
     if (record.status === "WFO" && record.phase === "planned") {
       if (date >= today) planned++;

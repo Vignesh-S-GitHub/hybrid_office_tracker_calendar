@@ -83,7 +83,7 @@ describe("attendance calculations", () => {
     });
     expect(statistics(data, "2026-09", today).WFO).toBe(1);
     delete data.attendance[today];
-    expect(statistics(data, "2026-10", today).recorded).toBe(0);
+    expect(statistics(data, "2026-10", today).recorded).toBe(2);
   });
   it("keeps overridden historical targets and handles zero and exceeded targets", () => {
     const data = emptyData();
@@ -105,7 +105,7 @@ describe("attendance calculations", () => {
     expect(statistics(data, "2026-10", today)).toMatchObject({
       WFH: 0,
       plannedWFH: 1,
-      recorded: 0,
+      recorded: 2,
     });
   });
 });

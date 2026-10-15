@@ -86,8 +86,8 @@ export function DashboardPage({
           <section className="card breakdown-card">
             <h2>Attendance breakdown</h2>
             <p className="muted small-text">
-              Share of {stats.recorded} recorded days. Office and home plans are
-              excluded.
+              Share of {stats.recorded} tracked days, including official
+              holidays. Office and home plans are excluded.
             </p>
             {statuses.map((status) => {
               const { label, className } = statusInfo[status];

@@ -19,7 +19,15 @@
 - Export and restore validated JSON backups, with confirmation before replacement or reset.
 - Install as a PWA and use it offline after the first successful production visit and service-worker activation.
 
-No backend, login, analytics, external fonts, AI API, calendar API, or paid service. Fresh installs have **no sample attendance records**.
+No backend, login, analytics, external fonts, AI API, calendar API, or paid service. Fresh installs have **no sample attendance records**. The built-in All India 2026 holiday calendar is shown automatically as a separate calendar layer.
+
+## 🇮🇳 All India Holidays - 2026
+
+The **Holidays** screen contains exactly the 14 holidays in [India Post’s All India Holidays - 2026 list](https://www.indiapost.gov.in/holidays-list), cross-checked against the [India Portal central holiday calendar](https://www.india.gov.in/calendar) on 15 October 2026. It excludes postal-circle, state, regional, restricted, and other-year holiday catalogs. Additional central gazetted holidays that do not belong to the requested India Post All India list are also excluded.
+
+**One source disagreement is explicit:** Id-ul-Zuha is 28 May 2026 in India Portal’s updated gazetted entry, while India Post lists 27 May. The tracker uses 28 May and preserves the postal date in its source metadata and the Holidays screen notice. The remaining 13 dates agree. The source data is bundled in `src/lib/holidays.ts` for offline use; there are no runtime requests or automatic substitutions from other sources.
+
+These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. The Holidays catalog itself always retains all 14 dates. History’s individual records and Recent activity remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
 
 ## Stack
 
@@ -74,7 +82,7 @@ WFH plans are always excluded from automatic suggestions. Turning off **Keep exi
 | Still to schedule    | `max(0, target − completed WFO − planned WFO)`                                             |
 | Actual progress      | Completed WFO divided by target                                                            |
 | Projected progress   | Completed WFO plus accepted future/current WFO plans, divided by target                    |
-| Breakdown percentage | Each recorded status divided by all recorded statuses in the month; WFO/WFH plans excluded |
+| Breakdown percentage | Each tracked status divided by all tracked days in the month, including official holidays; WFO/WFH plans excluded |
 
 Progress bars cap at 100%; numeric percentages may exceed 100% and extra office days are shown. A zero target is treated as complete. Future leave and holiday entries describe unavailable dates and appear in their monthly counts. Suggestions never contribute to projected progress. Historical months receive no recommendations. The app checks the local date every 30 seconds and when visibility changes.
 
@@ -113,7 +121,7 @@ npm run preview
 Remove-Item Env:VITE_BASE_PATH
 ```
 
-For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Dashboard, History, or Settings does not need server-side routing.
+For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Dashboard, Holidays, History, or Settings does not need server-side routing.
 
 The PWA manifest, icons, service-worker scope, assets, and navigation fallback follow the same base path. Updates display an **Update now** prompt; they do not clear LocalStorage. Android install availability depends on browser support and a valid HTTPS deployment. Downloading a ZIP or opening `index.html` directly does not provide the production app experience.
 
@@ -124,7 +132,7 @@ src/
   components/     Calendar editor, planner, reusable cards and dialogs
   hooks/          Persistence, cross-tab updates, local-day refresh
   lib/            Dates, validation/storage, statistics, deterministic planner
-  pages/          Calendar, Dashboard, History, Settings
+  pages/          Calendar, Dashboard, Holidays, History, Settings
   test/           UI interaction tests and browser mocks
   types.ts        Versioned data model
   App.tsx         Navigation and application actions
@@ -137,4 +145,4 @@ public/           App icons
 
 Automated tests cover leap years, real date validation, month lengths, status replacement, planned/completed separation, target overrides, weekly constraints including month boundaries, preferred weekdays, consecutive-day handling, capacity alerts, replanning, migration, storage failures, corrupt data recovery, backup validation/export, navigation, theme, and reset confirmation.
 
-The planner is a personal aid; it cannot infer employer policies, verify real attendance, or import public holidays automatically. Enter leave and holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
+The planner is a personal aid; it cannot infer employer policies or verify real attendance. The built-in holiday catalog covers only All India Holidays for 2026. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.

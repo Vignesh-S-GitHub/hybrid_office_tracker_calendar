@@ -6,6 +6,7 @@ import { statistics } from "../lib/statistics";
 import { planMonth } from "../lib/planner";
 import { MonthControls, StatCards, TargetProgress } from "../components/ui";
 import { statusInfo, statuses } from "../lib/status";
+import { calendarAttendance, holidayFor } from "../lib/holidays";
 
 export function CalendarPage({
   data,
@@ -29,6 +30,7 @@ export function CalendarPage({
   history: () => void;
 }) {
   const stats = statistics(data, month, today);
+  const attendance = calendarAttendance(data);
   const recommended = new Set(
     planMonth(data, month, today).recommendations.map((row) => row.date),
   );
@@ -62,11 +64,12 @@ export function CalendarPage({
           ))}
           {days.map((day) => {
             const key = dateKey(day),
-              record = data.attendance[key],
+              record = attendance[key],
               inMonth = key.startsWith(month);
+            const holiday = holidayFor(key);
             const suggested = inMonth && recommended.has(key);
             const label = record
-              ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}`
+              ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
               : suggested
                 ? "Suggested office day"
                 : "No entry";
@@ -75,7 +78,10 @@ export function CalendarPage({
                 key={key}
                 aria-label={`${format(day, "MMMM d, yyyy")}, ${label}`}
                 aria-current={key === today ? "date" : undefined}
-                title={record?.notes || label}
+                title={
+                  [holiday?.name, record?.notes].filter(Boolean).join(" · ") ||
+                  label
+                }
                 className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""}`}
                 onClick={() => edit(key)}
               >
@@ -85,7 +91,9 @@ export function CalendarPage({
                 />
                 {record && (
                   <span className="cell-caption">
-                    {record.status}
+                    {holiday && !data.attendance[key]
+                      ? holiday.name
+                      : record.status}
                     {record.phase === "planned" ? " · Plan" : ""}
                   </span>
                 )}
@@ -129,6 +137,12 @@ export function CalendarPage({
         <h2>{format(new Date(`${month}-01T12:00:00`), "MMMM yyyy")} summary</h2>
         <StatCards stats={stats} />
         <TargetProgress stats={stats} />
+        {month.startsWith("2026-") && (
+          <p className="small-text muted">
+            Includes All India 2026 holidays. Saved attendance overrides the
+            displayed status for that date.
+          </p>
+        )}
         {(stats.planned > 0 || stats.plannedWFH > 0) && (
           <p className="small-text muted">
             Plans: {stats.planned} WFO · {stats.plannedWFH} WFH. Plans are

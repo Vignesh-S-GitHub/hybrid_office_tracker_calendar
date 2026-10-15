@@ -1,6 +1,7 @@
 import type { Recommendation, TrackerData } from "../types";
 import { dateKey, localDate, monthDays, nextDay, weekKey } from "./dates";
 import { statistics } from "./statistics";
+import { holidayFor } from "./holidays";
 
 interface Option {
   dates: string[];
@@ -105,12 +106,14 @@ export function planMonth(
   );
   const excluded = new Set(data.rejected[month] ?? []);
   const eligible = working.filter(
-    (date) => !data.attendance[date] && !excluded.has(date),
+    (date) =>
+      !data.attendance[date] && !holidayFor(date) && !excluded.has(date),
   );
   const reschedulable = working.filter(
     (date) =>
       data.attendance[date]?.status === "WFH" &&
-      data.attendance[date]?.phase === "planned",
+      data.attendance[date]?.phase === "planned" &&
+      !holidayFor(date),
   );
   const capacity = schedule(data, eligible, 31, false).length;
   const strictCapacity = schedule(data, eligible, 31, true).length;

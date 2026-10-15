@@ -5,6 +5,7 @@ import { Modal } from "./ui";
 import { statuses, statusInfo } from "../lib/status";
 import { localDate } from "../lib/dates";
 import type { Attendance, Phase, Status } from "../types";
+import { holidayFor, holidaySources } from "../lib/holidays";
 
 export function AttendanceEditor({
   date,
@@ -20,6 +21,7 @@ export function AttendanceEditor({
   onClose: () => void;
 }) {
   const [notes, setNotes] = useState(record?.notes ?? "");
+  const holiday = holidayFor(date);
   const [phase, setPhase] = useState<Phase>(
     date > today ? "planned" : (record?.phase ?? "completed"),
   );
@@ -29,6 +31,28 @@ export function AttendanceEditor({
       subtitle={`Selected date: ${format(localDate(date), "MMMM d, yyyy")}`}
       onClose={onClose}
     >
+      {holiday && (
+        <div className="official-holiday-notice">
+          <strong>{holiday.name}</strong>
+          <p>All India holiday · 2026</p>
+          <p>
+            Record attendance here if you worked. Clearing your entry restores
+            the official holiday on the calendar.
+          </p>
+          <div>
+            <a
+              href={holidaySources.indiaPortal}
+              target="_blank"
+              rel="noreferrer"
+            >
+              India Portal
+            </a>
+            <a href={holidaySources.indiaPost} target="_blank" rel="noreferrer">
+              India Post
+            </a>
+          </div>
+        </div>
+      )}
       <fieldset className="phase-controls">
         <legend>Office & home attendance</legend>
         <label>

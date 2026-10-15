@@ -12,6 +12,7 @@ import {
   X,
   Download,
   RefreshCw,
+  Palmtree,
 } from "lucide-react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import type { Phase, Settings, Status, TrackerData } from "./types";
@@ -20,6 +21,7 @@ import { CalendarPage } from "./pages/CalendarPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { HolidaysPage } from "./pages/HolidaysPage";
 import { Planner } from "./components/Planner";
 import { Modal } from "./components/ui";
 import { AttendanceEditor } from "./components/AttendanceEditor";
@@ -37,6 +39,7 @@ const pages = [
   { key: "calendar", label: "Calendar", Icon: CalendarDays },
   { key: "dashboard", label: "Dashboard", Icon: ChartNoAxesCombined },
   { key: "history", label: "History", Icon: History },
+  { key: "holidays", label: "Holidays", Icon: Palmtree },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
 ] as const;
 type Page = (typeof pages)[number]["key"];
@@ -220,6 +223,11 @@ export default function App() {
     }
   };
   const pageCopy = {
+    holidays: [
+      "INDIA · OFFICIAL HOLIDAY CALENDAR",
+      "All India Holidays - 2026",
+      "Plan your workweek around India’s All India holiday calendar.",
+    ],
     calendar: [
       "YOUR PERSONAL WORK CALENDAR",
       "A little planning. A better balance.",
@@ -314,6 +322,16 @@ export default function App() {
               {locked ? "Export recovery copy" : "Export backup"}
             </button>
           </div>
+        )}
+        {page === "holidays" && (
+          <HolidaysPage
+            today={today}
+            viewDate={(date) => {
+              setMonth(date.slice(0, 7));
+              navigate("calendar");
+              edit(date);
+            }}
+          />
         )}
         {page === "calendar" && (
           <CalendarPage

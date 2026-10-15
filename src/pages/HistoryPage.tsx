@@ -46,6 +46,12 @@ export function HistoryPage({
       <section className="card history-header">
         <MonthControls month={month} onChange={setMonth} today={today} />
         <StatCards stats={statistics(data, month, today)} />
+        {month.startsWith("2026-") && (
+          <p className="small-text muted history-holiday-note">
+            Holiday totals include the All India 2026 calendar. Individual
+            entries below are your saved records.
+          </p>
+        )}
       </section>
       <section className="card history-records">
         <div className="split history-tools">
