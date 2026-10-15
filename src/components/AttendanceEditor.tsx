@@ -34,7 +34,7 @@ export function AttendanceEditor({
       {holiday && (
         <div className="official-holiday-notice">
           <strong>{holiday.name}</strong>
-          <p>All India holiday · 2026</p>
+          <p>All India holiday · {date.slice(0, 4)}</p>
           <p>
             Record attendance here if you worked. Clearing your entry restores
             the official holiday on the calendar.

@@ -1,4 +1,5 @@
 import type { Attendance, TrackerData } from "../types";
+import bundled from "../data/india-holidays.json";
 
 export interface IndiaHoliday {
   date: string;
@@ -6,122 +7,58 @@ export interface IndiaHoliday {
   indiaPostDate: string;
   indiaPortalName: string;
 }
+export interface HolidayCatalog {
+  year: number;
+  verifiedOn: string;
+  sources: { indiaPortal: string; indiaPost: string };
+  holidays: readonly IndiaHoliday[];
+}
+export const holidayCatalogs: readonly HolidayCatalog[] = bundled.catalogs;
+export const holidaySources = holidayCatalogs[0].sources;
+export const holidayCatalogForYear = (year: number) =>
+  holidayCatalogs.find((catalog) => catalog.year === year);
 
-export const holidaySources = {
-  indiaPortal: "https://www.india.gov.in/calendar",
-  indiaPost: "https://www.indiapost.gov.in/holidays-list",
-  verifiedOn: "2026-10-15",
-} as const;
+export function activeHolidayCatalog(
+  today: string,
+  catalogs: readonly HolidayCatalog[] = holidayCatalogs,
+): HolidayCatalog {
+  const year = Number(today.slice(0, 4));
+  return (
+    [...catalogs]
+      .sort((a, b) => b.year - a.year)
+      .find((catalog) => catalog.year <= year) ?? catalogs[0]
+  );
+}
 
-// Membership is exactly India Post's "All India Holidays - 2026" list.
-// Dates were cross-checked against India Portal's 2026 gazetted entries.
-// For the one disagreement, prefer the updated central calendar and retain
-// the postal date so the difference can be shown rather than hidden.
-export const indiaHolidays2026: readonly IndiaHoliday[] = [
-  {
-    date: "2026-01-26",
-    name: "Republic Day",
-    indiaPostDate: "2026-01-26",
-    indiaPortalName: "Republic Day",
-  },
-  {
-    date: "2026-03-21",
-    name: "Id-ul-Fitr",
-    indiaPostDate: "2026-03-21",
-    indiaPortalName: "Id- ul- Fitr",
-  },
-  {
-    date: "2026-03-31",
-    name: "Mahavir Jayanti",
-    indiaPostDate: "2026-03-31",
-    indiaPortalName: "Mahavir Jayanti",
-  },
-  {
-    date: "2026-04-03",
-    name: "Good Friday",
-    indiaPostDate: "2026-04-03",
-    indiaPortalName: "Good Friday",
-  },
-  {
-    date: "2026-05-01",
-    name: "Buddha Purnima",
-    indiaPostDate: "2026-05-01",
-    indiaPortalName: "Budha Purnima",
-  },
-  {
-    date: "2026-05-28",
-    name: "Id-ul-Zuha",
-    indiaPostDate: "2026-05-27",
-    indiaPortalName: "Id- ul- Zuha (Bakrid)",
-  },
-  {
-    date: "2026-06-26",
-    name: "Muharram",
-    indiaPostDate: "2026-06-26",
-    indiaPortalName: "Muharram",
-  },
-  {
-    date: "2026-08-15",
-    name: "Independence Day",
-    indiaPostDate: "2026-08-15",
-    indiaPortalName: "Independence Day",
-  },
-  {
-    date: "2026-08-26",
-    name: "Prophet Mohammad's Birthday (Id-e-Milad)",
-    indiaPostDate: "2026-08-26",
-    indiaPortalName:
-      "Milad- un- Nabi or Id- e- Milad (Birthday of Prophet Mohammad)",
-  },
-  {
-    date: "2026-10-02",
-    name: "Mahatma Gandhi's Birthday",
-    indiaPostDate: "2026-10-02",
-    indiaPortalName: "Mahatma Gandhi's Birthday",
-  },
-  {
-    date: "2026-10-20",
-    name: "Dussehra (Vijay Dashmi)",
-    indiaPostDate: "2026-10-20",
-    indiaPortalName: "Dussehra",
-  },
-  {
-    date: "2026-11-08",
-    name: "Diwali (Deepavali)",
-    indiaPostDate: "2026-11-08",
-    indiaPortalName: "Diwali (Deepavali)",
-  },
-  {
-    date: "2026-11-24",
-    name: "Guru Nanak's Birthday",
-    indiaPostDate: "2026-11-24",
-    indiaPortalName: "Guru Nanak's Birthday",
-  },
-  {
-    date: "2026-12-25",
-    name: "Christmas Day",
-    indiaPostDate: "2026-12-25",
-    indiaPortalName: "Christmas Day",
-  },
-];
-
-export const holidayFor = (date: string) =>
-  indiaHolidays2026.find((holiday) => holiday.date === date);
+// Multiple named holidays can coincide in a future year. Display their names
+// together while counting that date only once in attendance totals.
+export function holidayFor(date: string): IndiaHoliday | undefined {
+  const matches = holidayCatalogForYear(
+    Number(date.slice(0, 4)),
+  )?.holidays.filter((holiday) => holiday.date === date);
+  if (!matches?.length) return undefined;
+  return {
+    ...matches[0],
+    name: matches.map((holiday) => holiday.name).join(" / "),
+  };
+}
 
 export function calendarAttendance(
   data: TrackerData,
 ): Record<string, Attendance> {
-  const official = Object.fromEntries(
-    indiaHolidays2026.map((holiday) => [
-      holiday.date,
-      {
-        status: "Holiday" as const,
-        phase: "completed" as const,
-        notes: `${holiday.name} · All India holiday`,
-        updatedAt: `${holidaySources.verifiedOn}T00:00:00Z`,
-      },
-    ]),
-  );
-  // Personal attendance takes precedence, without modifying or migrating it.
+  const official: Record<string, Attendance> = {};
+  for (const catalog of holidayCatalogs) {
+    for (const holiday of catalog.holidays) {
+      const previous = official[holiday.date];
+      official[holiday.date] = {
+        status: "Holiday",
+        phase: "completed",
+        notes: previous
+          ? `${previous.notes} / ${holiday.name}`
+          : `${holiday.name} · All India holiday`,
+        updatedAt: `${catalog.verifiedOn}T00:00:00Z`,
+      };
+    }
+  }
   return { ...official, ...data.attendance };
 }

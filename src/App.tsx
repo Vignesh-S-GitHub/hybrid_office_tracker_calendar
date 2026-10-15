@@ -22,6 +22,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { HolidaysPage } from "./pages/HolidaysPage";
+import { activeHolidayCatalog } from "./lib/holidays";
 import { Planner } from "./components/Planner";
 import { Modal } from "./components/ui";
 import { AttendanceEditor } from "./components/AttendanceEditor";
@@ -225,7 +226,7 @@ export default function App() {
   const pageCopy = {
     holidays: [
       "INDIA · OFFICIAL HOLIDAY CALENDAR",
-      "All India Holidays - 2026",
+      `All India Holidays - ${activeHolidayCatalog(today).year}`,
       "Plan your workweek around India’s All India holiday calendar.",
     ],
     calendar: [

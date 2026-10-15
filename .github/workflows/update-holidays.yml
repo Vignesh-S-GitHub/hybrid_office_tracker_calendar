@@ -1,0 +1,88 @@
+name: Refresh All India holidays
+
+on:
+  schedule:
+    # 06:17 IST on the first of each month. January rolls over the year;
+    # subsequent checks retry late publication and verify official corrections.
+    - cron: "47 0 1 * *"
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Year to verify (blank = current year in India)"
+        type: string
+        required: false
+        default: ""
+      dry_run:
+        description: "Validate sources without committing or deploying"
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: all-india-holiday-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Fetch and validate both official sources
+        id: update
+        env:
+          HOLIDAY_YEAR: ${{ inputs.year }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
+        shell: bash
+        run: |
+          args=()
+          if [[ -n "$HOLIDAY_YEAR" ]]; then args+=(--year "$HOLIDAY_YEAR"); fi
+          if [[ "$DRY_RUN" == "true" ]]; then args+=(--dry-run); fi
+          npm run holidays:update -- "${args[@]}"
+      - run: npm test
+      - name: Commit the verified catalog
+        id: commit
+        if: steps.update.outputs.status == 'verified'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HOLIDAY_YEAR: ${{ steps.update.outputs.year }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        shell: bash
+        run: |
+          git add src/data/india-holidays.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m "Refresh All India holidays for $HOLIDAY_YEAR"
+            # Credentials exist only in this step's environment, not Git config.
+            git -c 'credential.helper=!f() { printf "username=x-access-token\npassword=%s\n" "$GH_TOKEN"; }; f' push origin "HEAD:$DEFAULT_BRANCH"
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: refresh
+    if: needs.refresh.outputs.commit != ''
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # GITHUB_TOKEN pushes do not trigger push workflows. Call the existing
+    # quality gate and Pages deployment explicitly, using the verified commit.
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ needs.refresh.outputs.commit }}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "catalogs": [
+    {
+      "year": 2026,
+      "verifiedOn": "2026-10-15",
+      "sources": {
+        "indiaPortal": "https://www.india.gov.in/calendar",
+        "indiaPost": "https://www.indiapost.gov.in/holidays-list"
+      },
+      "holidays": [
+        {
+          "date": "2026-01-26",
+          "name": "Republic Day",
+          "indiaPostDate": "2026-01-26",
+          "indiaPortalName": "Republic Day"
+        },
+        {
+          "date": "2026-03-21",
+          "name": "Id-ul-Fitr",
+          "indiaPostDate": "2026-03-21",
+          "indiaPortalName": "Id- ul- Fitr"
+        },
+        {
+          "date": "2026-03-31",
+          "name": "Mahavir Jayanti",
+          "indiaPostDate": "2026-03-31",
+          "indiaPortalName": "Mahavir Jayanti"
+        },
+        {
+          "date": "2026-04-03",
+          "name": "Good Friday",
+          "indiaPostDate": "2026-04-03",
+          "indiaPortalName": "Good Friday"
+        },
+        {
+          "date": "2026-05-01",
+          "name": "Buddha Purnima",
+          "indiaPostDate": "2026-05-01",
+          "indiaPortalName": "Budha Purnima"
+        },
+        {
+          "date": "2026-05-28",
+          "name": "Id-ul-Zuha",
+          "indiaPostDate": "2026-05-27",
+          "indiaPortalName": "Id- ul- Zuha (Bakrid)"
+        },
+        {
+          "date": "2026-06-26",
+          "name": "Muharram",
+          "indiaPostDate": "2026-06-26",
+          "indiaPortalName": "Muharram"
+        },
+        {
+          "date": "2026-08-15",
+          "name": "Independence Day",
+          "indiaPostDate": "2026-08-15",
+          "indiaPortalName": "Independence Day"
+        },
+        {
+          "date": "2026-08-26",
+          "name": "Prophet Mohammad's Birthday (Id-e-Milad)",
+          "indiaPostDate": "2026-08-26",
+          "indiaPortalName": "Milad- un- Nabi or Id- e- Milad (Birthday of Prophet Mohammad)"
+        },
+        {
+          "date": "2026-10-02",
+          "name": "Mahatma Gandhi's Birthday",
+          "indiaPostDate": "2026-10-02",
+          "indiaPortalName": "Mahatma Gandhi's Birthday"
+        },
+        {
+          "date": "2026-10-20",
+          "name": "Dussehra (Vijay Dashmi)",
+          "indiaPostDate": "2026-10-20",
+          "indiaPortalName": "Dussehra"
+        },
+        {
+          "date": "2026-11-08",
+          "name": "Diwali (Deepavali)",
+          "indiaPostDate": "2026-11-08",
+          "indiaPortalName": "Diwali (Deepavali)"
+        },
+        {
+          "date": "2026-11-24",
+          "name": "Guru Nanak's Birthday",
+          "indiaPostDate": "2026-11-24",
+          "indiaPortalName": "Guru Nanak's Birthday"
+        },
+        {
+          "date": "2026-12-25",
+          "name": "Christmas Day",
+          "indiaPostDate": "2026-12-25",
+          "indiaPortalName": "Christmas Day"
+        }
+      ]
+    }
+  ]
+}

@@ -6,23 +6,27 @@ import {
   Flag,
   ShieldCheck,
 } from "lucide-react";
-import { holidaySources, indiaHolidays2026 } from "../lib/holidays";
+import { activeHolidayCatalog, type HolidayCatalog } from "../lib/holidays";
 import { localDate } from "../lib/dates";
 
 export function HolidaysPage({
   today,
   viewDate,
+  catalog = activeHolidayCatalog(today),
 }: {
   today: string;
   viewDate: (date: string) => void;
+  catalog?: HolidayCatalog;
 }) {
-  const upcoming = indiaHolidays2026.filter(
-    (holiday) => holiday.date >= today,
-  ).length;
+  const { year, holidays, sources, verifiedOn } = catalog;
+  const differences = holidays.filter(
+    (holiday) => holiday.date !== holiday.indiaPostDate,
+  );
+  const upcoming = holidays.filter((holiday) => holiday.date >= today).length;
   return (
     <section
       className="card holidays-card"
-      aria-label="All India Holidays - 2026"
+      aria-label={`All India Holidays - ${year}`}
     >
       <div className="holiday-page-heading">
         <div className="flex-row">
@@ -30,10 +34,9 @@ export function HolidaysPage({
             <Flag size={23} />
           </span>
           <div>
-            <h2>All India Holidays - 2026</h2>
+            <h2>All India Holidays - {year}</h2>
             <p className="muted small-text">
-              India · {indiaHolidays2026.length} official holidays · {upcoming}{" "}
-              remaining
+              India · {holidays.length} official holidays · {upcoming} remaining
             </p>
           </div>
         </div>
@@ -43,30 +46,39 @@ export function HolidaysPage({
         </span>
       </div>
       <p className="holiday-scope">
-        Only the holidays in India Post’s All India 2026 list, cross-checked
+        Only the holidays in India Post’s All India {year} list, cross-checked
         against India Portal’s central calendar. State, regional, and restricted
         holidays are excluded.
       </p>
       <div className="holiday-source-links">
-        <a href={holidaySources.indiaPortal} target="_blank" rel="noreferrer">
+        <a href={sources.indiaPortal} target="_blank" rel="noreferrer">
           India Portal calendar <ExternalLink size={13} />
         </a>
-        <a href={holidaySources.indiaPost} target="_blank" rel="noreferrer">
+        <a href={sources.indiaPost} target="_blank" rel="noreferrer">
           India Post All India list <ExternalLink size={13} />
         </a>
-        <span>
-          Verified {format(localDate(holidaySources.verifiedOn), "d MMM yyyy")}
-        </span>
+        <span>Verified {format(localDate(verifiedOn), "d MMM yyyy")}</span>
       </div>
-      <div className="notice holiday-date-note">
-        <strong>Source date difference: Id-ul-Zuha</strong>
-        <p>
-          India Portal lists 28 May 2026; India Post lists 27 May 2026. This
-          calendar uses India Portal’s updated date, 28 May.
-        </p>
-      </div>
+      {year !== Number(today.slice(0, 4)) && (
+        <div className="notice holiday-date-note" role="status">
+          The {today.slice(0, 4)} All India list is not yet available from both
+          official sources. Showing the last verified calendar ({year}). These
+          dates apply only to {year}.
+        </div>
+      )}
+      {differences.map((holiday) => (
+        <div className="notice holiday-date-note" key={holiday.name}>
+          <strong>Source date difference: {holiday.name}</strong>
+          <p>
+            India Portal lists {format(localDate(holiday.date), "d MMMM yyyy")};
+            India Post lists{" "}
+            {format(localDate(holiday.indiaPostDate), "d MMMM yyyy")}. This
+            calendar uses India Portal’s date.
+          </p>
+        </div>
+      ))}
       <div className="holiday-list">
-        {indiaHolidays2026.map((holiday) => (
+        {holidays.map((holiday) => (
           <div
             className={`holiday-row ${holiday.date < today ? "past-holiday" : ""}`}
             key={holiday.name}

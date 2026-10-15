@@ -1,0 +1,406 @@
+{
+  "data": {
+    "data": [
+      {
+        "attributes": {
+          "title": "Vaisakhi / Vishu / Meshadi (Tamil New Year's Day)",
+          "date": "2026-04-14",
+          "alias": "vaisakhi-vishu-meshadi-tamil-new-years-day",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Raksha Bandhan",
+          "date": "2026-08-28",
+          "alias": "raksha-bandhan",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Vaisakhadi (Bengal) / Bahag Bihu (Assam)",
+          "date": "2026-04-15",
+          "alias": "vaisakhadi-bengal-bahag-bihu-assam",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Birthday of Guru Rabindranath Tagore",
+          "date": "2026-05-09",
+          "alias": "birthday-of-guru-rabindranath-tagore",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Rath Yatra",
+          "date": "2026-07-16",
+          "alias": "rath-yatra",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Parsi New Year's day/ Nauraj",
+          "date": "2026-08-15",
+          "alias": "parsi-new-years-day-nauraj",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Onam or Thiru Onam Day",
+          "date": "2026-08-26",
+          "alias": "onam-or-thiru-onam-day",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Ganesh Chaturthi / Vinayaka Chaturthi",
+          "date": "2026-09-14",
+          "alias": "ganesh-chaturthi-vinayaka-chaturthi",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Dusshera (Saptami)",
+          "date": "2026-10-18",
+          "alias": "dusshera-saptami",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Dussehra (Mahashtami)",
+          "date": "2026-10-19",
+          "alias": "dussehra-mahashtami",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Dussehra (Mahanavmi)",
+          "date": "2026-10-20",
+          "alias": "dussehra-mahanavmi",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Maharishi Valmiki's Birthday",
+          "date": "2026-10-26",
+          "alias": "maharishi-valmikis-birthday",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Naraka Chaturdasi",
+          "date": "2026-11-08",
+          "alias": "naraka-chaturdasi",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Bhai Duj",
+          "date": "2026-11-11",
+          "alias": "bhai-duj",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Guru Teg Bahadur's Martyrdom Day",
+          "date": "2026-11-24",
+          "alias": "guru-teg-bahadurs-martyrdom-day",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Hazarat Ali's Birthday",
+          "date": "2026-12-23",
+          "alias": "hazarat-alis-birthday",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Christmas Eve",
+          "date": "2026-12-24",
+          "alias": "christmas-eve",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Diwali (Deepavali)",
+          "date": "2026-11-08",
+          "alias": "diwali-deepavali",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Republic Day",
+          "date": "2026-01-26",
+          "alias": "republic-day",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Holi",
+          "date": "2026-03-04",
+          "alias": "holi",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Id- ul- Fitr",
+          "date": "2026-03-21",
+          "alias": "id-ul-fitr",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Ram Navami",
+          "date": "2026-03-26",
+          "alias": "ram-navami",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Mahavir Jayanti",
+          "date": "2026-03-31",
+          "alias": "mahavir-jayanti",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Good Friday",
+          "date": "2026-04-03",
+          "alias": "good-friday",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Muharram",
+          "date": "2026-06-26",
+          "alias": "muharram",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Independence Day",
+          "date": "2026-08-15",
+          "alias": "independence-day",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Janmashtami (Vaishnva)",
+          "date": "2026-09-04",
+          "alias": "janmashtami-vaishnva",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Mahatma Gandhi's Birthday",
+          "date": "2026-10-02",
+          "alias": "mahatma-gandhis-birthday",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Dussehra",
+          "date": "2026-10-20",
+          "alias": "dussehra",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Guru Nanak's Birthday",
+          "date": "2026-11-24",
+          "alias": "guru-nanaks-birthday",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Christmas Day",
+          "date": "2026-12-25",
+          "alias": "christmas-day",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "New Year's Day",
+          "date": "2026-01-01",
+          "alias": "new-years-day",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Hazarat Ali's Birthday",
+          "date": "2026-01-03",
+          "alias": "hazarat-alis-birthday",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Makar Sankranti / Magha Bihu / Pongal",
+          "date": "2026-01-14",
+          "alias": "makar-sankranti-magha-bihu-pongal",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Sri Panchami, Basant Panchami",
+          "date": "2026-01-23",
+          "alias": "sri-panchami-basant-panchami",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Guru Ravi Das's Birthday",
+          "date": "2026-02-01",
+          "alias": "guru-ravi-dass-birthday",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Birthday of Swami Dayananda Saraswati",
+          "date": "2026-02-12",
+          "alias": "birthday-of-swami-dayananda-saraswati",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Maha Shivratri",
+          "date": "2026-02-15",
+          "alias": "maha-shivratri",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Holika dahan / Dolyatra",
+          "date": "2026-03-03",
+          "alias": "holika-dahan-dolyatra",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Jamat- Ul- Vida",
+          "date": "2026-03-20",
+          "alias": "jamat-ul-vida",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Easter Sunday",
+          "date": "2026-04-05",
+          "alias": "easter-sunday",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Karaka Chaturthi (Karwa Chouth)",
+          "date": "2026-10-29",
+          "alias": "karaka-chaturthi-karwa-chouth",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Govardhan Puja",
+          "date": "2026-11-09",
+          "alias": "govardhan-puja",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Pratihar Shashthi or Surya Shashthi (Chhat Puja)",
+          "date": "2026-11-15",
+          "alias": "pratihar-shashthi-or-surya-shashthi-chhat-puja",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Budha Purnima",
+          "date": "2026-05-01",
+          "alias": "budha-purnima",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Shiva ji Jayanti",
+          "date": "2026-02-19",
+          "alias": "shiva-ji-jayanti",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Birthday of Dr. B.R. Ambedkar",
+          "date": "2026-04-14",
+          "alias": "birthday-of-dr-br-ambedkar",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Id- ul- Zuha (Bakrid)",
+          "date": "2026-05-28",
+          "alias": "id-ul-zuha-bakrid",
+          "holiday_type": "Gazetted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Chaitra Sukladi / Gudi Padava/ Ugadi/ Cheti Chand",
+          "date": "2026-03-19",
+          "alias": "chaitra-sukladi-gudi-padava-ugadi-cheti-chand",
+          "holiday_type": "Restricted"
+        }
+      },
+      {
+        "attributes": {
+          "title": "Milad- un- Nabi or Id- e- Milad (Birthday of Prophet Mohammad)",
+          "date": "2026-08-26",
+          "alias": "milad-un-nabi-or-id-e-milad-birthday-of-prophet-mohammad",
+          "holiday_type": "Gazetted"
+        }
+      }
+    ]
+  }
+}

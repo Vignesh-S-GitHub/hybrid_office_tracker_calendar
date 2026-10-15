@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source not "../scripts";
 
 .calendar-cell .cell-caption {
   max-width: 100%;

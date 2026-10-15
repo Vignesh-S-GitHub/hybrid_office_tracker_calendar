@@ -5,7 +5,8 @@ import {
   calendarAttendance,
   holidayFor,
   holidaySources,
-  indiaHolidays2026,
+  holidayCatalogForYear,
+  activeHolidayCatalog,
 } from "./holidays";
 import { emptyData } from "./storage";
 import { planMonth } from "./planner";
@@ -14,6 +15,8 @@ import { validDate } from "./dates";
 import { HolidaysPage } from "../pages/HolidaysPage";
 import { AttendanceEditor } from "../components/AttendanceEditor";
 import { CalendarPage } from "../pages/CalendarPage";
+
+const indiaHolidays2026 = holidayCatalogForYear(2026)!.holidays;
 
 describe("All India Holidays - 2026", () => {
   it("contains exactly the 14 All India holidays with valid unique 2026 dates", () => {
@@ -35,7 +38,7 @@ describe("All India Holidays - 2026", () => {
     expect(holidayFor("2026-04-14")).toBeUndefined();
     expect(holidayFor("2026-09-04")).toBeUndefined();
     expect(holidayFor("2026-10-19")).toBeUndefined(); // Restricted Dussehra observance.
-    expect(holidayFor("2027-01-26")).toBeUndefined();
+    expect(holidayFor("1900-01-26")).toBeUndefined();
   });
   it("retains the India Post date and makes the India Portal correction explicit", () => {
     expect(holidayFor("2026-05-28")).toMatchObject({
@@ -61,7 +64,9 @@ describe("All India Holidays - 2026", () => {
       status: "Holiday",
       notes: "Dussehra (Vijay Dashmi) · All India holiday",
     });
-    expect(Object.keys(calendar)).toHaveLength(14);
+    expect(
+      Object.keys(calendar).filter((date) => date.startsWith("2026-")),
+    ).toHaveLength(14);
     expect(JSON.stringify(data)).toBe(original);
     expect(data.attendance).toEqual({});
   });
@@ -95,7 +100,7 @@ describe("All India Holidays - 2026", () => {
     expect(statistics(data, "2026-10", "2026-10-15").Holiday).toBe(2);
     expect(statistics(data, "2026-11", "2026-10-15").Holiday).toBe(2);
     expect(statistics(data, "2026-02", "2026-10-15").Holiday).toBe(0);
-    expect(statistics(data, "2027-10", "2026-10-15").Holiday).toBe(0);
+    expect(statistics(data, "1900-10", "2026-10-15").Holiday).toBe(0);
     expect(statistics(data, "2026-10", "2026-10-15").WFO).toBe(0);
   });
   it("excludes official holidays from suggestions even when all weekdays are allowed", () => {
@@ -199,5 +204,44 @@ describe("All India Holidays - 2026", () => {
     expect(
       dialog.queryByRole("button", { name: "Clear status" }),
     ).not.toBeInTheDocument();
+  });
+  it("keeps the last verified calendar with a visible notice when a new year is unpublished", () => {
+    render(
+      <HolidaysPage
+        today="2027-01-01"
+        catalog={holidayCatalogForYear(2026)!}
+        viewDate={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "2027 All India list is not yet available",
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "These dates apply only to 2026",
+    );
+  });
+  it("selects the new year automatically without replacing historical catalogs", () => {
+    const old = holidayCatalogForYear(2026)!;
+    const future = {
+      ...old,
+      year: 2027,
+      holidays: old.holidays.map((holiday) => ({
+        ...holiday,
+        date: holiday.date.replace("2026", "2027"),
+        indiaPostDate: holiday.indiaPostDate.replace("2026", "2027"),
+      })),
+    };
+    expect(activeHolidayCatalog("2026-12-31", [old, future])).toBe(old);
+    expect(activeHolidayCatalog("2027-01-01", [future, old])).toBe(future);
+    render(
+      <HolidaysPage today="2027-01-01" catalog={future} viewDate={vi.fn()} />,
+    );
+    expect(
+      screen.getByRole("heading", { name: "All India Holidays - 2027" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/India Portal lists 28 May 2027/),
+    ).toBeInTheDocument();
   });
 });

@@ -19,15 +19,38 @@
 - Export and restore validated JSON backups, with confirmation before replacement or reset.
 - Install as a PWA and use it offline after the first successful production visit and service-worker activation.
 
-No backend, login, analytics, external fonts, AI API, calendar API, or paid service. Fresh installs have **no sample attendance records**. The built-in All India 2026 holiday calendar is shown automatically as a separate calendar layer.
+No backend, login, analytics, external fonts, AI API, calendar API, or paid service. Fresh installs have **no sample attendance records**. Verified All India holiday catalogs are bundled as a separate calendar layer, starting with 2026.
 
-## 🇮🇳 All India Holidays - 2026
+## 🇮🇳 All India holiday calendar
 
-The **Holidays** screen contains exactly the 14 holidays in [India Post’s All India Holidays - 2026 list](https://www.indiapost.gov.in/holidays-list), cross-checked against the [India Portal central holiday calendar](https://www.india.gov.in/calendar) on 15 October 2026. It excludes postal-circle, state, regional, restricted, and other-year holiday catalogs. Additional central gazetted holidays that do not belong to the requested India Post All India list are also excluded.
+The initial **2026** catalog contains exactly the 14 holidays in [India Post’s All India Holidays - 2026 list](https://www.indiapost.gov.in/holidays-list), cross-checked against the [India Portal central holiday calendar](https://www.india.gov.in/calendar) on 15 October 2026. It excludes postal-circle, state, regional, and restricted holiday lists. Each later year is added only after the same two sources are cross-checked. Additional central gazetted holidays that do not belong to the requested India Post All India list are also excluded.
 
-**One source disagreement is explicit:** Id-ul-Zuha is 28 May 2026 in India Portal’s updated gazetted entry, while India Post lists 27 May. The tracker uses 28 May and preserves the postal date in its source metadata and the Holidays screen notice. The remaining 13 dates agree. The source data is bundled in `src/lib/holidays.ts` for offline use; there are no runtime requests or automatic substitutions from other sources.
+**One source disagreement is explicit:** Id-ul-Zuha is 28 May 2026 in India Portal’s updated gazetted entry, while India Post lists 27 May. The tracker uses 28 May and preserves the postal date in its source metadata and the Holidays screen notice. The remaining 13 dates agree. Source data is bundled in `src/data/india-holidays.json` for offline use. There are no browser runtime requests or substitutions from other sources. Date differences for every year are rendered from source metadata.
 
-These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. The Holidays catalog itself always retains all 14 dates. History’s individual records and Recent activity remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
+These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. Each yearly Holidays catalog retains its full verified list. History’s individual records and Recent activity remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
+
+
+### Automatic yearly updates from 2027
+
+The [Refresh All India holidays workflow](.github/workflows/update-holidays.yml) runs at **06:17 IST on the first day of each month**. January 2027 is the first automatic rollover to a new year; monthly runs retry late publication and pick up official corrections. Until then, the 2026 list continues to be verified. There is no guessed future-year data.
+
+The updater reads only the exact **All India Holidays - YEAR** table from India Post, then matches every entry to a unique **Gazetted** entry from India Portal. Table scope, dates, weekdays, completeness, duplicate names, fixed national holidays, and response pagination are checked. India Portal dates take precedence on disagreement; the postal date is retained for the visible difference notice. Unmatched names, changed layouts, shrinking holiday counts, and network failures fail the job for review. An unpublished year produces a clear job summary and is retried next month. Existing catalogs remain unchanged on either path.
+
+Validated updates and verification dates are committed to `src/data/india-holidays.json` with the built-in `GITHUB_TOKEN`. Previous years are retained for historical calendars. The workflow explicitly calls the existing checks and Pages deployment for the verified commit, because pushes by `GITHUB_TOKEN` do not trigger a second push workflow. **No PAT or additional secret is required.** Normal branch protection rules still apply; a rejected push fails without force-pushing.
+
+The Holidays screen automatically displays the current year's verified catalog. If it is not published yet, it shows the last verified year with an explicit notice; those old dates are never reused for the new year's calendar or recommendations. A later year's publication does not modify personal attendance or JSON backups. Installed PWA clients receive the normal **Update now** prompt on their next visit.
+
+To test or retry manually, open **Actions → Refresh All India holidays → Run workflow** on `main`, enter a year (or leave blank for the current year in India), and leave **dry_run** checked to validate without committing or deploying. Uncheck it to publish a successfully verified catalog.
+
+```sh
+npm run holidays:update -- --year 2026 --dry-run
+npm run holidays:update -- --year 2027 --dry-run
+npm test
+```
+
+Run without `--dry-run` only when you want to update the local bundled catalog. Source parser tests use captured official 2026 fixtures and simulated future records; they require no network. Live dry runs verify source availability without changing the app.
+
+GitHub can delay scheduled runs and disables public-repository schedules after 60 days of repository inactivity. Successful monthly verification commits record ongoing activity, but check **Actions** and re-enable the workflow if GitHub disables it or source failures leave the repository inactive. A disabled workflow can also be run manually. See [GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
 
 ## Stack
 
@@ -145,4 +168,4 @@ public/           App icons
 
 Automated tests cover leap years, real date validation, month lengths, status replacement, planned/completed separation, target overrides, weekly constraints including month boundaries, preferred weekdays, consecutive-day handling, capacity alerts, replanning, migration, storage failures, corrupt data recovery, backup validation/export, navigation, theme, and reset confirmation.
 
-The planner is a personal aid; it cannot infer employer policies or verify real attendance. The built-in holiday catalog covers only All India Holidays for 2026. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
+The planner is a personal aid; it cannot infer employer policies or verify real attendance. Built-in holiday catalogs cover only verified All India lists, starting with 2026; unpublished years are not inferred. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.

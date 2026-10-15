@@ -6,7 +6,11 @@ import { statistics } from "../lib/statistics";
 import { planMonth } from "../lib/planner";
 import { MonthControls, StatCards, TargetProgress } from "../components/ui";
 import { statusInfo, statuses } from "../lib/status";
-import { calendarAttendance, holidayFor } from "../lib/holidays";
+import {
+  calendarAttendance,
+  holidayFor,
+  holidayCatalogForYear,
+} from "../lib/holidays";
 
 export function CalendarPage({
   data,
@@ -137,10 +141,10 @@ export function CalendarPage({
         <h2>{format(new Date(`${month}-01T12:00:00`), "MMMM yyyy")} summary</h2>
         <StatCards stats={stats} />
         <TargetProgress stats={stats} />
-        {month.startsWith("2026-") && (
+        {holidayCatalogForYear(Number(month.slice(0, 4))) && (
           <p className="small-text muted">
-            Includes All India 2026 holidays. Saved attendance overrides the
-            displayed status for that date.
+            Includes All India {month.slice(0, 4)} holidays. Saved attendance
+            overrides the displayed status for that date.
           </p>
         )}
         {(stats.planned > 0 || stats.plannedWFH > 0) && (
