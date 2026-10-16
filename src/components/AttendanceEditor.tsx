@@ -27,6 +27,7 @@ export function AttendanceEditor({
   );
   return (
     <Modal
+      placement="right"
       title={format(localDate(date), "EEEE, MMMM d")}
       subtitle={`Selected date: ${format(localDate(date), "MMMM d, yyyy")}`}
       onClose={onClose}

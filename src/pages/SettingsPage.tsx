@@ -390,8 +390,8 @@ export function SettingsPage({
           <ShieldCheck size={28} />
           <h2>Just you and your calendar.</h2>
           <p>
-            Your attendance stays in this browser. No account, no tracking, no
-            server uploads.
+            Guest records stay in this browser. Sign in to sync your account’s
+            calendar using a private hosted SQLite database.{" "}
           </p>
           <p>
             Export a JSON backup to keep a copy or move to another device.

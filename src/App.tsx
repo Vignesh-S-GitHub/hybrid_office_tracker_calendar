@@ -25,6 +25,7 @@ import { HolidaysPage } from "./pages/HolidaysPage";
 import { activeHolidayCatalog } from "./lib/holidays";
 import { Planner } from "./components/Planner";
 import { Modal } from "./components/ui";
+import { Account } from "./components/Account";
 import { AttendanceEditor } from "./components/AttendanceEditor";
 import {
   downloadBackup,
@@ -55,7 +56,8 @@ interface Confirmation {
 }
 
 export default function App() {
-  const { data, commit, today, error, locked } = useTracker();
+  const { data, commit, today, error, locked, user, status, account } =
+    useTracker();
   const [page, setPage] = useState<Page>(readPage);
   const [month, updateMonth] = useState(() =>
     data.settings.defaultMonth === "current"
@@ -280,6 +282,7 @@ export default function App() {
             ))}
           </nav>
           <div className="header-actions">
+            <Account store={account} />
             <button
               className="icon-button theme-toggle"
               aria-label={
@@ -312,7 +315,7 @@ export default function App() {
           </div>
           <span className="privacy-note">
             <ShieldCheck size={16} />
-            Private & saved on this device
+            {user ? status : "Private & saved on this device"}
           </span>
         </div>
         {error && (
@@ -383,7 +386,7 @@ export default function App() {
             clearData={() =>
               setConfirmation({
                 title: "Clear all your data?",
-                body: "This removes every attendance record, saved plan, monthly target, and preference from this browser. Export a backup first if you want to restore them later.",
+                body: "This removes every attendance record, saved plan, monthly target, and preference from the current calendar (including your account when signed in). Export a backup first if you want to restore them later.",
                 label: "Clear all data",
                 danger: true,
                 action: () => {
@@ -425,7 +428,9 @@ export default function App() {
           </span>
           <span>
             <ShieldCheck size={14} />
-            Browser-only · No account needed
+            {user
+              ? "Private account · SQLite sync"
+              : "Guest mode · Sign in to sync"}
           </span>
         </footer>
       </main>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { addMonths, format } from "date-fns";
 import { statuses, statusInfo } from "../lib/status";
@@ -128,12 +128,15 @@ export function Modal({
   children,
   onClose,
   subtitle,
+  placement = "center",
 }: {
   title: string;
   subtitle?: string;
+  placement?: "center" | "right";
   children: ReactNode;
   onClose: () => void;
 }) {
+  const titleId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const previousFocus = useRef<Element | null>(null);
   useEffect(() => {
@@ -147,6 +150,7 @@ export function Modal({
   return (
     <dialog
       ref={dialog}
+      className={placement === "right" ? "dialog-right" : undefined}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -154,11 +158,11 @@ export function Modal({
       onClick={(event) => {
         if (event.target === dialog.current) onClose();
       }}
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
     >
       <div className="dialog-content">
         <div className="split">
-          <h2 id="dialog-title">{title}</h2>
+          <h2 id={titleId}>{title}</h2>
           <button
             className="icon-button"
             aria-label="Close dialog"

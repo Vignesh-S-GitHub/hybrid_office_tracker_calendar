@@ -4,6 +4,7 @@ import { cleanup } from "@testing-library/react";
 
 afterEach(() => {
   cleanup();
+  if (typeof sessionStorage !== "undefined") sessionStorage.clear();
   if (typeof localStorage !== "undefined") localStorage.clear();
   vi.useRealTimers();
 });

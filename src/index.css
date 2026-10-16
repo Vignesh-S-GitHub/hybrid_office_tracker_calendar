@@ -1829,6 +1829,9 @@ input[type="month"] {
   display: none;
 }
 dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
   border: 1px solid var(--border);
   border-radius: 19px;
   padding: 0;
@@ -1840,6 +1843,13 @@ dialog {
   box-shadow: 0 24px 100px #0003;
   overflow: auto;
 }
+@media (min-width: 768px) {
+  dialog.dialog-right {
+    margin-inline-start: auto;
+    margin-inline-end: clamp(24px, 4vw, 64px);
+  }
+}
+
 dialog::backdrop {
   background: #0f172a66;
   backdrop-filter: blur(4px);
@@ -2983,4 +2993,31 @@ dialog::backdrop {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+.account-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+.account-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+.account-form input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: inherit;
+}
+.account-error {
+  color: #dc2626;
+  margin-top: 16px;
+}
+.account-button {
+  white-space: nowrap;
 }

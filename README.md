@@ -1,10 +1,10 @@
 # 📅 Hybrid Office Tracker
 
-**Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, built to run entirely in your browser.
+**Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, with optional account login and cross-device SQLite sync.
 
 | Calendar                   | Dashboard                     | Smart planner                 | Your data                   |
 | -------------------------- | ----------------------------- | ----------------------------- | --------------------------- |
-| WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | LocalStorage + JSON backups |
+| WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | SQLite sync + JSON backups |
 
 ## What it does
 
@@ -19,7 +19,7 @@
 - Export and restore validated JSON backups, with confirmation before replacement or reset.
 - Install as a PWA and use it offline after the first successful production visit and service-worker activation.
 
-No backend, login, analytics, external fonts, AI API, calendar API, or paid service. Fresh installs have **no sample attendance records**. Verified All India holiday catalogs are bundled as a separate calendar layer, starting with 2026.
+Guest mode needs no account. Optional email/password login adds cross-device sync through a hosted SQLite backend. No analytics, external fonts, AI API, or calendar API. Fresh installs have **no sample attendance records**. Verified All India holiday catalogs are bundled as a separate calendar layer, starting with 2026.
 
 ## 🇮🇳 All India holiday calendar
 
@@ -28,7 +28,6 @@ The initial **2026** catalog contains exactly the 14 holidays in [India Post’s
 **One source disagreement is explicit:** Id-ul-Zuha is 28 May 2026 in India Portal’s updated gazetted entry, while India Post lists 27 May. The tracker uses 28 May and preserves the postal date in its source metadata and the Holidays screen notice. The remaining 13 dates agree. Source data is bundled in `src/data/india-holidays.json` for offline use. There are no browser runtime requests or substitutions from other sources. Date differences for every year are rendered from source metadata.
 
 These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. Each yearly Holidays catalog retains its full verified list. History’s individual records and Recent activity remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
-
 
 ### Automatic yearly updates from 2027
 
@@ -97,14 +96,14 @@ The scheduler enumerates eligible subsets of each Monday–Sunday week and uses 
 
 WFH plans are always excluded from automatic suggestions. Turning off **Keep existing WFH plans** reveals a separate review list. Replacing WFH with WFO requires confirmation. Existing leave and holiday records are never automatically replaced.
 
-| Metric               | Definition                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------ |
-| Completed WFO        | Explicitly completed WFO records on or before today                                        |
-| Planned WFO          | Accepted WFO plans dated today or later                                                    |
-| Overdue plans        | Past WFO plans still awaiting confirmation; excluded from completed and projected totals   |
-| Still to schedule    | `max(0, target − completed WFO − planned WFO)`                                             |
-| Actual progress      | Completed WFO divided by target                                                            |
-| Projected progress   | Completed WFO plus accepted future/current WFO plans, divided by target                    |
+| Metric               | Definition                                                                                                        |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Completed WFO        | Explicitly completed WFO records on or before today                                                               |
+| Planned WFO          | Accepted WFO plans dated today or later                                                                           |
+| Overdue plans        | Past WFO plans still awaiting confirmation; excluded from completed and projected totals                          |
+| Still to schedule    | `max(0, target − completed WFO − planned WFO)`                                                                    |
+| Actual progress      | Completed WFO divided by target                                                                                   |
+| Projected progress   | Completed WFO plus accepted future/current WFO plans, divided by target                                           |
 | Breakdown percentage | Each tracked status divided by all tracked days in the month, including official holidays; WFO/WFH plans excluded |
 
 Progress bars cap at 100%; numeric percentages may exceed 100% and extra office days are shown. A zero target is treated as complete. Future leave and holiday entries describe unavailable dates and appear in their monthly counts. Suggestions never contribute to projected progress. Historical months receive no recommendations. The app checks the local date every 30 seconds and when visibility changes.
@@ -121,7 +120,7 @@ Schema version 2 contains `settings`, `monthlyTargets`, `attendance`, and `rejec
 
 Corrupt saved data is preserved rather than overwritten. The warning offers a raw recovery export; restore a valid backup or explicitly reset in Settings before editing. Storage quota/permission failures show a persistent warning; export the current in-memory state before leaving. Open tabs receive storage changes from other tabs; simultaneous edits use the last saved state.
 
-Data belongs to this **browser profile and origin**. Local development, production preview, and GitHub Pages use different origins and do not share records. Browsers can evict site data; private browsing may remove data when closed. There is no cloud sync or automatic cloud backup.
+Guest data belongs to this browser profile and origin. Signing in enables private account sync through a Cloudflare Worker and D1 (SQLite). Guest records are never uploaded automatically: use Account → Import this device’s guest records to replace your account calendar after confirmation. Account changes save automatically; active devices refresh every 30 seconds and when returning to the tab. Offline edits retain a device recovery copy and retry when connected. Concurrent edits pause syncing until you choose which copy to keep. Export a backup before replacing a copy.
 
 ## Deploy on GitHub Pages
 
@@ -169,3 +168,46 @@ public/           App icons
 Automated tests cover leap years, real date validation, month lengths, status replacement, planned/completed separation, target overrides, weekly constraints including month boundaries, preferred weekdays, consecutive-day handling, capacity alerts, replanning, migration, storage failures, corrupt data recovery, backup validation/export, navigation, theme, and reset confirmation.
 
 The planner is a personal aid; it cannot infer employer policies or verify real attendance. Built-in holiday catalogs cover only verified All India lists, starting with 2026; unpublished years are not inferred. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
+
+## Login and SQLite backend
+
+The frontend remains on GitHub Pages. Application code, schema migrations, and holiday data are in GitHub; passwords, sessions, and personal calendars live in the private D1 database, never in the public repository. Passwords use Better Auth’s scrypt hashing. Bearer sessions last up to seven days and are held in sessionStorage for this tab; closing the tab may require signing in again. A per-account recovery copy remains in localStorage, so use a trusted browser and clear site data on shared computers after exporting any unsynced work. Signup currently has no email verification or password recovery: save your password.
+
+Local development (Node 24+):
+
+```sh
+npm ci
+# Copy .dev.vars.example to .dev.vars and generate a random secret.
+# Copy .env.example to .env.local for the local frontend API URL.
+npx wrangler d1 migrations apply DB --local
+npm run api:dev
+# In another terminal:
+npm run dev
+```
+
+Use the same local D1 state for both backend commands. The schema is versioned under server/migrations; never commit .dev.vars, .env.local, .wrangler, or database files. Regenerate binding types after config changes with `npx wrangler types --env-interface CloudflareEnv`.
+
+Validation:
+
+```sh
+npm run lint
+npm run api:check
+npm test
+npm run build
+npm audit --audit-level=high
+# With the local backend running (creates synthetic accounts locally):
+npm run api:test
+```
+
+Backend deployment uses your authenticated Cloudflare account:
+
+```sh
+# First setup only; enter a cryptographically random secret, never a password:
+npx wrangler secret put BETTER_AUTH_SECRET
+npm run api:migrate
+npm run api:deploy
+```
+
+`wrangler.jsonc` contains public binding IDs and allowed frontend origins. `VITE_API_URL` can override the default API URL at build time. The backend accepts only the configured origins and authenticated user-scoped requests. Server writes use an atomic revision check to prevent silent cross-device overwrites. Tracking sync requests are limited to 1 MB; larger JSON backups can still be used in guest mode (up to 5 MB). Keep using JSON exports as an independent backup.
+
+GitHub Actions validates backend types and deploys the frontend; backend deployment remains an explicit Wrangler command, requiring Cloudflare credentials on the developer machine. No Cloudflare personal credentials are stored in GitHub. The yearly holiday workflow continues independently.

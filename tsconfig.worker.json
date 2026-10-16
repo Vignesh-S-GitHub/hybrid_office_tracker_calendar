@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "lib": ["ES2022"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": [
+    "server/**/*.ts",
+    "worker-configuration.d.ts",
+    "src/lib/backup.ts",
+    "src/lib/dates.ts",
+    "src/types.ts"
+  ]
+}

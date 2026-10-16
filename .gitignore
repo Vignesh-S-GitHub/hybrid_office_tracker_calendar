@@ -7,3 +7,9 @@ coverage/
 !.env.example
 output/
 *.tsbuildinfo
+
+.wrangler/
+.dev.vars*
+.worker-build/
+
+!.dev.vars.example

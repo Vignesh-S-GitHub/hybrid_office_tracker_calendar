@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hybrid-office-tracker-api",
+  "main": "server/index.ts",
+  "account_id": "86d7f2e8f8427578c3dfe0857a5ad5c5",
+  "compatibility_date": "2026-10-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "vars": {
+    "API_URL": "https://hybrid-office-tracker-api.vigneshshanmugam.workers.dev",
+    "ALLOWED_ORIGINS": "https://vignesh-s-github.github.io",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hybrid-office-tracker",
+      "database_id": "508ccf25-4d13-406b-92ee-bccbcf3ed9db",
+      "migrations_dir": "server/migrations",
+    },
+  ],
+}

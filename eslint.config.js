@@ -4,7 +4,7 @@ import hooks from "eslint-plugin-react-hooks";
 import refresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules", "output"] },
+  { ignores: ["dist", "node_modules", "output", ".wrangler", "worker-configuration.d.ts", ".worker-build"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

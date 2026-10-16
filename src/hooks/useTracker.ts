@@ -1,42 +1,31 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { dateKey } from "../lib/dates";
-import { loadData, persistData } from "../lib/storage";
-import type { TrackerData } from "../types";
+import { TrackerStore } from "../lib/sync";
 
 export function useTracker() {
-  const [initial] = useState(loadData);
-  const [data, setData] = useState(initial.data);
-  const [error, setError] = useState(initial.error);
-  const [locked, setLocked] = useState(!!initial.error);
+  const [store] = useState(() => new TrackerStore());
+  const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
   const [today, setToday] = useState(() => dateKey(new Date()));
   useEffect(() => {
-    const tick = () => setToday(dateKey(new Date()));
-    const timer = setInterval(tick, 30_000);
-    const reload = (event: StorageEvent) => {
-      if (event.key && event.key !== "hybrid-office-tracker") return;
-      const loaded = loadData();
-      setData(loaded.data);
-      setError(loaded.error);
-      setLocked(!!loaded.error);
+    void store.start();
+    const tick = () => {
+      setToday(dateKey(new Date()));
+      if (document.visibilityState === "visible") void store.refresh();
     };
-    window.addEventListener("storage", reload);
+    const timer = setInterval(tick, 30000);
+    const storage = (event: StorageEvent) => {
+      if (!event.key || event.key === "hybrid-office-tracker")
+        store.reloadGuest();
+    };
+    window.addEventListener("storage", storage);
+    window.addEventListener("online", tick);
     document.addEventListener("visibilitychange", tick);
     return () => {
       clearInterval(timer);
-      window.removeEventListener("storage", reload);
+      window.removeEventListener("storage", storage);
+      window.removeEventListener("online", tick);
       document.removeEventListener("visibilitychange", tick);
     };
-  }, []);
-  const commit = useCallback(
-    (next: TrackerData, replace = false) => {
-      if (locked && !replace) return false;
-      const saveError = persistData(next);
-      setData(next);
-      setError(saveError);
-      if (replace) setLocked(false);
-      return true;
-    },
-    [locked],
-  );
-  return { data, commit, error, locked, today };
+  }, [store]);
+  return { ...state, today, commit: store.commit, account: store };
 }
