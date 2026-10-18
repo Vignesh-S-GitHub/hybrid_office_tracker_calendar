@@ -14,6 +14,10 @@ export function useTracker() {
     };
     const timer = setInterval(tick, 30000);
     const storage = (event: StorageEvent) => {
+      if (event.key === "hybrid-office-session" || event.key === null) {
+        void store.reloadSession();
+        return;
+      }
       if (!event.key || event.key === "hybrid-office-tracker")
         store.reloadGuest();
     };

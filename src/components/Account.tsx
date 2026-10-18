@@ -109,7 +109,7 @@ export function Account({ store }: { store: TrackerStore }) {
               {confirmLogout && (
                 <div className="storage-warning">
                   <p>
-                    Sign out on this tab? Unsynced changes remain in this
+                    Sign out on this device? Unsynced changes remain in this
                     browser’s account recovery copy. Export a backup before
                     signing out on a shared device.
                   </p>
@@ -123,7 +123,7 @@ export function Account({ store }: { store: TrackerStore }) {
                       })
                     }
                   >
-                    Sign out this tab
+                    Sign out this device
                   </button>
                   <button
                     className="button"

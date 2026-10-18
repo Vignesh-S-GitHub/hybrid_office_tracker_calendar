@@ -116,37 +116,99 @@ export class TrackerStore {
       });
     }
   }
-  start = async () => {
-    if (this.started) return;
-    this.started = true;
-    let session: Session | null = null;
+  private readSession(): Pick<Session, "token"> | null {
+    // Read the former tab-only session once so an already signed-in user can
+    // migrate without entering their password again.
+    let raw: string | null = null;
     try {
-      session = JSON.parse(sessionStorage.getItem(SESSION) || "null");
+      raw = localStorage.getItem(SESSION);
     } catch {
-      sessionStorage.removeItem(SESSION);
+      /* Persistent storage may be blocked. */
     }
-    if (session?.token) {
-      this.update({
-        busy: true,
-        locked: true,
-        status: "Checking your session…",
-      });
+    if (!raw) {
       try {
-        const verified = await api<{ user: User } | null>(
-          "/api/auth/get-session",
-          session.token,
-        );
-        if (!verified?.user)
-          throw new Error("Your session expired. Sign in again.");
-        await this.connect({ token: session.token, user: verified.user });
-      } catch (error) {
-        this.update({
-          status:
-            error instanceof Error ? error.message : "Sign in to reconnect.",
-          busy: false,
-          locked: !!loadData().error,
-        });
+        raw = sessionStorage.getItem(SESSION);
+      } catch {
+        /* Tab storage may also be blocked. */
       }
+    }
+    if (!raw) return null;
+    const session = JSON.parse(raw) as Pick<Session, "token">;
+    if (
+      typeof session?.token !== "string" ||
+      !session.token ||
+      session.token.length > 1024
+    )
+      throw new Error("Invalid saved session.");
+    return session;
+  }
+  private rememberSession(session: Session) {
+    const saved = JSON.stringify({ token: session.token });
+    try {
+      localStorage.setItem(SESSION, saved);
+      sessionStorage.removeItem(SESSION);
+      this.update({ error: null });
+    } catch {
+      // Storage restrictions must not turn a successful login into a failure.
+      try {
+        sessionStorage.setItem(SESSION, saved);
+      } catch {
+        /* In-memory login still works. */
+      }
+      this.update({
+        error:
+          "Signed in for this visit only. Browser storage could not remember your login.",
+      });
+    }
+  }
+  private forgetSession() {
+    try {
+      localStorage.removeItem(SESSION);
+    } catch {
+      /* Storage may be blocked. */
+    }
+    try {
+      sessionStorage.removeItem(SESSION);
+    } catch {
+      /* Storage may be blocked. */
+    }
+  }
+  start = async () => {
+    if (this.started || this.session) return;
+    this.started = true;
+    let session: Pick<Session, "token"> | null = null;
+    try {
+      session = this.readSession();
+    } catch {
+      this.forgetSession();
+    }
+    if (!session) return;
+    const epoch = ++this.generation;
+    this.update({ busy: true, locked: true, status: "Checking your session…" });
+    try {
+      const verified = await api<{ user: User } | null>(
+        "/api/auth/get-session",
+        session.token,
+      );
+      if (epoch !== this.generation) return;
+      if (!verified?.user)
+        throw new ApiError("Your session expired. Sign in again.", 401);
+      const current = { token: session.token, user: verified.user };
+      this.rememberSession(current);
+      await this.connect(current, epoch);
+    } catch (error) {
+      if (epoch !== this.generation) return;
+      if (error instanceof ApiError && error.status === 401)
+        this.forgetSession();
+      else this.started = false; // A network failure should retry when reconnected.
+      this.update({
+        status:
+          error instanceof Error
+            ? error.message
+            : "Unable to reconnect. Retry when connected.",
+        busy: false,
+        locked: !!loadData().error,
+      });
     }
   };
   authenticate = async (
@@ -157,24 +219,25 @@ export class TrackerStore {
   ) => {
     if (this.snapshot.busy)
       throw new Error("Please wait for the current request.");
+    const epoch = ++this.generation;
+    this.started = true;
     this.update({ busy: true });
     try {
       const result = await api<Session>(
-        `/api/auth/${signup ? "sign-up" : "sign-in"}/email`,
+        "/api/auth/" + (signup ? "sign-up" : "sign-in") + "/email",
         undefined,
         { email, password, ...(signup ? { name } : {}) },
       );
-      // Retain the new session even if the first data fetch fails; retrying never
-      // creates a duplicate account or uploads guest data automatically.
-      sessionStorage.setItem(SESSION, JSON.stringify(result));
-      await this.connect(result);
+      if (epoch !== this.generation) return;
+      this.rememberSession(result);
+      await this.connect(result, epoch);
     } finally {
-      this.update({ busy: false });
+      if (epoch === this.generation) this.update({ busy: false });
     }
   };
-  private async connect(session: Session) {
+  private async connect(session: Session, epoch: number) {
     const remote = await api<Remote>("/api/tracker", session.token);
-    const epoch = ++this.generation;
+    if (epoch !== this.generation) return;
     this.session = session;
     this.revision = remote.revision;
     this.dirty = false;
@@ -195,7 +258,6 @@ export class TrackerStore {
     this.update({
       data: cached?.data ?? remote.data ?? emptyData(),
       user: session.user,
-      error: null,
       locked: conflict,
       conflict,
       busy: false,
@@ -206,6 +268,29 @@ export class TrackerStore {
     this.cache();
     if (cached && !conflict && epoch === this.generation) void this.flush();
   }
+  reloadSession = async () => {
+    // Signing out or changing accounts in one tab must also remove the old
+    // account from other open tabs before they fetch another private calendar.
+    ++this.generation;
+    this.session = null;
+    this.dirty = false;
+    this.started = false;
+    try {
+      sessionStorage.removeItem(SESSION);
+    } catch {
+      /* Storage may be blocked. */
+    }
+    const initial = loadData();
+    this.update({
+      ...initial,
+      user: null,
+      locked: !!initial.error,
+      conflict: false,
+      busy: false,
+      status: "Saved on this device",
+    });
+    await this.start();
+  };
   commit = (data: TrackerData, replace = false) => {
     if (
       this.snapshot.busy ||
@@ -266,13 +351,11 @@ export class TrackerStore {
     }
   }
   refresh = async () => {
-    if (
-      !this.session ||
-      this.saving ||
-      this.snapshot.busy ||
-      this.snapshot.conflict
-    )
+    if (!this.session) {
+      await this.start();
       return;
+    }
+    if (this.saving || this.snapshot.busy || this.snapshot.conflict) return;
     if (this.dirty) {
       await this.flush();
       return;
@@ -329,7 +412,8 @@ export class TrackerStore {
     ++this.generation;
     this.session = null;
     this.dirty = false;
-    sessionStorage.removeItem(SESSION);
+    this.started = true;
+    this.forgetSession();
     const initial = loadData();
     this.update({
       ...initial,

@@ -2,8 +2,8 @@
 
 **Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, with optional account login and cross-device SQLite sync.
 
-| Calendar                   | Dashboard                     | Smart planner                 | Your data                   |
-| -------------------------- | ----------------------------- | ----------------------------- | --------------------------- |
+| Calendar                   | Dashboard                     | Smart planner                 | Your data                  |
+| -------------------------- | ----------------------------- | ----------------------------- | -------------------------- |
 | WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | SQLite sync + JSON backups |
 
 ## What it does
@@ -171,7 +171,7 @@ The planner is a personal aid; it cannot infer employer policies or verify real 
 
 ## Login and SQLite backend
 
-The frontend remains on GitHub Pages. Application code, schema migrations, and holiday data are in GitHub; passwords, sessions, and personal calendars live in the private D1 database, never in the public repository. Passwords use Better Auth’s scrypt hashing. Bearer sessions last up to seven days and are held in sessionStorage for this tab; closing the tab may require signing in again. A per-account recovery copy remains in localStorage, so use a trusted browser and clear site data on shared computers after exporting any unsynced work. Signup currently has no email verification or password recovery: save your password.
+The frontend remains on GitHub Pages. Application code, schema migrations, and holiday data are in GitHub; passwords, sessions, and personal calendars live in the private D1 database, never in the public repository. Passwords use Better Auth’s scrypt hashing. Bearer sessions are remembered in localStorage across tabs and browser restarts. The server verifies the session before loading account records; its existing seven-day expiry and renewal rules still apply. Signing out removes the remembered token and signs other open tabs on this browser out too. Older tab-only sessions migrate after successful server verification. Temporary connection failures retain the token and retry when the app reconnects. Passwords are never stored in browser storage. A per-account recovery copy remains in localStorage, so use a trusted browser and clear site data on shared computers after exporting any unsynced work. Signup currently has no email verification or password recovery: save your password.
 
 Local development (Node 24+):
 

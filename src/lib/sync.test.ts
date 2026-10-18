@@ -7,7 +7,7 @@ function mockApi(
   respond: (
     path: string,
     init: RequestInit,
-  ) => object | Response | Promise<object | Response>,
+  ) => object | null | Response | Promise<object | null | Response>,
 ) {
   const fetcher = vi.fn(async (url: string, init: RequestInit) => {
     const result = await respond(new URL(url).pathname, init);
@@ -42,6 +42,7 @@ it("keeps guest records separate and only imports them on request", async () => 
   await store.signOut();
   expect(store.getSnapshot().data.settings.monthlyTarget).toBe(7);
   expect(sessionStorage.getItem("hybrid-office-session")).toBeNull();
+  expect(localStorage.getItem("hybrid-office-session")).toBeNull();
 });
 it("automatically saves authenticated changes with a revision", async () => {
   const fetcher = mockApi((path, init) =>
@@ -64,7 +65,9 @@ it("automatically saves authenticated changes with a revision", async () => {
     data: next,
     revision: 2,
   });
-  expect(localStorage.getItem("hybrid-office-session")).toBeNull();
+  expect(JSON.parse(localStorage.getItem("hybrid-office-session")!)).toEqual({
+    token: session.token,
+  });
 });
 it("serializes edits made while a previous save is in flight", async () => {
   let finish!: (value: object) => void;
@@ -178,4 +181,150 @@ it("rejects unauthenticated session restoration without showing account cache", 
   await store.start();
   expect(store.getSnapshot().user).toBeNull();
   expect(store.getSnapshot().locked).toBe(false);
+});
+
+it("restores sign-in after closing a tab without storing the password", async () => {
+  const cloud = emptyData();
+  cloud.settings.monthlyTarget = 17;
+  const fetcher = mockApi((path) =>
+    path.includes("sign-in")
+      ? session
+      : path.includes("get-session")
+        ? { user }
+        : { data: cloud, revision: 1 },
+  );
+  const first = new TrackerStore();
+  await first.authenticate(false, user.email, "never-store-this-password", "");
+  expect(JSON.parse(localStorage.getItem("hybrid-office-session")!)).toEqual({
+    token: session.token,
+  });
+  expect(sessionStorage.getItem("hybrid-office-session")).toBeNull();
+  sessionStorage.clear(); // A new mobile visit has no previous tab storage.
+  const reopened = new TrackerStore();
+  await reopened.start();
+  expect(reopened.getSnapshot().user?.id).toBe(user.id);
+  expect(reopened.getSnapshot().data.settings.monthlyTarget).toBe(17);
+  const verification = fetcher.mock.calls.find(([url]) =>
+    url.includes("get-session"),
+  );
+  expect(verification?.[1].headers).toEqual({
+    Authorization: "Bearer synthetic-token",
+  });
+  expect(
+    [...Array(localStorage.length)]
+      .map((_, i) => localStorage.getItem(localStorage.key(i)!))
+      .join(),
+  ).not.toContain("never-store-this-password");
+});
+
+it("migrates a valid legacy tab session only after server verification", async () => {
+  sessionStorage.setItem("hybrid-office-session", JSON.stringify(session));
+  let verify!: (value: object) => void;
+  mockApi((path) =>
+    path.includes("get-session")
+      ? new Promise<object>((resolve) => {
+          verify = resolve;
+        })
+      : { data: emptyData(), revision: 0 },
+  );
+  const store = new TrackerStore();
+  const restoring = store.start();
+  expect(localStorage.getItem("hybrid-office-session")).toBeNull();
+  expect(store.getSnapshot().user).toBeNull();
+  verify({ user });
+  await restoring;
+  expect(JSON.parse(localStorage.getItem("hybrid-office-session")!)).toEqual({
+    token: session.token,
+  });
+  expect(sessionStorage.getItem("hybrid-office-session")).toBeNull();
+});
+
+it("clears expired persistent and legacy credentials without exposing cached data", async () => {
+  localStorage.setItem(
+    "hybrid-office-session",
+    JSON.stringify({ token: session.token }),
+  );
+  sessionStorage.setItem("hybrid-office-session", JSON.stringify(session));
+  mockApi(() => null);
+  const store = new TrackerStore();
+  await store.start();
+  expect(store.getSnapshot().user).toBeNull();
+  expect(localStorage.getItem("hybrid-office-session")).toBeNull();
+  expect(sessionStorage.getItem("hybrid-office-session")).toBeNull();
+});
+
+it("retains a remembered login during a connection failure and restores it on retry", async () => {
+  localStorage.setItem(
+    "hybrid-office-session",
+    JSON.stringify({ token: session.token }),
+  );
+  let offline = true;
+  mockApi((path) => {
+    if (offline) throw new TypeError("Offline");
+    return path.includes("get-session")
+      ? { user }
+      : { data: emptyData(), revision: 0 };
+  });
+  const store = new TrackerStore();
+  await store.start();
+  expect(store.getSnapshot().user).toBeNull();
+  expect(localStorage.getItem("hybrid-office-session")).not.toBeNull();
+  offline = false;
+  await store.refresh();
+  expect(store.getSnapshot().user?.id).toBe(user.id);
+});
+
+it("does not restore a slow account request after another tab signs out", async () => {
+  localStorage.setItem(
+    "hybrid-office-session",
+    JSON.stringify({ token: session.token }),
+  );
+  let finish!: (value: object) => void;
+  mockApi(
+    () =>
+      new Promise<object>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const store = new TrackerStore();
+  const restoring = store.start();
+  localStorage.removeItem("hybrid-office-session");
+  await store.reloadSession();
+  finish({ user });
+  await restoring;
+  expect(store.getSnapshot().user).toBeNull();
+  expect(localStorage.getItem("hybrid-office-session")).toBeNull();
+});
+
+it("switches open tabs to the newly verified account", async () => {
+  const otherUser = {
+    id: "user-two",
+    name: "Second",
+    email: "second@example.com",
+  };
+  const otherData = emptyData();
+  otherData.settings.monthlyTarget = 2;
+  mockApi((path, init) =>
+    path.includes("sign-in")
+      ? session
+      : path.includes("get-session")
+        ? { user: otherUser }
+        : {
+            data:
+              (init.headers as Record<string, string>).Authorization ===
+              "Bearer second-token"
+                ? otherData
+                : emptyData(),
+            revision: 1,
+          },
+  );
+  const store = new TrackerStore();
+  await store.authenticate(false, user.email, "password", "");
+  localStorage.setItem(
+    "hybrid-office-session",
+    JSON.stringify({ token: "second-token" }),
+  );
+  await store.reloadSession();
+  expect(store.getSnapshot().user?.id).toBe("user-two");
+  expect(store.getSnapshot().data.settings.monthlyTarget).toBe(2);
 });
