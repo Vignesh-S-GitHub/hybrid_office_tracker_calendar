@@ -473,25 +473,6 @@ strong {
   letter-spacing: -0.5px;
   white-space: nowrap;
 }
-.brand-icon {
-  width: 43px;
-  height: 45px;
-  display: grid;
-  place-items: center;
-  color: white;
-  background: linear-gradient(145deg, #4b8aff, #1f5bf5);
-  border: 1px solid #ffffff40;
-  border-radius: 12px;
-  box-shadow: 0 4px 9px #2563eb20;
-}
-.brand small {
-  display: block;
-  font-size: 10px;
-  font-weight: 450;
-  letter-spacing: 1.2px;
-  color: var(--muted);
-  margin-top: 4px;
-}
 .desktop-nav {
   display: flex;
   gap: 7px;
@@ -553,11 +534,6 @@ strong {
 .intro > .privacy-note {
   align-self: flex-end;
   margin-bottom: 5px;
-}
-.intro .muted {
-  font-size: 13px;
-  margin-top: 9px;
-  line-height: 1.6;
 }
 .privacy-note {
   display: flex;
@@ -1810,21 +1786,6 @@ input[type="month"] {
   margin-top: 9px;
   line-height: 1.9;
 }
-.app-footer {
-  padding: 25px 0;
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: var(--muted);
-}
-.app-footer > span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.app-footer > span:first-child > svg {
-  color: var(--primary);
-}
 .mobile-nav {
   display: none;
 }
@@ -2261,17 +2222,6 @@ dialog::backdrop {
     gap: 9px;
     letter-spacing: -0.5px;
   }
-  .brand-icon {
-    width: 32px;
-    height: 34px;
-    border-radius: 9px;
-  }
-  .brand-icon svg {
-    width: 23px;
-  }
-  .brand small {
-    display: none;
-  }
   .desktop-nav {
     display: none;
   }
@@ -2294,21 +2244,10 @@ dialog::backdrop {
     display: block;
     margin-bottom: 23px;
   }
-  .intro .eyebrow {
-    font-size: 8px;
-    letter-spacing: 1.4px;
-    margin-bottom: 8px;
-  }
   .intro h1 {
     font-size: 25px;
     letter-spacing: -0.8px;
     line-height: 1.35;
-  }
-  .intro .muted {
-    font-size: 11px;
-    line-height: 1.7;
-    max-width: 290px;
-    margin-top: 7px;
   }
   .calendar-card {
     padding: 18px 12px 0;
@@ -2603,15 +2542,6 @@ dialog::backdrop {
   }
   .success-banner p {
     font-size: 10px;
-  }
-  .app-footer {
-    display: flex;
-    justify-content: center;
-    padding: 23px 0 12px;
-    font-size: 9px;
-  }
-  .app-footer > span:last-child {
-    display: none;
   }
   .page-month {
     padding: 16px;
@@ -3020,4 +2950,66 @@ dialog::backdrop {
 }
 .account-button {
   white-space: nowrap;
+}
+
+/* Shared identity: reserve the image box and never crop the generated mark. */
+.brand {
+  min-width: 0;
+}
+.brand-mark {
+  display: block;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  object-fit: contain;
+  border-radius: 11px;
+}
+.brand-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.header-actions {
+  flex-shrink: 0;
+  align-items: center;
+}
+.intro > .privacy-note {
+  align-self: center;
+  margin-bottom: 0;
+  white-space: normal;
+  max-width: 32ch;
+}
+.about-card > strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.about-card .brand-mark {
+  width: 32px;
+  height: 32px;
+  flex-basis: 32px;
+  border-radius: 8px;
+}
+@media (max-width: 767px) {
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    border-radius: 9px;
+  }
+  .brand {
+    font-size: 15px;
+  }
+}
+@media (max-width: 359px) {
+  .header-inner {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  .brand {
+    font-size: 14px;
+    gap: 7px;
+  }
+  .account-button {
+    padding-inline: 8px;
+  }
 }

@@ -1,3 +1,4 @@
+import { BrandMark } from "../components/BrandMark";
 import {
   Building2,
   CalendarDays,
@@ -206,7 +207,7 @@ export function SettingsPage({
           </div>
           <div className="setting-stacked">
             <strong>Preferred office days</strong>
-            <p>Your first choice when there’s room to be flexible.</p>
+            <p>Prioritize these days.</p>
             <WeekdayPicker
               label="Preferred office days"
               value={settings.preferredDays}
@@ -229,7 +230,7 @@ export function SettingsPage({
           <label className="setting-row toggle-row">
             <div>
               <strong>Avoid consecutive office days</strong>
-              <p>Leave a little breathing room when possible.</p>
+              <p>Space out office days.</p>
             </div>
             <input
               type="checkbox"
@@ -264,7 +265,7 @@ export function SettingsPage({
           <label className="setting-row">
             <div>
               <strong>Week starts on</strong>
-              <p>Make the calendar feel familiar.</p>
+              <p>First day of the week.</p>
             </div>
             <select
               value={settings.weekStartsOn}
@@ -293,7 +294,7 @@ export function SettingsPage({
           <label className="setting-row">
             <div>
               <strong>Open calendar to</strong>
-              <p>Choose where to start each visit.</p>
+              <p>Month shown when you open the app.</p>
             </div>
             <select
               value={settings.defaultMonth === "current" ? "current" : "custom"}
@@ -388,15 +389,9 @@ export function SettingsPage({
         </section>
         <section className="card privacy-card">
           <ShieldCheck size={28} />
-          <h2>Just you and your calendar.</h2>
-          <p>
-            Guest records stay in this browser. Sign in to sync your account’s
-            calendar using a private hosted SQLite database.{" "}
-          </p>
-          <p>
-            Export a JSON backup to keep a copy or move to another device.
-            Clearing browser data also clears your records.
-          </p>
+          <h2>Your data</h2>
+          <p>Guest records stay on this device. Sign in to sync.</p>
+          <p>Export a backup before clearing browser data.</p>
           <span className="pill green-pill">
             <WifiOff size={13} />
             Works offline after the first visit
@@ -408,14 +403,9 @@ export function SettingsPage({
             About
           </h2>
           <strong>
-            Hybrid Office Tracker{" "}
+            <BrandMark /> Hybrid Tracker{" "}
             <span className="muted small-text">v1.0.0</span>
           </strong>
-          <p className="muted small-text">
-            A simple way to plan your hybrid schedule.
-            <br />
-            Built for a better work–life balance.
-          </p>
         </section>
       </div>
     </div>

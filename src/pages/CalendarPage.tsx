@@ -132,9 +132,7 @@ export function CalendarPage({
         </div>
         <div className="calendar-tip">
           <CalendarCheck2 size={16} />
-          <span>
-            Make a day your own. Select any date to add or edit an entry.
-          </span>
+          <span>Select a date to mark attendance.</span>
         </div>
       </section>
       <aside className="card summary-card">
@@ -143,8 +141,8 @@ export function CalendarPage({
         <TargetProgress stats={stats} />
         {holidayCatalogForYear(Number(month.slice(0, 4))) && (
           <p className="small-text muted">
-            Includes All India {month.slice(0, 4)} holidays. Saved attendance
-            overrides the displayed status for that date.
+            All India {month.slice(0, 4)} holidays included. Your entries take
+            priority.
           </p>
         )}
         {(stats.planned > 0 || stats.plannedWFH > 0) && (

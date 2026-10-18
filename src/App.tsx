@@ -22,7 +22,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { HolidaysPage } from "./pages/HolidaysPage";
-import { activeHolidayCatalog } from "./lib/holidays";
+import { BrandMark } from "./components/BrandMark";
 import { Planner } from "./components/Planner";
 import { Modal } from "./components/ui";
 import { Account } from "./components/Account";
@@ -225,32 +225,12 @@ export default function App() {
       if (fileInput.current) fileInput.current.value = "";
     }
   };
-  const pageCopy = {
-    holidays: [
-      "INDIA · OFFICIAL HOLIDAY CALENDAR",
-      `All India Holidays - ${activeHolidayCatalog(today).year}`,
-      "Plan your workweek around India’s All India holiday calendar.",
-    ],
-    calendar: [
-      "YOUR PERSONAL WORK CALENDAR",
-      "A little planning. A better balance.",
-      "Office days, home days, and everything in between.",
-    ],
-    dashboard: [
-      "THE BIG PICTURE",
-      "Your month in balance.",
-      "A clear view of how your hybrid schedule is shaping up.",
-    ],
-    history: [
-      "EVERY DAY HAS A STORY",
-      "A little perspective.",
-      "Look back on your days and keep the bigger picture in sight.",
-    ],
-    settings: [
-      "MAKE IT YOURS",
-      "Your rhythm. Your rules.",
-      "Set your preferences and find a routine that works for you.",
-    ],
+  const pageTitles = {
+    holidays: "Holidays",
+    calendar: "Calendar",
+    dashboard: "Dashboard",
+    history: "History",
+    settings: "Settings",
   };
   return (
     <>
@@ -261,12 +241,8 @@ export default function App() {
             href="#calendar"
             onClick={() => setPage("calendar")}
           >
-            <span className="brand-icon">
-              <CalendarDays size={26} strokeWidth={2.2} />
-            </span>
-            <span>
-              Hybrid Office Tracker<small>Plan · Track · Stay balanced</small>
-            </span>
+            <BrandMark />
+            <span className="brand-name">Hybrid Tracker</span>
           </a>
           <nav className="desktop-nav" aria-label="Main navigation">
             {pages.map(({ key, label, Icon }) => (
@@ -308,14 +284,10 @@ export default function App() {
       </header>
       <main className="app-main" id="main-content">
         <div className="intro">
-          <div>
-            <p className="eyebrow">{pageCopy[page][0]}</p>
-            <h1>{pageCopy[page][1]}</h1>
-            <p className="muted">{pageCopy[page][2]}</p>
-          </div>
+          <h1>{pageTitles[page]}</h1>
           <span className="privacy-note">
             <ShieldCheck size={16} />
-            {user ? status : "Private & saved on this device"}
+            {user ? status : "Saved on this device"}
           </span>
         </div>
         {error && (
@@ -422,17 +394,6 @@ export default function App() {
             settings={() => navigate("settings")}
           />
         )}
-        <footer className="app-footer">
-          <span>
-            <CalendarDays size={15} />A workweek that works for you.
-          </span>
-          <span>
-            <ShieldCheck size={14} />
-            {user
-              ? "Private account · SQLite sync"
-              : "Guest mode · Sign in to sync"}
-          </span>
-        </footer>
       </main>
       <nav className="mobile-nav" aria-label="Mobile navigation">
         {pages.map(({ key, label, Icon }) => (

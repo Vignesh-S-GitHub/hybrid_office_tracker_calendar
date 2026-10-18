@@ -28,8 +28,7 @@ export function AttendanceEditor({
   return (
     <Modal
       placement="right"
-      title={format(localDate(date), "EEEE, MMMM d")}
-      subtitle={`Selected date: ${format(localDate(date), "MMMM d, yyyy")}`}
+      title={format(localDate(date), "EEE, d MMM yyyy")}
       onClose={onClose}
     >
       {holiday && (
@@ -87,12 +86,12 @@ export function AttendanceEditor({
         <textarea
           maxLength={2000}
           rows={3}
-          placeholder="A little context for your day…"
+          placeholder="Add a note"
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
         />
       </label>
-      <p className="eyebrow">CHOOSE A STATUS TO SAVE</p>
+      <p className="eyebrow">SAVE AS</p>
       <div className="status-options">
         {statuses.map((status) => {
           const { Icon, label, className } = statusInfo[status];
@@ -126,9 +125,7 @@ export function AttendanceEditor({
           Clear status
         </button>
       )}
-      <p className="small-text muted text-center">
-        One day, one status. Changes are saved automatically.
-      </p>
+      <p className="small-text muted text-center">Saved automatically.</p>
     </Modal>
   );
 }

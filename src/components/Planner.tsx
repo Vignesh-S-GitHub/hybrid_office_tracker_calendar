@@ -41,12 +41,8 @@ export function Planner({
           </span>
           <div>
             <h2>Smart WFO Planner</h2>
-            <p className="muted small-text">
-              A little structure. A lot more balance.
-            </p>
           </div>
         </div>
-        <span className="pill blue-pill">Made for your week</span>
       </div>
       <div className="planner-metrics">
         {[
@@ -83,7 +79,7 @@ export function Planner({
           <CircleCheck size={22} />
           <div>
             <strong>Monthly Office Target Completed</strong>
-            <p>You’ve reached your goal. Enjoy your balance.</p>
+            <p>Your monthly goal is complete.</p>
           </div>
         </div>
       ) : (
@@ -101,7 +97,7 @@ export function Planner({
             <div className="alert">
               <TriangleAlert size={20} />
               <div>
-                <strong>Your schedule needs a little adjustment</strong>
+                <strong>Not enough available days</strong>
                 <p>
                   You need {plan.toSchedule} more WFO days, but your current
                   schedule has capacity for {plan.capacity}.{" "}
@@ -216,7 +212,7 @@ export function Planner({
       )}
       <p className="planner-footnote">
         <span className="dot office" />
-        Suggestions become plans only when you accept them.
+        Accept suggestions to plan office days.
       </p>
     </section>
   );
