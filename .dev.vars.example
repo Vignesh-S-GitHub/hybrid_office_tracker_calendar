@@ -1,3 +1,7 @@
 BETTER_AUTH_SECRET=replace-with-a-random-secret-at-least-32-characters
 API_URL=http://localhost:8787
 ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+
+# Optional Telegram integration (use a separate test bot locally).
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_WEBHOOK_SECRET=

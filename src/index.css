@@ -8,9 +8,6 @@
   white-space: nowrap;
   padding: 0 3px;
 }
-.mobile-nav {
-  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-}
 .holidays-card {
   padding: 26px;
 }
@@ -2394,7 +2391,7 @@ dialog::backdrop {
   }
   .mobile-nav {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     position: fixed;
     bottom: 0;
     left: 0;
@@ -3011,5 +3008,172 @@ dialog::backdrop {
   }
   .account-button {
     padding-inline: 8px;
+  }
+}
+
+.trains-page {
+  display: grid;
+  gap: 20px;
+}
+.trains-layout {
+  display: grid;
+  grid-template-columns: minmax(290px, 0.8fr) minmax(0, 1.2fr);
+  gap: 24px;
+  align-items: start;
+}
+.telegram-card,
+.train-form-card,
+.train-journey,
+.train-empty {
+  padding: 24px;
+}
+.telegram-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.telegram-card p {
+  color: var(--muted);
+  margin-top: 8px;
+}
+.train-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.train-list {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.train-list > .split {
+  padding: 0 2px;
+}
+.train-journey {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.train-journey h3 {
+  margin-top: 16px;
+  font-size: 18px;
+}
+.train-journey > p {
+  margin-top: 8px;
+  font-size: 12px;
+}
+.train-booking,
+.train-preview {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--soft);
+  margin-top: 14px;
+  font-size: 12px;
+}
+.train-booking span,
+.train-preview span,
+.train-preview small {
+  color: var(--muted);
+}
+.train-preview small {
+  margin-top: 8px;
+}
+.train-status {
+  color: var(--primary);
+  background: var(--soft);
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.train-status-booked {
+  color: var(--office);
+  background: var(--office-soft);
+}
+.train-status-needs_review {
+  color: var(--holiday);
+  background: var(--holiday-soft);
+}
+.train-status-cancelled {
+  color: var(--muted);
+}
+.train-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+}
+.train-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.train-form label {
+  font-size: 12px;
+}
+.train-form select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  color: inherit;
+  background: var(--surface);
+  padding: 12px;
+  border-radius: 12px;
+}
+.train-form .train-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.train-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+.train-form summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 12px;
+  padding-block: 6px;
+}
+.train-advanced {
+  display: grid;
+  gap: 16px;
+  padding-top: 14px;
+}
+.train-notice {
+  color: var(--primary);
+  font-size: 13px;
+}
+.train-footnote {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.train-empty {
+  text-align: center;
+  color: var(--muted);
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .trains-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .telegram-card,
+  .train-form-card,
+  .train-journey {
+    padding: 18px;
+  }
+  .train-form input {
+    padding-inline: 9px;
   }
 }

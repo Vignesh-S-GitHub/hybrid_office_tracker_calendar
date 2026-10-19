@@ -87,6 +87,20 @@ export class TrackerStore {
       conflict: false,
     };
   }
+  request = async <T>(
+    path: string,
+    body?: unknown,
+    method?: string,
+  ): Promise<T> => {
+    if (!this.session) throw new Error("Sign in to manage train reminders.");
+    if (!/^\/api\/(train-reminders|telegram)(\/|$)/.test(path))
+      throw new Error("Unsupported account request.");
+    const epoch = this.generation;
+    const result = await api<T>(path, this.session.token, body, method);
+    if (epoch !== this.generation)
+      throw new Error("Account changed. Try again.");
+    return result;
+  };
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);

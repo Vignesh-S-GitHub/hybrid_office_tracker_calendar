@@ -185,7 +185,7 @@ npm run api:dev
 npm run dev
 ```
 
-Use the same local D1 state for both backend commands. The schema is versioned under server/migrations; never commit .dev.vars, .env.local, .wrangler, or database files. Regenerate binding types after config changes with `npx wrangler types --env-interface CloudflareEnv`.
+Use the same local D1 state for both backend commands. The schema is versioned under server/migrations; never commit .dev.vars, .env.local, .wrangler, or database files. Regenerate binding types after config changes with `npx wrangler types --env-interface CloudflareEnv --strict-vars false`.
 
 Validation:
 
@@ -211,3 +211,9 @@ npm run api:deploy
 `wrangler.jsonc` contains public binding IDs and allowed frontend origins. `VITE_API_URL` can override the default API URL at build time. The backend accepts only the configured origins and authenticated user-scoped requests. Server writes use an atomic revision check to prevent silent cross-device overwrites. Tracking sync requests are limited to 1 MB; larger JSON backups can still be used in guest mode (up to 5 MB). Keep using JSON exports as an independent backup.
 
 GitHub Actions validates backend types and deploys the frontend; backend deployment remains an explicit Wrangler command, requiring Cloudflare credentials on the developer machine. No Cloudflare personal credentials are stored in GitHub. The yearly holiday workflow continues independently.
+
+## Train booking reminders
+
+The Trains tab links optional outward/return journeys to saved planned WFO visits. Private journeys sync through your account. Defaults: a 60-day booking window based on departure at the train origin, reminders the previous evening and five minutes before opening, with optional follow-up. Telegram supports Booked and Remind in 1 hour actions. Changing linked office plans pauses delivery for review.
+
+See [Telegram setup, use, privacy and verification](docs/telegram-reminders.md). A one-time BotFather setup and server secrets are required before messages can be delivered. Journeys are stored separately from attendance JSON backups.

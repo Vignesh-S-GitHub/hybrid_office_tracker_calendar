@@ -382,7 +382,7 @@ export function SettingsPage({
               <Trash2 size={21} />
             </span>
             <span>
-              <strong>Clear all data</strong>
+              <strong>Clear calendar data</strong>
               <small>Reset records and preferences after confirmation.</small>
             </span>
           </button>

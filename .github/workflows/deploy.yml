@@ -40,6 +40,7 @@ jobs:
       - run: npm run lint
       - run: npm run api:check
       - run: npm test
+      - run: npm run api:test:reminders
       - run: npm audit --audit-level=high
       - run: npm run build
         env:

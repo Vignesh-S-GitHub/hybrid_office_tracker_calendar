@@ -15,7 +15,8 @@
     "api:check": "tsc -p tsconfig.worker.json",
     "api:deploy": "wrangler deploy",
     "api:migrate": "wrangler d1 migrations apply DB --remote",
-    "api:test": "node scripts/test-api.mjs"
+    "api:test": "node scripts/test-api.mjs",
+    "api:test:reminders": "node scripts/test-reminders.mjs"
   },
   "dependencies": {
     "better-auth": "^1.7.10",

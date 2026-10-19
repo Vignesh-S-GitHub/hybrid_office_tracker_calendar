@@ -130,15 +130,19 @@ describe("complete attendance flow", () => {
       screen.getByText("Your story starts with a day"),
     ).toBeInTheDocument();
     await user.click(nav.getByRole("button", { name: "Settings" }));
-    await user.click(screen.getByRole("button", { name: /Clear all data/ }));
+    await user.click(
+      screen.getByRole("button", { name: /Clear calendar data/ }),
+    );
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.theme).toBe(
       "dark",
     );
-    await user.click(screen.getByRole("button", { name: /Clear all data/ }));
+    await user.click(
+      screen.getByRole("button", { name: /Clear calendar data/ }),
+    );
     await user.click(
       within(screen.getByRole("dialog")).getByRole("button", {
-        name: "Clear all data",
+        name: "Clear calendar data",
       }),
     );
     await waitFor(() =>

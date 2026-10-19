@@ -8,7 +8,10 @@
   "workers_dev": true,
   "preview_urls": false,
   "observability": { "enabled": true },
+  "triggers": { "crons": ["* * * * *"] },
   "vars": {
+    "TELEGRAM_BOT_USERNAME": "",
+    "TELEGRAM_API_BASE": "https://api.telegram.org",
     "API_URL": "https://hybrid-office-tracker-api.vigneshshanmugam.workers.dev",
     "ALLOWED_ORIGINS": "https://vignesh-s-github.github.io",
   },

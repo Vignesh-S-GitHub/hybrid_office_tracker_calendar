@@ -1,8 +1,8 @@
 import { createAuth } from "./auth";
 import { parseBackup } from "../src/lib/backup";
 
-const json = (value: unknown, status = 200) =>
-  Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
+import { boundedBody, json, RequestError } from "./http";
+import { deliverReminders, reminderApi, telegramWebhook } from "./reminders";
 
 async function handle(request: Request, env: CloudflareEnv): Promise<Response> {
   const url = new URL(request.url);
@@ -26,7 +26,13 @@ async function handle(request: Request, env: CloudflareEnv): Promise<Response> {
     }
     return createAuth(env).handler(request);
   }
-  if (url.pathname !== "/api/tracker")
+  if (url.pathname === "/api/telegram/webhook")
+    return telegramWebhook(request, env);
+  if (
+    url.pathname !== "/api/tracker" &&
+    !url.pathname.startsWith("/api/train-reminders") &&
+    !url.pathname.startsWith("/api/telegram/")
+  )
     return json({ error: "Not found." }, 404);
   const session = await createAuth(env).api.getSession({
     headers: request.headers,
@@ -34,6 +40,7 @@ async function handle(request: Request, env: CloudflareEnv): Promise<Response> {
   if (!session)
     return json({ error: "Sign in again to sync your tracking." }, 401);
   const userId = session.user.id;
+  if (url.pathname !== "/api/tracker") return reminderApi(request, env, userId);
   if (request.method === "GET") {
     const row = await env.DB.prepare(
       "SELECT data, revision FROM tracker_data WHERE user_id = ?",
@@ -57,7 +64,9 @@ async function handle(request: Request, env: CloudflareEnv): Promise<Response> {
     if (!Number.isSafeInteger(input.revision) || Number(input.revision) < 0)
       throw new Error("Invalid revision.");
     // Accept today in every civil timezone; the Worker itself runs in UTC.
-    const latestToday = new Date(Date.now() + 14 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const latestToday = new Date(Date.now() + 14 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
     data = JSON.stringify(parseBackup(JSON.stringify(input.data), latestToday));
   } catch {
     return json({ error: "Invalid tracking backup." }, 400);
@@ -85,46 +94,25 @@ async function handle(request: Request, env: CloudflareEnv): Promise<Response> {
   return json({ revision: expected + 1 });
 }
 
-async function boundedBody(
-  request: Request,
-  max: number,
-): Promise<Uint8Array | null> {
-  if (!request.body) return new Uint8Array();
-  const reader = request.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > max) {
-      await reader.cancel();
-      return null;
-    }
-    chunks.push(value);
-  }
-  const body = new Uint8Array(size);
-  let offset = 0;
-  for (const chunk of chunks) {
-    body.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return body;
-}
-
 export default {
+  async scheduled(_controller, env) {
+    await deliverReminders(env);
+  },
   async fetch(request, env) {
     let response: Response;
     try {
       response = await handle(request, env);
-    } catch {
-      response = json(
-        {
-          error:
-            "Sync service is temporarily unavailable. Your device copy is unchanged.",
-        },
-        503,
-      );
+    } catch (error) {
+      if (error instanceof RequestError)
+        response = json({ error: error.message }, error.status);
+      else
+        response = json(
+          {
+            error:
+              "Sync service is temporarily unavailable. Your device copy is unchanged.",
+          },
+          503,
+        );
     }
     const headers = new Headers(response.headers);
     const origin = request.headers.get("Origin");

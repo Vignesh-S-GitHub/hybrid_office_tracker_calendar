@@ -13,6 +13,7 @@ import {
   Download,
   RefreshCw,
   Palmtree,
+  TrainFront,
 } from "lucide-react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import type { Phase, Settings, Status, TrackerData } from "./types";
@@ -21,6 +22,7 @@ import { CalendarPage } from "./pages/CalendarPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { TrainsPage } from "./pages/TrainsPage";
 import { HolidaysPage } from "./pages/HolidaysPage";
 import { BrandMark } from "./components/BrandMark";
 import { Planner } from "./components/Planner";
@@ -42,6 +44,7 @@ const pages = [
   { key: "dashboard", label: "Dashboard", Icon: ChartNoAxesCombined },
   { key: "history", label: "History", Icon: History },
   { key: "holidays", label: "Holidays", Icon: Palmtree },
+  { key: "trains", label: "Trains", Icon: TrainFront },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
 ] as const;
 type Page = (typeof pages)[number]["key"];
@@ -226,6 +229,7 @@ export default function App() {
     }
   };
   const pageTitles = {
+    trains: "Trains",
     holidays: "Holidays",
     calendar: "Calendar",
     dashboard: "Dashboard",
@@ -341,6 +345,14 @@ export default function App() {
             edit={edit}
           />
         )}
+        {page === "trains" && (
+          <TrainsPage
+            key={user?.id ?? "guest"}
+            data={data}
+            account={account}
+            signedIn={!!user}
+          />
+        )}
         {page === "settings" && (
           <SettingsPage
             data={data}
@@ -357,9 +369,9 @@ export default function App() {
             importData={() => fileInput.current?.click()}
             clearData={() =>
               setConfirmation({
-                title: "Clear all your data?",
-                body: "This removes every attendance record, saved plan, monthly target, and preference from the current calendar (including your account when signed in). Export a backup first if you want to restore them later.",
-                label: "Clear all data",
+                title: "Clear calendar data?",
+                body: "This removes every attendance record, saved plan, monthly target, and preference from the current calendar (including your account when signed in). Train journeys stay saved; linked reminders may pause. Export a backup first if you want to restore the calendar later.",
+                label: "Clear calendar data",
                 danger: true,
                 action: () => {
                   commit(emptyData(), true);
