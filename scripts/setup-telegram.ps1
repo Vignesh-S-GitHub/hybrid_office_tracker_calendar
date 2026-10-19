@@ -6,7 +6,8 @@ $secretPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($botSecre
 try {
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
     $startInfo.FileName = (Get-Command node -ErrorAction Stop).Source
-    $startInfo.ArgumentList.Add((Join-Path $PSScriptRoot 'setup-telegram.mjs'))
+    # Windows PowerShell 5.1 uses .NET Framework, which lacks ArgumentList.
+    $startInfo.Arguments = '"' + (Join-Path $PSScriptRoot 'setup-telegram.mjs') + '"'
     $startInfo.UseShellExecute = $false
     $startInfo.CreateNoWindow = $true
     $startInfo.RedirectStandardInput = $true

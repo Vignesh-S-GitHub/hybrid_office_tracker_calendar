@@ -19,10 +19,10 @@ Changing/removing a linked planned WFO day pauses that journey at its next deliv
 
 The account owner must create a bot in Telegram; this cannot be created through the public Bot API. In the verified [@BotFather](https://t.me/BotFather) chat send `/newbot`, choose a name and an available username ending in `bot`. Keep the token private; do not paste it into GitHub, chat, source files or a command argument.
 
-From the repository in **PowerShell 7**, with Node 24+, installed dependencies and Wrangler already logged in:
+From the repository in **Windows PowerShell 5.1 or PowerShell 7**, with Node 24+, installed dependencies and Wrangler already logged in:
 
 ```powershell
-pwsh -File .\scripts\setup-telegram.ps1
+powershell.exe -NoProfile -File .\scripts\setup-telegram.ps1
 ```
 
 The prompt hides the token. The helper passes it through standard input, verifies `getMe`, refuses to take over a bot used by another webhook, stores `TELEGRAM_BOT_TOKEN` and a generated `TELEGRAM_WEBHOOK_SECRET` using Cloudflare's secret manager, records only the public username in `wrangler.jsonc`, generates types, applies migrations, deploys the Worker and verifies the registered webhook. It enables only `message` and `callback_query` updates. Commit the public configuration/types changes after setup so a later deploy preserves the username. The helper does not send any message until the user connects or clicks a test.
