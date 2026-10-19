@@ -19,6 +19,35 @@ function fixture(configured = false) {
   return { account, request };
 }
 describe("train reminders screen", () => {
+  it("prefills both journeys from a Calendar office visit without saving automatically", async () => {
+    const { account, request } = fixture();
+    const data = emptyData(),
+      first = shiftDate(indiaToday(), 70),
+      last = shiftDate(first, 1);
+    for (const date of [first, last])
+      data.attendance[date] = {
+        status: "WFO",
+        phase: "planned",
+        notes: "",
+        updatedAt: new Date().toISOString(),
+      };
+    render(
+      <TrainsPage data={data} account={account} signedIn officeDate={last} />,
+    );
+    await screen.findByText("Telegram setup pending.");
+    expect(screen.getByLabelText("Office visit")).toHaveValue(
+      `${first},${last}`,
+    );
+    expect(screen.getByLabelText("Outward journey")).toHaveValue(
+      shiftDate(first, -1),
+    );
+    expect(screen.getByLabelText("Return journey")).toHaveValue(last);
+    expect(screen.getByLabelText("Add return journey")).toBeChecked();
+    expect(request).not.toHaveBeenCalledWith(
+      "/api/train-reminders",
+      expect.anything(),
+    );
+  });
   it("keeps guests local and asks them to sign in", () => {
     const { account, request } = fixture();
     render(

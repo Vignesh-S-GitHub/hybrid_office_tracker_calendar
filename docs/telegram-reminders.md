@@ -57,3 +57,13 @@ The integration test starts isolated local workerd/D1 and a fake Telegram endpoi
 Backend releases require migration `0003_train_reminders.sql` and `npm run api:deploy` separately from the existing Pages workflow. Keep the minute cron in `wrangler.jsonc`. The setup helper performs these backend steps after a token is supplied; frontend publication follows the normal Pages pipeline.
 
 References: [Telegram Bot API](https://core.telegram.org/bots/api), [bot deep links](https://core.telegram.org/bots/features#deep-linking), [Cloudflare cron triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/), [IRCTC terms](https://contents.irctc.co.in/en/Terms%20and%20conditions.pdf).
+
+## Calendar shortcuts
+
+Calendar shows a train icon on booking dates. Grey icons are estimates from saved future planned WFO visits: outward travel the previous day (clamped to today), return on the last WFO day, and a 60-day window at 08:00 IST. Confirm your actual boarding date and train origin offset in Trains. A saved journey overrides its estimate with its custom booking date, time and status. These markers do not create attendance or notifications.
+
+Tap a train icon for booking details, then Plan train or View reminder. Mark attendance remains available in that dialog. The Train booking card lists relevant office visits/journeys; tap a booking date to jump back to that month. A planned WFO day also offers Plan train for this visit in its date editor. Plan train opens the selected office visit with outward and return dates prefilled. Review stations/dates and Save reminder to schedule Telegram delivery. Guests can view estimates, but must sign in and explicitly import guest office plans if desired; guest records are never uploaded automatically.
+
+Saved reminders refresh every 30 seconds and on returning online/visible. If they cannot load, Calendar remains usable and clearly shows estimates. Booked journeys and changed office plans display their saved/review status; account changes discard old reminder responses.
+
+Calendar also checks Telegram connection status: connected journeys show their next scheduled reminder time; disconnected journeys offer Connect Telegram. If the connection status alone is unavailable, the saved booking dates stay visible with a check-connection note.

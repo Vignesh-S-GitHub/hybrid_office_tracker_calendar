@@ -67,6 +67,11 @@ export default function App() {
       ? monthKey(new Date())
       : data.settings.defaultMonth,
   );
+  const [trainShortcut, setTrainShortcut] = useState<{
+    owner: string | null;
+    officeDate?: string;
+    journeyId?: string;
+  } | null>(null);
   const [editor, setEditor] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
@@ -102,10 +107,18 @@ export default function App() {
     }
   }, [toast]);
   const navigate = (next: Page) => {
+    setTrainShortcut(null);
     setPage(next);
     location.assign(`#${next}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const openTrains = (officeDate?: string, journeyId?: string) => {
+    navigate("trains");
+    setEditor(null);
+    setTrainShortcut({ owner: user?.id ?? null, officeDate, journeyId });
+  };
+  const activeTrainShortcut =
+    trainShortcut?.owner === (user?.id ?? null) ? trainShortcut : null;
   const setMonth = (next: string) => {
     if (validMonth(next)) updateMonth(next);
   };
@@ -315,6 +328,10 @@ export default function App() {
         )}
         {page === "calendar" && (
           <CalendarPage
+            key={user?.id ?? "guest"}
+            account={account}
+            userId={user?.id ?? null}
+            openTrains={openTrains}
             data={data}
             month={month}
             today={today}
@@ -347,10 +364,12 @@ export default function App() {
         )}
         {page === "trains" && (
           <TrainsPage
-            key={user?.id ?? "guest"}
+            key={`${user?.id ?? "guest"}:${activeTrainShortcut?.officeDate ?? ""}:${activeTrainShortcut?.journeyId ?? ""}`}
             data={data}
             account={account}
             signedIn={!!user}
+            officeDate={activeTrainShortcut?.officeDate}
+            journeyId={activeTrainShortcut?.journeyId}
           />
         )}
         {page === "settings" && (
@@ -438,6 +457,13 @@ export default function App() {
           record={data.attendance[editor]}
           onSave={saveAttendance}
           onClose={() => setEditor(null)}
+          onPlanTrain={
+            data.attendance[editor]?.status === "WFO" &&
+            data.attendance[editor]?.phase === "planned" &&
+            editor >= today
+              ? () => openTrains(editor)
+              : undefined
+          }
         />
       )}
       {confirmation && (

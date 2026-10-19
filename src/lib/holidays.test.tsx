@@ -14,6 +14,7 @@ import { statistics } from "./statistics";
 import { validDate } from "./dates";
 import { HolidaysPage } from "../pages/HolidaysPage";
 import { AttendanceEditor } from "../components/AttendanceEditor";
+import { TrackerStore } from "./sync";
 import { CalendarPage } from "../pages/CalendarPage";
 
 const indiaHolidays2026 = holidayCatalogForYear(2026)!.holidays;
@@ -171,6 +172,9 @@ describe("All India Holidays - 2026", () => {
   it("shows official holiday names in the calendar and a sourced date detail", () => {
     render(
       <CalendarPage
+        account={new TrackerStore()}
+        userId={null}
+        openTrains={vi.fn()}
         data={emptyData()}
         month="2026-10"
         today="2026-10-15"

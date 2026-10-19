@@ -1,5 +1,21 @@
+import { useRef, useState } from "react";
 import { format, isWeekend } from "date-fns";
-import { Plus, Download, Upload, History, CalendarCheck2 } from "lucide-react";
+import {
+  Plus,
+  Download,
+  Upload,
+  History,
+  CalendarCheck2,
+  TrainFront,
+} from "lucide-react";
+import type { TrackerStore } from "../lib/sync";
+import { calendarTrainBookings } from "../lib/calendarTrains";
+import { useCalendarTrains } from "../hooks/useCalendarTrains";
+import {
+  CalendarTrainBooking,
+  CalendarBookingRows,
+} from "../components/CalendarTrainBooking";
+import { Modal } from "../components/ui";
 import type { TrackerData } from "../types";
 import { calendarDays, dateKey } from "../lib/dates";
 import { statistics } from "../lib/statistics";
@@ -22,6 +38,9 @@ export function CalendarPage({
   exportData,
   importData,
   history,
+  account,
+  userId,
+  openTrains,
 }: {
   data: TrackerData;
   month: string;
@@ -32,7 +51,22 @@ export function CalendarPage({
   exportData: () => void;
   importData: () => void;
   history: () => void;
+  account: TrackerStore;
+  userId: string | null;
+  openTrains: (officeDate?: string, journeyId?: string) => void;
 }) {
+  const saved = useCalendarTrains(account, userId);
+  const bookings = saved.loading
+    ? []
+    : calendarTrainBookings(data, saved.reminders, today);
+  const [bookingDialog, setBookingDialog] = useState<string | null>(null);
+  const [bookingDay, setBookingDay] = useState<string | null>(null);
+  const calendar = useRef<HTMLElement>(null);
+  const showBookingDate = (date: string) => {
+    setMonth(date.slice(0, 7));
+    setBookingDay(date);
+    calendar.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  };
   const stats = statistics(data, month, today);
   const attendance = calendarAttendance(data);
   const recommended = new Set(
@@ -50,7 +84,7 @@ export function CalendarPage({
   );
   return (
     <div className="calendar-layout">
-      <section className="card calendar-card">
+      <section className="card calendar-card" ref={calendar}>
         <MonthControls month={month} onChange={setMonth} today={today} />
         <div
           className="calendar-grid"
@@ -70,6 +104,15 @@ export function CalendarPage({
             const key = dateKey(day),
               record = attendance[key],
               inMonth = key.startsWith(month);
+            const trainBookings = bookings.filter((item) => item.date === key);
+            const bookingState = trainBookings.some(
+              (item) =>
+                item.status === "pending" || item.status === "needs_review",
+            )
+              ? "pending"
+              : trainBookings.every((item) => item.status === "booked")
+                ? "booked"
+                : "estimate";
             const holiday = holidayFor(key);
             const suggested = inMonth && recommended.has(key);
             const label = record
@@ -80,16 +123,26 @@ export function CalendarPage({
             return (
               <button
                 key={key}
-                aria-label={`${format(day, "MMMM d, yyyy")}, ${label}`}
+                aria-label={`${format(day, "MMMM d, yyyy")}, ${label}${trainBookings.length ? `, Train booking${bookingState === "estimate" ? " estimate" : bookingState === "booked" ? " booked" : ""}` : ""}`}
                 aria-current={key === today ? "date" : undefined}
                 title={
                   [holiday?.name, record?.notes].filter(Boolean).join(" · ") ||
                   label
                 }
-                className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""}`}
-                onClick={() => edit(key)}
+                className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected || key === bookingDay ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
+                onClick={() =>
+                  trainBookings.length ? setBookingDialog(key) : edit(key)
+                }
               >
-                <span className="day-number">{format(day, "d")}</span>
+                <span className="day-number">
+                  {format(day, "d")}
+                  {!!trainBookings.length && (
+                    <TrainFront
+                      className="calendar-booking-icon"
+                      aria-hidden="true"
+                    />
+                  )}
+                </span>
                 <span
                   className={`day-dot ${record ? statusInfo[record.status].className : suggested ? "suggestion-dot" : "unmarked"}`}
                 />
@@ -129,6 +182,12 @@ export function CalendarPage({
             <i className="dot suggestion-dot" />
             Suggested
           </span>
+          {!!bookings.length && (
+            <span className="calendar-train-legend">
+              <TrainFront aria-hidden="true" />
+              Train booking
+            </span>
+          )}
         </div>
         <div className="calendar-tip">
           <CalendarCheck2 size={16} />
@@ -158,6 +217,16 @@ export function CalendarPage({
           <Plus size={20} />
           Mark a day
         </button>
+        <CalendarTrainBooking
+          bookings={bookings}
+          month={month}
+          openTrains={openTrains}
+          showDate={showBookingDate}
+          error={saved.error}
+          loading={saved.loading}
+          refresh={saved.refresh}
+          connected={saved.connected}
+        />
         <div className="quick-actions">
           <h3>Quick actions</h3>
           <div>
@@ -176,6 +245,35 @@ export function CalendarPage({
           </div>
         </div>
       </aside>
+      {bookingDialog && (
+        <Modal
+          title={`Train bookings · ${format(new Date(bookingDialog + "T12:00:00"), "d MMM yyyy")}`}
+          onClose={() => setBookingDialog(null)}
+        >
+          <CalendarBookingRows
+            bookings={bookings.filter((item) => item.date === bookingDialog)}
+            connected={saved.connected}
+            openTrains={openTrains}
+          />
+          {bookings.some(
+            (item) => item.date === bookingDialog && item.status === "estimate",
+          ) && (
+            <p className="calendar-train-help">
+              Estimates use 60 days before travel. Confirm the train’s origin
+              date in Trains before saving notifications.
+            </p>
+          )}
+          <button
+            className="button full"
+            onClick={() => {
+              edit(bookingDialog);
+              setBookingDialog(null);
+            }}
+          >
+            Mark attendance
+          </button>
+        </Modal>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { Trash2, Check } from "lucide-react";
+import { Trash2, Check, TrainFront } from "lucide-react";
 import { Modal } from "./ui";
 import { statuses, statusInfo } from "../lib/status";
 import { localDate } from "../lib/dates";
@@ -13,12 +13,14 @@ export function AttendanceEditor({
   record,
   onSave,
   onClose,
+  onPlanTrain,
 }: {
   date: string;
   today: string;
   record?: Attendance;
   onSave: (status: Status | null, notes: string, phase: Phase) => void;
   onClose: () => void;
+  onPlanTrain?: () => void;
 }) {
   const [notes, setNotes] = useState(record?.notes ?? "");
   const holiday = holidayFor(date);
@@ -123,6 +125,12 @@ export function AttendanceEditor({
         >
           <Trash2 size={16} />
           Clear status
+        </button>
+      )}
+      {onPlanTrain && (
+        <button className="button full" onClick={onPlanTrain}>
+          <TrainFront size={16} />
+          Plan train for this visit
         </button>
       )}
       <p className="small-text muted text-center">Saved automatically.</p>

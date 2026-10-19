@@ -3177,3 +3177,96 @@ dialog::backdrop {
     padding-inline: 9px;
   }
 }
+
+.calendar-train-panel {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  margin-top: 20px;
+}
+.calendar-train-panel h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+}
+.calendar-booking-rows {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.calendar-booking-row {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.calendar-booking-row .split {
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: 11px;
+}
+.calendar-booking-row .train-status {
+  font-size: 9px;
+  padding: 4px 6px;
+}
+.calendar-booking-row .button {
+  margin-top: 10px;
+  min-height: 36px;
+}
+.calendar-booking-date {
+  display: block;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: 11px;
+  padding: 10px 0 0;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 36px;
+}
+.calendar-booking-time,
+.calendar-booking-route {
+  font-size: 12px;
+  margin-top: 9px;
+}
+.calendar-train-help {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+.calendar-cell .day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+.calendar-booking-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.booking-estimate .calendar-booking-icon {
+  color: var(--muted);
+}
+.booking-booked .calendar-booking-icon {
+  color: var(--office);
+}
+.calendar-train-legend {
+  color: var(--primary);
+}
+.calendar-train-legend svg {
+  width: 12px;
+  height: 12px;
+}
+.train-journey.is-focused {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  scroll-margin-top: 100px;
+}
+.calendar-card {
+  scroll-margin-top: 95px;
+}

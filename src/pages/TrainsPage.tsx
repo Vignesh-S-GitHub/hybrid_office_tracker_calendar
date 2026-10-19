@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Bell, Check, ExternalLink, RefreshCw, TrainFront } from "lucide-react";
 import type { TrackerData } from "../types";
 import type { TrackerStore } from "../lib/sync";
@@ -15,6 +15,7 @@ import {
   type TrainInput,
   type TrainReminder,
 } from "../lib/trains";
+import { visitTravelDates } from "../lib/calendarTrains";
 import { Modal } from "../components/ui";
 
 const visitLabel = (dates: string[]) =>
@@ -23,13 +24,22 @@ export function TrainsPage({
   data,
   account,
   signedIn,
+  officeDate,
+  journeyId,
 }: {
   data: TrackerData;
   account: TrackerStore;
   signedIn: boolean;
+  officeDate?: string;
+  journeyId?: string;
 }) {
   return signedIn ? (
-    <AccountTrains data={data} account={account} />
+    <AccountTrains
+      data={data}
+      account={account}
+      officeDate={officeDate}
+      journeyId={journeyId}
+    />
   ) : (
     <section className="card train-empty">
       <TrainFront size={32} />
@@ -41,13 +51,25 @@ export function TrainsPage({
 function AccountTrains({
   data,
   account,
+  officeDate,
+  journeyId,
 }: {
   data: TrackerData;
   account: TrackerStore;
+  officeDate?: string;
+  journeyId?: string;
 }) {
+  const focusedJourney = useRef<HTMLElement>(null);
   const [reminders, setReminders] = useState<TrainReminder[]>([]);
   const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (!loading && journeyId)
+      focusedJourney.current?.scrollIntoView?.({
+        behavior: "smooth",
+        block: "center",
+      });
+  }, [loading, journeyId]);
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -233,6 +255,7 @@ function AccountTrains({
           <h2>Add a journey</h2>
           <p className="muted">Choose travel dates for your office visit.</p>
           <JourneyForm
+            officeDate={journeyId ? undefined : officeDate}
             data={data}
             busy={busy}
             save={async (journeys) => {
@@ -256,7 +279,11 @@ function AccountTrains({
             </div>
           )}
           {reminders.map((item) => (
-            <article className="card train-journey" key={item.id}>
+            <article
+              className={`card train-journey ${item.id === journeyId ? "is-focused" : ""}`}
+              key={item.id}
+              ref={item.id === journeyId ? focusedJourney : undefined}
+            >
               <div className="split">
                 <span className={`train-status train-status-${item.status}`}>
                   {item.status === "needs_review"
@@ -461,25 +488,37 @@ function AccountTrains({
 }
 function JourneyForm({
   data,
+  officeDate,
   initial,
   busy,
   save,
 }: {
   data: TrackerData;
+  officeDate?: string;
   initial?: TrainInput;
   busy: boolean;
   save: (journeys: TrainInput[]) => Promise<boolean>;
 }) {
   const today = indiaToday(),
     visits = officeVisits(data, today);
-  const [visit, setVisit] = useState(initial?.officeDates.join(",") ?? "");
+  const selectedVisit = officeDate
+    ? visits.find((dates) => dates.includes(officeDate))
+    : undefined;
+  const travel = selectedVisit
+    ? visitTravelDates(selectedVisit, today)
+    : undefined;
+  const [visit, setVisit] = useState(
+    initial?.officeDates.join(",") ?? selectedVisit?.join(",") ?? "",
+  );
   const [from, setFrom] = useState(initial?.from ?? "");
   const [to, setTo] = useState(initial?.to ?? "");
   const [journeyDate, setDate] = useState(
-    initial?.journeyDate ?? shiftDate(today, 61),
+    initial?.journeyDate ?? travel?.outward ?? shiftDate(today, 61),
   );
-  const [returnDate, setReturnDate] = useState(shiftDate(today, 63));
-  const [includeReturn, setIncludeReturn] = useState(false);
+  const [returnDate, setReturnDate] = useState(
+    travel?.returning ?? shiftDate(today, 63),
+  );
+  const [includeReturn, setIncludeReturn] = useState(!!selectedVisit);
   const [advanceDays, setAdvance] = useState(initial?.advanceDays ?? 60);
   const [originOffset, setOffset] = useState(initial?.originOffset ?? 0);
   const [returnOffset, setReturnOffset] = useState(0);
@@ -511,10 +550,9 @@ function JourneyForm({
     setVisit(value);
     if (value) {
       const dates = value.split(",");
-      setDate(
-        shiftDate(dates[0], -1) < today ? today : shiftDate(dates[0], -1),
-      );
-      setReturnDate(dates.at(-1)!);
+      const selectedTravel = visitTravelDates(dates, today);
+      setDate(selectedTravel.outward);
+      setReturnDate(selectedTravel.returning);
     }
   };
   const submit = async (event: FormEvent) => {
