@@ -1,4 +1,20 @@
-# 📅 Hybrid Office Tracker
+<div align="center">
+
+<img src="public/brand-icon-v2-192.png" alt="Hybrid Office Tracker logo" width="96" />
+
+# Hybrid Office Tracker
+
+**Plan. Track. Stay balanced.**
+
+![React](https://img.shields.io/badge/React-149ECA?style=flat-square&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Cloudflare D1](https://img.shields.io/badge/Cloudflare%20D1-F38020?style=flat-square&logo=cloudflare&logoColor=white)
+
+[Open tracker](https://vignesh-s-github.github.io/hybrid_office_tracker_calendar/) · [Run locally](#run-locally) · [Account setup](#optional-accounts-and-sqlite-backend) · [Train reminders](#train-booking-reminders)
+
+</div>
+
+---
 
 **Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, with optional account login and cross-device SQLite sync.
 
@@ -6,7 +22,7 @@
 | -------------------------- | ----------------------------- | ----------------------------- | -------------------------- |
 | WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | SQLite sync + JSON backups |
 
-## What it does
+## ✨ What it does
 
 - Responsive desktop calendar with a summary beside it, and fixed bottom navigation on mobile.
 - Edit any date, attach notes, and save one attendance status per day.
@@ -55,7 +71,9 @@ GitHub can delay scheduled runs and disables public-repository schedules after 6
 
 React · TypeScript · Vite · Tailwind CSS · Lucide React · date-fns · Vitest · React Testing Library · Workbox through vite-plugin-pwa. Dependency versions are resolved in `package-lock.json`.
 
-## Run locally
+<a id="run-locally"></a>
+
+## 🚀 Run locally
 
 Install **Node.js 24 LTS** with npm. In the repository root:
 
@@ -147,7 +165,7 @@ For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation u
 
 The PWA manifest, icons, service-worker scope, assets, and navigation fallback follow the same base path. Updates display an **Update now** prompt; they do not clear LocalStorage. Android install availability depends on browser support and a valid HTTPS deployment. Downloading a ZIP or opening `index.html` directly does not provide the production app experience.
 
-## Project map
+## 📁 Project map
 
 ```text
 src/
@@ -163,13 +181,15 @@ public/           App icons
 .github/          Pages workflow and dependency updates
 ```
 
-## Verification and limitations
+## 🧪 Verification and limitations
 
 Automated tests cover leap years, real date validation, month lengths, status replacement, planned/completed separation, target overrides, weekly constraints including month boundaries, preferred weekdays, consecutive-day handling, capacity alerts, replanning, migration, storage failures, corrupt data recovery, backup validation/export, navigation, theme, and reset confirmation.
 
 The planner is a personal aid; it cannot infer employer policies or verify real attendance. Built-in holiday catalogs cover only verified All India lists, starting with 2026; unpublished years are not inferred. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
 
-## Login and SQLite backend
+<a id="optional-accounts-and-sqlite-backend"></a>
+
+## 🔐 Optional accounts and SQLite backend
 
 The frontend remains on GitHub Pages. Application code, schema migrations, and holiday data are in GitHub; passwords, sessions, and personal calendars live in the private D1 database, never in the public repository. Passwords use Better Auth’s scrypt hashing. Bearer sessions are remembered in localStorage across tabs and browser restarts. The server verifies the session before loading account records; its existing seven-day expiry and renewal rules still apply. Signing out removes the remembered token and signs other open tabs on this browser out too. Older tab-only sessions migrate after successful server verification. Temporary connection failures retain the token and retry when the app reconnects. Passwords are never stored in browser storage. A per-account recovery copy remains in localStorage, so use a trusted browser and clear site data on shared computers after exporting any unsynced work. Signup currently has no email verification or password recovery: save your password.
 
@@ -212,8 +232,19 @@ npm run api:deploy
 
 GitHub Actions validates backend types and deploys the frontend; backend deployment remains an explicit Wrangler command, requiring Cloudflare credentials on the developer machine. No Cloudflare personal credentials are stored in GitHub. The yearly holiday workflow continues independently.
 
-## Train booking reminders
+<a id="train-booking-reminders"></a>
+
+## 🚆 Train booking reminders
 
 The Trains tab links optional outward/return journeys to saved planned WFO visits. Private journeys sync through your account. Defaults: a 60-day booking window based on departure at the train origin, reminders the previous evening and five minutes before opening, with optional follow-up. Telegram supports Booked and Remind in 1 hour actions. Changing linked office plans pauses delivery for review.
 
 See [Telegram setup, use, privacy and verification](docs/telegram-reminders.md). A one-time BotFather setup and server secrets are required before messages can be delivered. Journeys are stored separately from attendance JSON backups.
+
+
+## 🤝 Contributing
+
+Open an issue with a reproducible example or submit a focused pull request. Keep setup instructions and documentation aligned with any behavior changes.
+
+## 📄 License
+
+No repository-level `LICENSE` file is currently included.
