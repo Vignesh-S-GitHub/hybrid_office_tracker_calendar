@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { planMonth } from "../lib/planner";
 import { Disclosure } from "../components/Disclosure";
 import { format, isWeekend } from "date-fns";
 import {
@@ -36,6 +37,7 @@ export function CalendarPage({
   account,
   userId,
   openTrains,
+  planner,
 }: {
   data: TrackerData;
   month: string;
@@ -48,6 +50,7 @@ export function CalendarPage({
   account: TrackerStore;
   userId: string | null;
   openTrains: (officeDate?: string, journeyId?: string) => void;
+  planner?: ReactNode;
 }) {
   const saved = useCalendarTrains(account, userId);
   const bookings = saved.loading
@@ -56,6 +59,9 @@ export function CalendarPage({
   const [bookingDialog, setBookingDialog] = useState<string | null>(null);
   const stats = statistics(data, month, today);
   const attendance = calendarAttendance(data);
+  const recommended = new Set(
+    planMonth(data, month, today).recommendations.map((row) => row.date),
+  );
   const days = calendarDays(month, data.settings.weekStartsOn).filter(
     (day) => data.settings.showWeekends || !isWeekend(day),
   );
@@ -101,9 +107,12 @@ export function CalendarPage({
                   ? "booked"
                   : "estimate";
               const holiday = holidayFor(key);
+              const suggested = inMonth && recommended.has(key);
               const label = record
                 ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
-                : "No entry";
+                : suggested
+                  ? "Suggested office day"
+                  : "No entry";
               return (
                 <button
                   key={key}
@@ -114,7 +123,7 @@ export function CalendarPage({
                       .filter(Boolean)
                       .join(" · ") || label
                   }
-                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
+                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
                   onClick={() =>
                     trainBookings.length ? setBookingDialog(key) : edit(key)
                   }
@@ -129,7 +138,7 @@ export function CalendarPage({
                     )}
                   </span>
                   <span
-                    className={`day-dot ${record ? statusInfo[record.status].className : "unmarked"}`}
+                    className={`day-dot ${record ? statusInfo[record.status].className : suggested ? "suggestion-dot" : "unmarked"}`}
                   />
                   {record && (
                     <span className="cell-caption">
@@ -162,6 +171,10 @@ export function CalendarPage({
               <i className="dot planned-dot" />
               Planned
             </span>
+            <span>
+              <i className="dot suggestion-dot" />
+              Suggested
+            </span>
             {!!bookings.length && (
               <span className="calendar-train-legend">
                 <TrainFront aria-hidden="true" />
@@ -174,6 +187,7 @@ export function CalendarPage({
             <span>Select a date to mark attendance.</span>
           </div>
         </section>
+        {planner}
       </div>
       <aside className="card summary-card">
         <h2>{format(new Date(`${month}-01T12:00:00`), "MMMM yyyy")} summary</h2>

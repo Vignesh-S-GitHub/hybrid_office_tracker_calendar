@@ -18,7 +18,7 @@
 
 **Plan. Track. Stay balanced.** A simple hybrid-work calendar with holidays, train reminders, optional account login, and cross-device SQLite sync.
 
-The app has four pages: **Calendar, Holidays, Trains, and Settings**.
+The app has four pages: **Calendar, Holidays, Trains, and Settings**. Smart WFO Planner is available on the Calendar home page, with its preferences in Settings.
 
 ## ✨ What it does
 

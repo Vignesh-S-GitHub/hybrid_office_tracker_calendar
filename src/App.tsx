@@ -1,3 +1,5 @@
+import { Planner } from "./components/Planner";
+import { planMonth } from "./lib/planner";
 import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
@@ -167,6 +169,36 @@ export default function App() {
       });
     else save();
   };
+  const apply = (dates: string[]) => {
+    if (locked) return;
+    const eligible = new Set(
+      planMonth(data, month, today).recommendations.map((row) => row.date),
+    );
+    const accepted = dates.filter(
+      (date) => eligible.has(date) && !data.attendance[date],
+    );
+    if (!accepted.length) return;
+    const attendance = { ...data.attendance };
+    accepted.forEach((date) => {
+      attendance[date] = {
+        status: "WFO",
+        phase: "planned",
+        notes: "Office day planned with Smart WFO Planner.",
+        updatedAt: new Date().toISOString(),
+      };
+    });
+    commit({
+      ...data,
+      attendance,
+      monthlyTargets: {
+        ...data.monthlyTargets,
+        [month]: targetFor(data, month),
+      },
+    });
+    setToast(
+      `${accepted.length} office ${accepted.length === 1 ? "day" : "days"} planned. Confirm completion after attending.`,
+    );
+  };
   const exportData = () => {
     try {
       if (locked) downloadBackup(localStorage.getItem(STORAGE_KEY) ?? "", true);
@@ -203,6 +235,31 @@ export default function App() {
       if (fileInput.current) fileInput.current.value = "";
     }
   };
+  const planner = (
+    <Planner
+      data={data}
+      month={month}
+      today={today}
+      apply={apply}
+      reject={(date) =>
+        commit({
+          ...data,
+          rejected: {
+            ...data.rejected,
+            [month]: [...(data.rejected[month] ?? []), date],
+          },
+        })
+      }
+      regenerate={() => {
+        commit({ ...data, rejected: { ...data.rejected, [month]: [] } });
+        setToast(
+          "Plan recalculated with your saved preferences. Excluded suggestions are available again.",
+        );
+      }}
+      edit={edit}
+      settings={() => navigate("settings")}
+    />
+  );
   const pageTitles = {
     trains: "Trains",
     holidays: "Holidays",
@@ -289,6 +346,7 @@ export default function App() {
         {page === "calendar" && (
           <CalendarPage
             key={user?.id ?? "guest"}
+            planner={planner}
             account={account}
             userId={user?.id ?? null}
             openTrains={openTrains}

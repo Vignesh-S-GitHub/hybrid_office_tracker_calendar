@@ -58,9 +58,36 @@ describe("complete attendance flow", () => {
         nav.getAllByRole("button").map((button) => button.textContent),
       ).toEqual(["Calendar", "Holidays", "Trains", "Settings"]);
     }
+    expect(screen.getByRole("heading", { name: "Calendar" })).toBeVisible();
+  });
+  it("restores planner preferences and saves home-page suggestions as plans", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const nav = within(
+      screen.getByRole("navigation", { name: "Main navigation" }),
+    );
+    await user.click(nav.getByRole("button", { name: "Settings" }));
+    await user.click(
+      screen.getByRole("button", { name: "Smart planner preferences" }),
+    );
+    fireEvent.change(
+      screen.getByRole("spinbutton", { name: "Maximum office days per week" }),
+      { target: { value: "2" } },
+    );
     expect(
-      screen.getByRole("heading", { name: "Calendar" }),
-    ).toBeVisible();
+      JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.maxPerWeek,
+    ).toBe(2);
+    await user.click(nav.getByRole("button", { name: "Calendar" }));
+    await user.click(
+      screen.getByRole("button", { name: "Apply recommended plan" }),
+    );
+    const rows = Object.values(
+      JSON.parse(localStorage.getItem(STORAGE_KEY)!).attendance,
+    ) as { status: string; phase: string }[];
+    expect(rows.length).toBeGreaterThan(0);
+    expect(
+      rows.every((row) => row.status === "WFO" && row.phase === "planned"),
+    ).toBe(true);
   });
   it("changes month targets and keeps old attendance when navigating months", async () => {
     const data = emptyData();
@@ -121,9 +148,7 @@ describe("complete attendance flow", () => {
       screen.getByRole("navigation", { name: "Mobile navigation" }),
     );
     await user.click(nav.getByRole("button", { name: "Holidays" }));
-    expect(
-      screen.getByRole("heading", { name: "Holidays" }),
-    ).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Holidays" })).toBeVisible();
     await user.click(nav.getByRole("button", { name: "Trains" }));
     expect(screen.getByText(/Sign in to save journeys/)).toBeVisible();
     await user.click(nav.getByRole("button", { name: "Settings" }));
