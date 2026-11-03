@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Bell, Check, ExternalLink, RefreshCw, TrainFront } from "lucide-react";
+import {
+  Bell,
+  Check,
+  ChevronDown,
+  ExternalLink,
+  RefreshCw,
+  TrainFront,
+} from "lucide-react";
 import type { TrackerData } from "../types";
 import type { TrackerStore } from "../lib/sync";
 import {
@@ -75,6 +82,7 @@ function AccountTrains({
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [showJourneyForm, setShowJourneyForm] = useState(false);
   const [link, setLink] = useState("");
   const [editing, setEditing] = useState<TrainReminder | null>(null);
   const [confirm, setConfirm] = useState<{
@@ -250,21 +258,38 @@ function AccountTrains({
           {notice}
         </p>
       )}
-      <div className="trains-layout">
+      <div className={`trains-layout ${reminders.length ? "has-journeys" : ""}`}>
         <section className="card train-form-card">
-          <h2>Add a journey</h2>
-          <p className="muted">Choose travel dates for your office visit.</p>
-          <JourneyForm
-            officeDate={journeyId ? undefined : officeDate}
-            data={data}
-            busy={busy}
-            save={async (journeys) => {
-              return run(
-                () => account.request("/api/train-reminders", { journeys }),
-                "Journey saved.",
-              );
-            }}
-          />
+          <div className="split train-form-heading">
+            <h2>Add a journey</h2>
+            <button
+              className="icon-button train-form-toggle"
+              aria-label="Toggle journey form"
+              aria-expanded={showJourneyForm || !reminders.length || !!officeDate}
+              aria-controls="new-journey-form"
+              onClick={() => setShowJourneyForm((value) => !value)}
+              hidden={!reminders.length || !!officeDate}
+            >
+              <ChevronDown size={18} />
+            </button>
+          </div>
+          <div
+            id="new-journey-form"
+            className={`train-form-content ${!showJourneyForm && reminders.length && !officeDate ? "is-collapsed" : ""}`}
+          >
+            <p className="muted">Choose travel dates for your office visit.</p>
+            <JourneyForm
+              officeDate={journeyId ? undefined : officeDate}
+              data={data}
+              busy={busy}
+              save={async (journeys) => {
+                return run(
+                  () => account.request("/api/train-reminders", { journeys }),
+                  "Journey saved.",
+                );
+              }}
+            />
+          </div>
         </section>
         <section className="train-list" aria-labelledby="journeys-title">
           <div className="split">
@@ -327,7 +352,9 @@ function AccountTrains({
               {item.deliveryError && item.status === "pending" && (
                 <p className="account-error">{item.deliveryError}</p>
               )}
-              <div className="train-actions">
+              <div
+                className={`train-actions journey-actions ${item.status === "pending" ? "is-pending" : ""}`}
+              >
                 {item.status === "pending" && (
                   <>
                     <button

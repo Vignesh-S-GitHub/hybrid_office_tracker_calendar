@@ -24,7 +24,8 @@
 
 ## ✨ What it does
 
-- Responsive desktop calendar with a summary beside it, and fixed bottom navigation on mobile.
+- Compact, mobile-first layout with consistent card spacing, touch-friendly controls, and fixed bottom navigation. Desktop uses aligned content columns without stretching short panels.
+- Saved train journeys appear first on phones; expand Add a journey when needed. Desktop keeps the form beside your journeys.
 - Edit any date, attach notes, and save one attendance status per day.
 - Keep **completed**, **planned**, and **suggested** office days separate. Past plans never silently become completed attendance.
 - Track monthly targets, save month-specific overrides, and review previous months without losing data.
