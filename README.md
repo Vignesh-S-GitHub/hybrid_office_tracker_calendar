@@ -20,6 +20,8 @@
 
 The app has four pages: **Calendar, Holidays, Trains, and Settings**. Smart WFO Planner is available on the Calendar home page, with its preferences in Settings.
 
+With **Avoid consecutive office days** off, the planner fills the earliest eligible weeks up to the weekly maximum. A 12-day target with a five-day limit becomes 5 + 5 + 2 when all those weekdays are available. Turning avoidance on spaces suggestions across the month. Holidays, existing records, excluded dates, and weekly limits remain respected.
+
 ## ✨ What it does
 
 - Compact, mobile-first layout with consistent card spacing, touch-friendly controls, and fixed bottom navigation. Desktop uses aligned content columns without stretching short panels.

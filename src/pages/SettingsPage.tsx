@@ -240,7 +240,10 @@ export function SettingsPage({
           <label className="setting-row toggle-row">
             <div>
               <strong>Avoid consecutive office days</strong>
-              <p>Space out office days.</p>
+              <p>
+                On: space out office days. Off: fill the earliest weeks up to
+                your weekly limit.
+              </p>
             </div>
             <input
               type="checkbox"
