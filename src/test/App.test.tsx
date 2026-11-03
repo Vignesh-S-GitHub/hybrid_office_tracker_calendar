@@ -140,9 +140,11 @@ describe("complete attendance flow", () => {
   it("switches theme and supports mobile navigation and reset cancellation", async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(
-      screen.getByRole("button", { name: "Switch to dark mode" }),
-    );
+    // Fresh profiles now start in the premium dark appearance. Verify both directions.
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    await user.click(screen.getByRole("button", { name: "Switch to light mode" }));
+    expect(document.documentElement.dataset.theme).toBe("light");
+    await user.click(screen.getByRole("button", { name: "Switch to dark mode" }));
     expect(document.documentElement.dataset.theme).toBe("dark");
     const nav = within(
       screen.getByRole("navigation", { name: "Mobile navigation" }),
@@ -171,7 +173,7 @@ describe("complete attendance flow", () => {
     await waitFor(() =>
       expect(
         JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.theme,
-      ).toBe("system"),
+      ).toBe("dark"),
     );
   });
   it("prevents corruption from being overwritten by edits", async () => {
