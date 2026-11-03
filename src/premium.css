@@ -42,10 +42,9 @@ h1,h2,h3{letter-spacing:-.045em}
 .app-main{max-width:1240px;padding:19px 25px 40px}
 .intro{position:relative;isolation:isolate;min-height:124px;margin-bottom:16px;padding:28px 29px;display:flex;align-items:flex-start;flex-direction:column;justify-content:center;gap:7px;overflow:hidden;border-radius:24px;background:radial-gradient(circle at 77% 52%,#2a6ce780,transparent 50%),linear-gradient(115deg,#081b42,#132d68 58%,#214d8d);border:1px solid #628bd45d;box-shadow:0 18px 50px #0612355e}
 .intro::before{position:absolute;content:"";inset:0;z-index:-1;background:radial-gradient(ellipse 40% 70% at 93% 8%,#46eaf244,transparent 85%),radial-gradient(ellipse 65% 100% at 0 115%,#7551ff55,transparent 70%);pointer-events:none}
-.intro::after{position:absolute;content:"";right:0;bottom:0;width:60%;height:110%;z-index:-1;background-image:url('/ui-kit/scenes/cityline.svg');background-repeat:no-repeat;background-position:right bottom;background-size:contain;opacity:.95;pointer-events:none}
-.app-main[data-page="holidays"] .intro::after{background-image:url('/ui-kit/scenes/beach.svg')}
-.app-main[data-page="trains"] .intro::after{background-image:url('/ui-kit/scenes/train.svg');width:66%}
-.app-main[data-page="settings"] .intro::after{background-image:url('/ui-kit/scenes/settings.svg');width:55%}
+.intro::after{position:absolute;content:"";right:0;bottom:0;width:60%;height:110%;z-index:-1;background-image:var(--page-scene);background-repeat:no-repeat;background-position:right bottom;background-size:contain;opacity:.95;pointer-events:none}
+.app-main[data-page="trains"] .intro::after{width:66%}
+.app-main[data-page="settings"] .intro::after{width:55%}
 .intro h1{color:#fff;font-size:32px;font-weight:830;line-height:1.15;letter-spacing:-.06em;text-shadow:0 3px 12px #03132a60}
 .intro .privacy-note{color:#c6dbff;font-size:12px;max-width:30ch;align-self:auto}
 .intro .privacy-note svg{color:#6df0dd}
@@ -72,6 +71,7 @@ h1,h2,h3{letter-spacing:-.045em}
 .calendar-cell .cell-caption{font-size:9px}
 .calendar-cell.outside{opacity:.36}
 .calendar-cell.weekend:not(.office):not(.home):not(.holiday){background:#18264c}
+:root[data-theme="light"] .calendar-cell.weekend:not(.office):not(.home):not(.holiday){background:var(--soft)}
 .calendar-cell.today{background:linear-gradient(140deg,#1a63e5,#2259bc);box-shadow:0 0 0 2px #66c6ff,inset 0 1px 0 #ffffff4b;color:white}
 .calendar-cell.office:not(.today){background:linear-gradient(140deg,#0e665e,#124d66);border-color:#23ccac7d}
 .calendar-cell.home:not(.today){background:linear-gradient(140deg,#245b9c,#1d396e);border-color:#53b1ff77}
