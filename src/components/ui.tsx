@@ -48,11 +48,17 @@ export function StatCards({ stats }: { stats: Stats }) {
   return (
     <div className="stat-grid">
       {statuses.map((status) => {
-        const { Icon, short, className } = statusInfo[status];
+        const { short, className } = statusInfo[status];
         return (
           <div className={`stat-card ${className}`} key={status}>
             <span className="stat-icon">
-              <Icon size={22} />
+              <img
+                src={`${import.meta.env.BASE_URL}ui-kit/attendance/${status.toLowerCase()}.svg`}
+                alt=""
+                aria-hidden="true"
+                width="26"
+                height="26"
+              />
             </span>
             <div>
               <span>{short}</span>

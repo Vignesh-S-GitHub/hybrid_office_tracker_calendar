@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { activeHolidayCatalog, type HolidayCatalog } from "../lib/holidays";
 import { localDate } from "../lib/dates";
+import { holidayArtwork } from "../lib/holidayArtwork";
 
 export function HolidaysPage({
   today,
@@ -23,6 +24,7 @@ export function HolidaysPage({
     (holiday) => holiday.date !== holiday.indiaPostDate,
   );
   const upcoming = holidays.filter((holiday) => holiday.date >= today).length;
+  const highlighted = holidays.find((holiday) => holiday.date >= today) ?? holidays.at(-1);
   return (
     <section
       className="card holidays-card"
@@ -83,6 +85,18 @@ export function HolidaysPage({
           </p>
         </div>
       ))}
+      {highlighted && (
+        <div className="holiday-spotlight" aria-label="Featured official holiday">
+          <img
+            src={holidayArtwork(highlighted.name, "banner")}
+            alt=""
+            loading="lazy"
+          />
+          <span className="holiday-spotlight-date">
+            {format(localDate(highlighted.date), "d MMM yyyy")}
+          </span>
+        </div>
+      )}
       <div className="holiday-list">
         {holidays.map((holiday) => (
           <div
@@ -93,6 +107,12 @@ export function HolidaysPage({
               <span>{format(localDate(holiday.date), "MMM")}</span>
               <strong>{format(localDate(holiday.date), "d")}</strong>
             </div>
+            <img
+              className="holiday-artwork"
+              src={holidayArtwork(holiday.name, "illustration")}
+              alt=""
+              loading="lazy"
+            />
             <div className="holiday-description">
               <h3>{holiday.name}</h3>
               <p>{format(localDate(holiday.date), "EEEE, d MMMM yyyy")}</p>

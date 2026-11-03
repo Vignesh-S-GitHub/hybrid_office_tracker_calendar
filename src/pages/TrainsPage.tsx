@@ -49,7 +49,13 @@ export function TrainsPage({
     />
   ) : (
     <section className="card train-empty">
-      <TrainFront size={32} />
+      <img
+        className="train-empty-art"
+        src={`${import.meta.env.BASE_URL}ui-kit/illustrations/no-trains.svg`}
+        alt=""
+        aria-hidden="true"
+      />
+      <TrainFront size={32} className="train-fallback-icon" />
       <h2>Train reminders</h2>
       <p>Sign in to save journeys and receive Telegram reminders.</p>
     </section>
@@ -299,7 +305,13 @@ function AccountTrains({
           {loading && <p role="status">Loading journeys…</p>}
           {!loading && reminders.length === 0 && (
             <div className="card train-empty">
-              <TrainFront size={28} />
+              <img
+                className="train-empty-art"
+                src={`${import.meta.env.BASE_URL}ui-kit/illustrations/no-trains.svg`}
+                alt=""
+                aria-hidden="true"
+              />
+              <TrainFront size={28} className="train-fallback-icon" />
               <p>No journeys yet.</p>
             </div>
           )}
