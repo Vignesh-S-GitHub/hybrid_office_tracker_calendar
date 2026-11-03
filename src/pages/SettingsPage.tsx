@@ -1,3 +1,4 @@
+import { Disclosure } from "../components/Disclosure";
 import { BrandMark } from "../components/BrandMark";
 import {
   Building2,
@@ -129,11 +130,16 @@ export function SettingsPage({
   return (
     <div className="settings-layout">
       <div className="settings-column">
-        <section className="card settings-card">
-          <h2>
-            <Building2 size={20} />
-            Work preferences
-          </h2>
+        <Disclosure
+          className="card settings-card"
+          title={
+            <>
+              <Building2 size={20} />
+              Work preferences
+            </>
+          }
+          defaultOpen
+        >
           <div className="setting-row">
             <div>
               <strong>Default monthly office target</strong>
@@ -185,12 +191,16 @@ export function SettingsPage({
               </button>
             )}
           </div>
-        </section>
-        <section className="card settings-card">
-          <h2>
-            <Sparkles size={20} />
-            Smart planner preferences
-          </h2>
+        </Disclosure>
+        <Disclosure
+          className="card settings-card"
+          title={
+            <>
+              <Sparkles size={20} />
+              Smart planner preferences
+            </>
+          }
+        >
           <div className="setting-stacked">
             <strong>Working days</strong>
             <p>Only these weekdays are eligible for recommendations.</p>
@@ -256,12 +266,16 @@ export function SettingsPage({
               onChange={(event) => update({ protectWFH: event.target.checked })}
             />
           </label>
-        </section>
-        <section className="card settings-card">
-          <h2>
-            <CalendarDays size={20} />
-            Calendar preferences
-          </h2>
+        </Disclosure>
+        <Disclosure
+          className="card settings-card"
+          title={
+            <>
+              <CalendarDays size={20} />
+              Calendar preferences
+            </>
+          }
+        >
           <label className="setting-row">
             <div>
               <strong>Week starts on</strong>
@@ -325,14 +339,19 @@ export function SettingsPage({
               />
             </label>
           )}
-        </section>
+        </Disclosure>
       </div>
       <div className="settings-column">
-        <section className="card settings-card">
-          <h2>
-            <Sun size={20} />
-            Appearance
-          </h2>
+        <Disclosure
+          className="card settings-card"
+          title={
+            <>
+              <Sun size={20} />
+              Appearance
+            </>
+          }
+          defaultOpen
+        >
           <p className="muted small-text">A comfortable view, day or night.</p>
           <div className="theme-picker">
             {(
@@ -353,12 +372,16 @@ export function SettingsPage({
               </button>
             ))}
           </div>
-        </section>
-        <section className="card settings-card">
-          <h2>
-            <Download size={20} />
-            Data management
-          </h2>
+        </Disclosure>
+        <Disclosure
+          className="card settings-card"
+          title={
+            <>
+              <Download size={20} />
+              Data management
+            </>
+          }
+        >
           <button className="setting-action" onClick={exportData}>
             <span className="action-icon">
               <Download size={21} />
@@ -386,7 +409,7 @@ export function SettingsPage({
               <small>Reset records and preferences after confirmation.</small>
             </span>
           </button>
-        </section>
+        </Disclosure>
         <section className="card privacy-card">
           <ShieldCheck size={28} />
           <h2>Your data</h2>
@@ -397,16 +420,20 @@ export function SettingsPage({
             Works offline after the first visit
           </span>
         </section>
-        <section className="card settings-card about-card">
-          <h2>
-            <Info size={20} />
-            About
-          </h2>
+        <Disclosure
+          className="card settings-card about-card"
+          title={
+            <>
+              <Info size={20} />
+              About
+            </>
+          }
+        >
           <strong>
             <BrandMark /> Hybrid Tracker{" "}
             <span className="muted small-text">v1.0.0</span>
           </strong>
-        </section>
+        </Disclosure>
       </div>
     </div>
   );

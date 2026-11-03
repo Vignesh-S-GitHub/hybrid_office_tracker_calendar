@@ -45,20 +45,26 @@ export function HolidaysPage({
           Official sources
         </span>
       </div>
-      <p className="holiday-scope">
-        Only the holidays in India Post’s All India {year} list, cross-checked
-        against India Portal’s central calendar. State, regional, and restricted
-        holidays are excluded.
-      </p>
-      <div className="holiday-source-links">
-        <a href={sources.indiaPortal} target="_blank" rel="noreferrer">
-          India Portal calendar <ExternalLink size={13} />
-        </a>
-        <a href={sources.indiaPost} target="_blank" rel="noreferrer">
-          India Post All India list <ExternalLink size={13} />
-        </a>
-        <span>Verified {format(localDate(verifiedOn), "d MMM yyyy")}</span>
-      </div>
+      <Disclosure
+        className="holiday-sources"
+        title="Sources and coverage"
+        level={3}
+      >
+        <p className="holiday-scope">
+          Only the holidays in India Post’s All India {year} list, cross-checked
+          against India Portal’s central calendar. State, regional, and
+          restricted holidays are excluded.
+        </p>
+        <div className="holiday-source-links">
+          <a href={sources.indiaPortal} target="_blank" rel="noreferrer">
+            India Portal calendar <ExternalLink size={13} />
+          </a>
+          <a href={sources.indiaPost} target="_blank" rel="noreferrer">
+            India Post All India list <ExternalLink size={13} />
+          </a>
+          <span>Verified {format(localDate(verifiedOn), "d MMM yyyy")}</span>
+        </div>
+      </Disclosure>
       {year !== Number(today.slice(0, 4)) && (
         <div className="notice holiday-date-note" role="status">
           The {today.slice(0, 4)} All India list is not yet available from both
@@ -120,3 +126,4 @@ export function HolidaysPage({
     </section>
   );
 }
+import { Disclosure } from "../components/Disclosure";

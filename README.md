@@ -25,7 +25,8 @@
 ## ✨ What it does
 
 - Compact, mobile-first layout with consistent card spacing, touch-friendly controls, and fixed bottom navigation. Desktop uses aligned content columns without stretching short panels.
-- Saved train journeys appear first on phones; expand Add a journey when needed. Desktop keeps the form beside your journeys.
+- Saved train journeys appear first on phones; expand Add a journey when needed. Desktop uses two aligned journey columns with the add form above.
+- Section headings have expand/collapse arrows for secondary details in Calendar, Dashboard, History, Holidays, and Settings. The planner sits directly beneath the calendar, independently of the sidebar height. Collapsing sections keeps entered values intact.
 - Edit any date, attach notes, and save one attendance status per day.
 - Keep **completed**, **planned**, and **suggested** office days separate. Past plans never silently become completed attendance.
 - Track monthly targets, save month-specific overrides, and review previous months without losing data.

@@ -113,6 +113,9 @@ describe("Calendar to train reminders", () => {
   });
   it("jumps from the office month back to the 60-day booking month", async () => {
     render(<CalendarFixture account={new TrackerStore()} month="2026-12" />);
+    await userEvent
+      .setup()
+      .click(screen.getByRole("button", { name: /Train booking/ }));
     await userEvent.setup().click(
       screen.getByRole("button", {
         name: "Show booking date 10 October 2026 in calendar",
@@ -186,11 +189,12 @@ describe("Calendar to train reminders", () => {
     );
     await userEvent
       .setup()
-      .click(
-        await screen.findByRole("button", {
-          name: "Connect Telegram for reminders",
-        }),
-      );
+      .click(screen.getByRole("button", { name: /Train booking/ }));
+    await userEvent.setup().click(
+      await screen.findByRole("button", {
+        name: "Connect Telegram for reminders",
+      }),
+    );
     expect(openTrains).toHaveBeenCalledWith();
     expect(screen.queryByText(/Reminder ·.*08:55/)).not.toBeInTheDocument();
   });
@@ -203,6 +207,9 @@ describe("Calendar to train reminders", () => {
     );
     vi.spyOn(account, "request").mockImplementation(request);
     render(<CalendarFixture account={account} userId="one" />);
+    await userEvent
+      .setup()
+      .click(screen.getByRole("button", { name: /Train booking/ }));
     expect(
       await screen.findByRole("button", {
         name: /October 24, 2026,.*Train booking/,

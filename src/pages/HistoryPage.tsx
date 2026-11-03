@@ -1,3 +1,4 @@
+import { Disclosure } from "../components/Disclosure";
 import { useState } from "react";
 import { format } from "date-fns";
 import { History, Search, Pencil } from "lucide-react";
@@ -127,8 +128,7 @@ export function HistoryPage({
           </div>
         )}
       </section>
-      <section className="card monthly-table">
-        <h2>Month by month</h2>
+      <Disclosure className="card monthly-table" title={<>Month by month</>}>
         <p className="muted small-text">
           Completed office and home totals. Saved monthly targets stay with
           their month.
@@ -173,7 +173,7 @@ export function HistoryPage({
             </tbody>
           </table>
         </div>
-      </section>
+      </Disclosure>
     </>
   );
 }

@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
+import { Disclosure } from "../components/Disclosure";
 import { format, isWeekend } from "date-fns";
 import {
   Plus,
@@ -41,6 +42,7 @@ export function CalendarPage({
   account,
   userId,
   openTrains,
+  planner,
 }: {
   data: TrackerData;
   month: string;
@@ -54,6 +56,7 @@ export function CalendarPage({
   account: TrackerStore;
   userId: string | null;
   openTrains: (officeDate?: string, journeyId?: string) => void;
+  planner?: ReactNode;
 }) {
   const saved = useCalendarTrains(account, userId);
   const bookings = saved.loading
@@ -84,116 +87,122 @@ export function CalendarPage({
   );
   return (
     <div className="calendar-layout">
-      <section className="card calendar-card" ref={calendar}>
-        <MonthControls month={month} onChange={setMonth} today={today} />
-        <div
-          className="calendar-grid"
-          style={{
-            gridTemplateColumns: `repeat(${visibleWeekdays.length}, minmax(0, 1fr))`,
-          }}
-        >
-          {visibleWeekdays.map((day) => (
-            <div
-              className={`weekday ${day === "Sun" || day === "Sat" ? "weekend-label" : ""}`}
-              key={day}
-            >
-              {day}
-            </div>
-          ))}
-          {days.map((day) => {
-            const key = dateKey(day),
-              record = attendance[key],
-              inMonth = key.startsWith(month);
-            const trainBookings = bookings.filter((item) => item.date === key);
-            const bookingState = trainBookings.some(
-              (item) =>
-                item.status === "pending" || item.status === "needs_review",
-            )
-              ? "pending"
-              : trainBookings.every((item) => item.status === "booked")
-                ? "booked"
-                : "estimate";
-            const holiday = holidayFor(key);
-            const suggested = inMonth && recommended.has(key);
-            const label = record
-              ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
-              : suggested
-                ? "Suggested office day"
-                : "No entry";
-            return (
-              <button
-                key={key}
-                aria-label={`${format(day, "MMMM d, yyyy")}, ${label}${trainBookings.length ? `, Train booking${bookingState === "estimate" ? " estimate" : bookingState === "booked" ? " booked" : ""}` : ""}`}
-                aria-current={key === today ? "date" : undefined}
-                title={
-                  [holiday?.name, record?.notes].filter(Boolean).join(" · ") ||
-                  label
-                }
-                className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected || key === bookingDay ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
-                onClick={() =>
-                  trainBookings.length ? setBookingDialog(key) : edit(key)
-                }
+      <div className="calendar-primary">
+        <section className="card calendar-card" ref={calendar}>
+          <MonthControls month={month} onChange={setMonth} today={today} />
+          <div
+            className="calendar-grid"
+            style={{
+              gridTemplateColumns: `repeat(${visibleWeekdays.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {visibleWeekdays.map((day) => (
+              <div
+                className={`weekday ${day === "Sun" || day === "Sat" ? "weekend-label" : ""}`}
+                key={day}
               >
-                <span className="day-number">
-                  {format(day, "d")}
-                  {!!trainBookings.length && (
-                    <TrainFront
-                      className="calendar-booking-icon"
-                      aria-hidden="true"
-                    />
-                  )}
-                </span>
-                <span
-                  className={`day-dot ${record ? statusInfo[record.status].className : suggested ? "suggestion-dot" : "unmarked"}`}
-                />
-                {record && (
-                  <span className="cell-caption">
-                    {holiday && !data.attendance[key]
-                      ? holiday.name
-                      : record.status}
-                    {record.phase === "planned" ? " · Plan" : ""}
+                {day}
+              </div>
+            ))}
+            {days.map((day) => {
+              const key = dateKey(day),
+                record = attendance[key],
+                inMonth = key.startsWith(month);
+              const trainBookings = bookings.filter(
+                (item) => item.date === key,
+              );
+              const bookingState = trainBookings.some(
+                (item) =>
+                  item.status === "pending" || item.status === "needs_review",
+              )
+                ? "pending"
+                : trainBookings.every((item) => item.status === "booked")
+                  ? "booked"
+                  : "estimate";
+              const holiday = holidayFor(key);
+              const suggested = inMonth && recommended.has(key);
+              const label = record
+                ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
+                : suggested
+                  ? "Suggested office day"
+                  : "No entry";
+              return (
+                <button
+                  key={key}
+                  aria-label={`${format(day, "MMMM d, yyyy")}, ${label}${trainBookings.length ? `, Train booking${bookingState === "estimate" ? " estimate" : bookingState === "booked" ? " booked" : ""}` : ""}`}
+                  aria-current={key === today ? "date" : undefined}
+                  title={
+                    [holiday?.name, record?.notes]
+                      .filter(Boolean)
+                      .join(" · ") || label
+                  }
+                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected || key === bookingDay ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
+                  onClick={() =>
+                    trainBookings.length ? setBookingDialog(key) : edit(key)
+                  }
+                >
+                  <span className="day-number">
+                    {format(day, "d")}
+                    {!!trainBookings.length && (
+                      <TrainFront
+                        className="calendar-booking-icon"
+                        aria-hidden="true"
+                      />
+                    )}
                   </span>
-                )}
-                {suggested && <span className="cell-caption">Suggested</span>}
-              </button>
-            );
-          })}
-        </div>
-        <div className="legend">
-          {statuses.map((status) => (
-            <span key={status}>
-              <i className={`dot ${statusInfo[status].className}`} />
-              {status === "WFO"
-                ? "WFO (Office)"
-                : status === "WFH"
-                  ? "WFH (Home)"
-                  : status}
+                  <span
+                    className={`day-dot ${record ? statusInfo[record.status].className : suggested ? "suggestion-dot" : "unmarked"}`}
+                  />
+                  {record && (
+                    <span className="cell-caption">
+                      {holiday && !data.attendance[key]
+                        ? holiday.name
+                        : record.status}
+                      {record.phase === "planned" ? " · Plan" : ""}
+                    </span>
+                  )}
+                  {suggested && <span className="cell-caption">Suggested</span>}
+                </button>
+              );
+            })}
+          </div>
+          <div className="legend">
+            {statuses.map((status) => (
+              <span key={status}>
+                <i className={`dot ${statusInfo[status].className}`} />
+                {status === "WFO"
+                  ? "WFO (Office)"
+                  : status === "WFH"
+                    ? "WFH (Home)"
+                    : status}
+              </span>
+            ))}
+            <span>
+              <i className="dot unmarked" />
+              No entry
             </span>
-          ))}
-          <span>
-            <i className="dot unmarked" />
-            No entry
-          </span>
-          <span>
-            <i className="dot planned-dot" />
-            Planned
-          </span>
-          <span>
-            <i className="dot suggestion-dot" />
-            Suggested
-          </span>
-          {!!bookings.length && (
-            <span className="calendar-train-legend">
-              <TrainFront aria-hidden="true" />
-              Train booking
+            <span>
+              <i className="dot planned-dot" />
+              Planned
             </span>
-          )}
-        </div>
-        <div className="calendar-tip">
-          <CalendarCheck2 size={16} />
-          <span>Select a date to mark attendance.</span>
-        </div>
-      </section>
+            <span>
+              <i className="dot suggestion-dot" />
+              Suggested
+            </span>
+            {!!bookings.length && (
+              <span className="calendar-train-legend">
+                <TrainFront aria-hidden="true" />
+                Train booking
+              </span>
+            )}
+          </div>
+          <div className="calendar-tip">
+            <CalendarCheck2 size={16} />
+            <span>Select a date to mark attendance.</span>
+          </div>
+        </section>
+        {planner}
+      </div>
       <aside className="card summary-card">
         <h2>{format(new Date(`${month}-01T12:00:00`), "MMMM yyyy")} summary</h2>
         <StatCards stats={stats} />
@@ -227,8 +236,7 @@ export function CalendarPage({
           refresh={saved.refresh}
           connected={saved.connected}
         />
-        <div className="quick-actions">
-          <h3>Quick actions</h3>
+        <Disclosure className="quick-actions" title="Quick actions" level={3}>
           <div>
             <button onClick={exportData}>
               <Download size={21} />
@@ -243,7 +251,7 @@ export function CalendarPage({
               <span>View history</span>
             </button>
           </div>
-        </div>
+        </Disclosure>
       </aside>
       {bookingDialog && (
         <Modal

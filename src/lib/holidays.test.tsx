@@ -146,6 +146,9 @@ describe("All India Holidays - 2026", () => {
     const viewDate = vi.fn(),
       user = userEvent.setup();
     render(<HolidaysPage today="2026-10-15" viewDate={viewDate} />);
+    await user.click(
+      screen.getByRole("button", { name: "Sources and coverage" }),
+    );
     expect(
       screen.getByRole("heading", { name: "All India Holidays - 2026" }),
     ).toBeInTheDocument();

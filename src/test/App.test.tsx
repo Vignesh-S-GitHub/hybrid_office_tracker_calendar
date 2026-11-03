@@ -130,6 +130,7 @@ describe("complete attendance flow", () => {
       screen.getByText("Your story starts with a day"),
     ).toBeInTheDocument();
     await user.click(nav.getByRole("button", { name: "Settings" }));
+    await user.click(screen.getByRole("button", { name: "Data management" }));
     await user.click(
       screen.getByRole("button", { name: /Clear calendar data/ }),
     );

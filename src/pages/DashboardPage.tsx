@@ -1,3 +1,4 @@
+import { Disclosure } from "../components/Disclosure";
 import { ArrowRight, Building2, CircleCheck } from "lucide-react";
 import { format } from "date-fns";
 import type { TrackerData } from "../types";
@@ -83,8 +84,11 @@ export function DashboardPage({
           <TargetProgress stats={stats} />
         </section>
         <div className="dashboard-side">
-          <section className="card breakdown-card">
-            <h2>Attendance breakdown</h2>
+          <Disclosure
+            className="card breakdown-card"
+            title={<>Attendance breakdown</>}
+            defaultOpen
+          >
             <p className="muted small-text">
               Share of {stats.recorded} tracked days, including official
               holidays. Office and home plans are excluded.
@@ -123,7 +127,7 @@ export function DashboardPage({
               </div>
               <span className="pill green-pill">{stats.projectedPercent}%</span>
             </div>
-          </section>
+          </Disclosure>
           <section className="card recent-card">
             <div className="split">
               <h2>Recent activity</h2>

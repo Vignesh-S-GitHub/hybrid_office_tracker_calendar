@@ -3272,6 +3272,91 @@ dialog::backdrop {
 }
 
 /* Compact shared rhythm; preserve room for touch controls. */
+.calendar-primary {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+.calendar-primary > .planner-card {
+  margin-top: 0;
+}
+.disclosure > .disclosure-heading {
+  margin: 0;
+  font-size: 15px;
+}
+.disclosure .disclosure-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-size: inherit;
+  font-weight: 650;
+}
+.disclosure .disclosure-toggle > span {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  font-size: inherit;
+}
+.quick-actions.disclosure > .disclosure-heading {
+  font-size: 14px;
+}
+.disclosure-toggle > svg {
+  flex: 0 0 18px;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+.disclosure-toggle[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.disclosure-body:not([hidden]) {
+  margin-top: 12px;
+}
+.disclosure .disclosure-body > :first-child {
+  margin-top: 0;
+}
+.calendar-train-panel,
+.quick-actions.disclosure {
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.quick-actions .disclosure-body > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.train-form-toggle:not([hidden]) {
+  display: inline-flex;
+}
+.train-form-content.is-collapsed {
+  display: none;
+}
+.train-form-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.trains-layout.has-journeys {
+  grid-template-columns: minmax(0, 1fr);
+}
+.has-journeys .train-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+.has-journeys .train-list > .split {
+  grid-column: 1 / -1;
+}
 .header-inner,
 .app-main {
   max-width: 1200px;
@@ -3374,7 +3459,7 @@ dialog::backdrop {
   font-size: 12px;
 }
 .train-form-toggle {
-  display: none;
+  display: inline-flex;
 }
 .train-list {
   gap: 12px;
@@ -3431,6 +3516,9 @@ dialog::backdrop {
   min-width: 0;
 }
 @media (max-width: 900px) {
+  .has-journeys .train-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .train-form-content.is-collapsed {
     display: none;
   }

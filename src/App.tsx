@@ -241,6 +241,31 @@ export default function App() {
       if (fileInput.current) fileInput.current.value = "";
     }
   };
+  const planner = (
+    <Planner
+      data={data}
+      month={month}
+      today={today}
+      apply={apply}
+      reject={(date) =>
+        commit({
+          ...data,
+          rejected: {
+            ...data.rejected,
+            [month]: [...(data.rejected[month] ?? []), date],
+          },
+        })
+      }
+      regenerate={() => {
+        commit({ ...data, rejected: { ...data.rejected, [month]: [] } });
+        setToast(
+          "Plan recalculated with your saved preferences. Excluded suggestions are available again.",
+        );
+      }}
+      edit={edit}
+      settings={() => navigate("settings")}
+    />
+  );
   const pageTitles = {
     trains: "Trains",
     holidays: "Holidays",
@@ -329,6 +354,7 @@ export default function App() {
         {page === "calendar" && (
           <CalendarPage
             key={user?.id ?? "guest"}
+            planner={planner}
             account={account}
             userId={user?.id ?? null}
             openTrains={openTrains}
@@ -400,31 +426,7 @@ export default function App() {
             }
           />
         )}
-        {(page === "calendar" || page === "dashboard") && (
-          <Planner
-            data={data}
-            month={month}
-            today={today}
-            apply={apply}
-            reject={(date) =>
-              commit({
-                ...data,
-                rejected: {
-                  ...data.rejected,
-                  [month]: [...(data.rejected[month] ?? []), date],
-                },
-              })
-            }
-            regenerate={() => {
-              commit({ ...data, rejected: { ...data.rejected, [month]: [] } });
-              setToast(
-                "Plan recalculated with your saved preferences. Excluded suggestions are available again.",
-              );
-            }}
-            edit={edit}
-            settings={() => navigate("settings")}
-          />
-        )}
+        {page === "dashboard" && planner}
       </main>
       <nav className="mobile-nav" aria-label="Mobile navigation">
         {pages.map(({ key, label, Icon }) => (
