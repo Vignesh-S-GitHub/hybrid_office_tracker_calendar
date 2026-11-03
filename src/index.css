@@ -3470,6 +3470,10 @@ dialog::backdrop {
   .trains-layout {
     gap: 12px;
   }
+  .dashboard-layout,
+  .settings-layout {
+    align-items: stretch;
+  }
   .summary-card,
   .overview-card,
   .breakdown-card,
