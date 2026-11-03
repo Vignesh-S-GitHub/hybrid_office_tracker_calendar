@@ -354,7 +354,6 @@ export default function App() {
         {page === "calendar" && (
           <CalendarPage
             key={user?.id ?? "guest"}
-            planner={planner}
             account={account}
             userId={user?.id ?? null}
             openTrains={openTrains}

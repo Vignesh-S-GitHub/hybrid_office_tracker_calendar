@@ -52,10 +52,13 @@ describe("complete attendance flow", () => {
   it("applies suggestions as planned attendance and requires explicit completion", async () => {
     const user = userEvent.setup();
     render(<App />);
+    const nav = within(screen.getByRole("navigation", { name: "Main navigation" }));
+    await user.click(nav.getByRole("button", { name: "Dashboard" }));
     await user.click(
       screen.getByRole("button", { name: "Apply recommended plan" }),
     );
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+    await user.click(nav.getByRole("button", { name: "Calendar" }));
     expect(
       Object.values(saved.attendance).every(
         (row) => (row as { phase: string }).phase === "planned",

@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Disclosure } from "../components/Disclosure";
 import { format, isWeekend } from "date-fns";
 import {
@@ -12,10 +12,7 @@ import {
 import type { TrackerStore } from "../lib/sync";
 import { calendarTrainBookings } from "../lib/calendarTrains";
 import { useCalendarTrains } from "../hooks/useCalendarTrains";
-import {
-  CalendarTrainBooking,
-  CalendarBookingRows,
-} from "../components/CalendarTrainBooking";
+import { CalendarBookingRows } from "../components/CalendarTrainBooking";
 import { Modal } from "../components/ui";
 import type { TrackerData } from "../types";
 import { calendarDays, dateKey } from "../lib/dates";
@@ -42,7 +39,6 @@ export function CalendarPage({
   account,
   userId,
   openTrains,
-  planner,
 }: {
   data: TrackerData;
   month: string;
@@ -56,20 +52,12 @@ export function CalendarPage({
   account: TrackerStore;
   userId: string | null;
   openTrains: (officeDate?: string, journeyId?: string) => void;
-  planner?: ReactNode;
 }) {
   const saved = useCalendarTrains(account, userId);
   const bookings = saved.loading
     ? []
     : calendarTrainBookings(data, saved.reminders, today);
   const [bookingDialog, setBookingDialog] = useState<string | null>(null);
-  const [bookingDay, setBookingDay] = useState<string | null>(null);
-  const calendar = useRef<HTMLElement>(null);
-  const showBookingDate = (date: string) => {
-    setMonth(date.slice(0, 7));
-    setBookingDay(date);
-    calendar.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
-  };
   const stats = statistics(data, month, today);
   const attendance = calendarAttendance(data);
   const recommended = new Set(
@@ -88,7 +76,7 @@ export function CalendarPage({
   return (
     <div className="calendar-layout">
       <div className="calendar-primary">
-        <section className="card calendar-card" ref={calendar}>
+        <section className="card calendar-card">
           <MonthControls month={month} onChange={setMonth} today={today} />
           <div
             className="calendar-grid"
@@ -136,7 +124,7 @@ export function CalendarPage({
                       .filter(Boolean)
                       .join(" · ") || label
                   }
-                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected || key === bookingDay ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
+                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
                   onClick={() =>
                     trainBookings.length ? setBookingDialog(key) : edit(key)
                   }
@@ -201,7 +189,6 @@ export function CalendarPage({
             <span>Select a date to mark attendance.</span>
           </div>
         </section>
-        {planner}
       </div>
       <aside className="card summary-card">
         <h2>{format(new Date(`${month}-01T12:00:00`), "MMMM yyyy")} summary</h2>
@@ -226,16 +213,6 @@ export function CalendarPage({
           <Plus size={20} />
           Mark a day
         </button>
-        <CalendarTrainBooking
-          bookings={bookings}
-          month={month}
-          openTrains={openTrains}
-          showDate={showBookingDate}
-          error={saved.error}
-          loading={saved.loading}
-          refresh={saved.refresh}
-          connected={saved.connected}
-        />
         <Disclosure className="quick-actions" title="Quick actions" level={3}>
           <div>
             <button onClick={exportData}>
