@@ -151,7 +151,7 @@ function AccountTrains({
         }),
       action === "booked"
         ? "Booked. Reminders stopped."
-        : "I'll remind you in one hour.",
+        : `Reminder set for ${trainTime(item.bookingAt - 3_600_000)} (one hour before booking).`,
     );
   return (
     <div className="trains-page">
@@ -342,7 +342,7 @@ function AccountTrains({
                       disabled={busy}
                       onClick={() => void action(item, "snooze")}
                     >
-                      Remind in 1h
+                      Remind 1h before booking
                     </button>
                     <a
                       className="button small"

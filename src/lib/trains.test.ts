@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   bookingAt,
+  beforeBookingJobs,
   indiaToday,
   officeVisits,
   parseTrainInput,
@@ -21,6 +22,30 @@ const input: TrainInput = {
   officeDates: [],
 };
 describe("train booking dates", () => {
+  it("anchors the requested hour-before alert to booking, regardless of click time", () => {
+    const journey = { ...input, journeyDate: "2027-01-03" };
+    const expected = Date.parse("2026-11-04T07:00:00+05:30");
+    for (const now of [
+      "2026-11-03T18:34:00+05:30",
+      "2026-11-03T20:00:00+05:30",
+    ]) {
+      const jobs = beforeBookingJobs(journey, Date.parse(now));
+      expect(jobs[0]).toEqual({ kind: "snooze", due: expected });
+      expect(jobs.map((job) => job.kind)).toEqual([
+        "snooze", "opening", "followup",
+      ]);
+    }
+    expect(() => beforeBookingJobs(journey, expected)).toThrow("already passed");
+    expect(() => beforeBookingJobs(journey, bookingAt(journey))).toThrow(
+      "already passed",
+    );
+    expect(
+      beforeBookingJobs(
+        { ...journey, journeyDate: "2027-01-08" },
+        Date.parse("2026-11-03T18:34:00+05:30"),
+      )[0].due,
+    ).toBe(Date.parse("2026-11-09T07:00:00+05:30"));
+  });
   it("counts 60 days from the origin date across the year boundary, at 08:00 IST", () => {
     expect(new Date(bookingAt(input)).toISOString()).toBe(
       "2026-11-11T02:30:00.000Z",
