@@ -400,14 +400,19 @@ export default function App() {
         )}
       </main>
       <nav className="mobile-nav" aria-label="Mobile navigation">
-        {pages.map(({ key, label, Icon }) => (
+        {pages.map(({ key, label }) => (
           <button
             aria-current={page === key ? "page" : undefined}
             className={page === key ? "active" : ""}
             key={key}
             onClick={() => navigate(key)}
           >
-            <Icon size={21} />
+            <img
+              className="nav-asset-icon"
+              src={`${import.meta.env.BASE_URL}ui-kit/navigation/${key}-${page === key ? "active" : "outline"}.svg`}
+              alt=""
+              aria-hidden="true"
+            />
             <span>{label}</span>
           </button>
         ))}
