@@ -260,6 +260,12 @@ export default function App() {
       settings={() => navigate("settings")}
     />
   );
+  const pageSubtitles = {
+    calendar: "Track your days. Plan with confidence.",
+    holidays: "Verified All India holidays, clearly presented.",
+    trains: "Your booking dates and Telegram reminders.",
+    settings: "Make the tracker work your way.",
+  };
   const pageTitles = {
     trains: "Trains",
     holidays: "Holidays",
@@ -316,9 +322,10 @@ export default function App() {
           </div>
         </div>
       </header>
-      <main className="app-main" id="main-content">
+      <main className="app-main" data-page={page} id="main-content">
         <div className="intro">
           <h1>{pageTitles[page]}</h1>
+          <p className="page-subtitle">{pageSubtitles[page]}</p>
           <span className="privacy-note">
             <ShieldCheck size={16} />
             {user ? status : "Saved on this device"}
