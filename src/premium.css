@@ -1,0 +1,262 @@
+/* Hybrid Tracker / Midnight Aurora — visual layer only.
+ * Keep all attendance, planning, reminders, holiday, account and storage logic unchanged.
+ * Theme-aware, mobile-first, accessible and reduced-motion friendly. */
+:root, :root[data-theme="dark"] {
+  --page:#07122d;--surface:#13264d;--soft:#1b335f;--text:#f3f7ff;
+  --muted:#afc2e5;--border:#365588;--primary:#79b4ff;
+  --primary-soft:#203d79;--office:#30e3a8;--office-soft:#124b55;
+  --home:#5bbdff;--home-soft:#163d70;--leave:#ff9d72;
+  --leave-soft:#51334a;--holiday:#ffd266;--holiday-soft:#50426b;
+  --header:rgba(9,22,56,.88);--shadow:0 16px 40px rgba(1,8,32,.28);
+  --accent-purple:#8b78ff;--glass:rgba(23,48,101,.82);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --page:#e8efff;--surface:#fbfcff;--soft:#e8f0ff;--text:#0e2852;
+  --muted:#576d96;--border:#b9cdec;--primary:#235edc;
+  --primary-soft:#d9e7ff;--office:#119e78;--office-soft:#dff9eb;
+  --home:#176fcc;--home-soft:#e0edff;--leave:#d16b41;
+  --leave-soft:#ffede5;--holiday:#af7912;--holiday-soft:#fff2ce;
+  --header:rgba(249,251,255,.93);--shadow:0 12px 32px #38568b22;
+  --accent-purple:#6658d7;--glass:rgba(252,253,255,.86);color-scheme:light;
+}
+html{scroll-padding-top:88px}
+body{background:radial-gradient(ellipse 80% 400px at 2% -8%,#184ea7aa,transparent 80%),radial-gradient(ellipse 55% 370px at 105% 2%,#4e21877a,transparent 78%),radial-gradient(ellipse 70% 600px at 85% 120%,#0d458099,transparent 85%),var(--page);background-attachment:fixed;color:var(--text)}
+:root[data-theme="light"] body{background:radial-gradient(ellipse 72% 370px at 100% -60px,#a4c5ff99,transparent 82%),var(--page)}
+#root{min-height:100dvh}
+a,button{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+h1,h2,h3{letter-spacing:-.045em}
+.card{background:linear-gradient(151deg,color-mix(in srgb,var(--surface) 95%,#437bf9 5%),var(--surface));border:1px solid color-mix(in srgb,var(--border) 80%,transparent);border-radius:21px;box-shadow:var(--shadow)}
+:root[data-theme="light"] .card{background:var(--surface)}
+.app-header{position:sticky;top:0;z-index:50;background:var(--header);border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent);backdrop-filter:blur(26px);box-shadow:0 6px 22px #020c2433}
+.header-inner{max-width:1240px;min-height:70px;padding-inline:24px}
+.brand{gap:11px;font-size:19px;font-weight:800;letter-spacing:-.06em}
+.brand-mark{width:40px;height:40px;flex-basis:40px;filter:drop-shadow(0 5px 13px #2577f66b)}
+.header-actions{border:0;gap:8px}
+.header-actions .account-button,.header-actions .icon-button{color:var(--text);background:color-mix(in srgb,var(--soft) 82%,transparent);border:1px solid var(--border);border-radius:999px;box-shadow:inset 0 1px 0 #ffffff22}
+.header-actions .account-button{width:auto;min-height:43px}
+.desktop-nav{gap:7px}
+.desktop-nav button{color:var(--muted);font-weight:700;font-size:13px;border-radius:13px}
+.desktop-nav button.active{background:linear-gradient(128deg,#2563eb,#594edb);color:#fff;border-color:#809fff73;box-shadow:0 7px 22px #225ad740}
+.app-main{max-width:1240px;padding:19px 25px 40px}
+.intro{position:relative;isolation:isolate;min-height:124px;margin-bottom:16px;padding:28px 29px;display:flex;align-items:flex-start;flex-direction:column;justify-content:center;gap:7px;overflow:hidden;border-radius:24px;background:radial-gradient(circle at 77% 52%,#2a6ce780,transparent 50%),linear-gradient(115deg,#081b42,#132d68 58%,#214d8d);border:1px solid #628bd45d;box-shadow:0 18px 50px #0612355e}
+.intro::before{position:absolute;content:"";inset:0;z-index:-1;background:radial-gradient(ellipse 40% 70% at 93% 8%,#46eaf244,transparent 85%),radial-gradient(ellipse 65% 100% at 0 115%,#7551ff55,transparent 70%);pointer-events:none}
+.intro::after{position:absolute;content:"";right:0;bottom:0;width:60%;height:110%;z-index:-1;background-image:url('/ui-kit/scenes/cityline.svg');background-repeat:no-repeat;background-position:right bottom;background-size:contain;opacity:.95;pointer-events:none}
+.app-main[data-page="holidays"] .intro::after{background-image:url('/ui-kit/scenes/beach.svg')}
+.app-main[data-page="trains"] .intro::after{background-image:url('/ui-kit/scenes/train.svg');width:66%}
+.app-main[data-page="settings"] .intro::after{background-image:url('/ui-kit/scenes/settings.svg');width:55%}
+.intro h1{color:#fff;font-size:32px;font-weight:830;line-height:1.15;letter-spacing:-.06em;text-shadow:0 3px 12px #03132a60}
+.intro .privacy-note{color:#c6dbff;font-size:12px;max-width:30ch;align-self:auto}
+.intro .privacy-note svg{color:#6df0dd}
+.intro .page-subtitle{position:relative;color:#c9ddff;font-size:12px;font-weight:530;line-height:1.4}
+.button{border-radius:13px;border-color:var(--border);font-weight:700;min-height:43px}
+.button.primary,.button.primary.full,.mark-button{background:linear-gradient(105deg,#0bbcbc,#2568f0 68%,#7356ef);border:1px solid #80b1ff88;color:white;box-shadow:0 8px 20px #0c70ff40}
+.button.primary:hover:not(:disabled),.mark-button:hover:not(:disabled){filter:brightness(1.1);background:linear-gradient(105deg,#12cccb,#2568f0 68%,#7356ef)}
+.button.small,.icon-button{border-radius:12px}
+.month-controls{min-height:52px;background:linear-gradient(120deg,var(--soft),color-mix(in srgb,var(--soft) 80%,#485ada));border:1px solid var(--border);border-radius:17px;gap:6px;margin-bottom:13px;padding:5px}
+.month-controls h2{color:var(--text);font-size:17px;font-weight:800}
+.month-controls .icon-button{width:38px;min-width:38px;flex-basis:38px;min-height:37px;background:linear-gradient(145deg,#567bc085,#314974);border:1px solid #7da8fb66;color:#fff;border-radius:13px}
+:root[data-theme="light"] .month-controls .icon-button{background:#fff;color:var(--primary)}
+.month-controls .today-button{min-height:37px;color:var(--primary);padding-inline:10px;border-radius:10px;background:var(--surface)}
+.calendar-layout{grid-template-columns:minmax(0,1fr) minmax(280px,330px);gap:15px;align-items:start}
+.calendar-primary{gap:13px}
+.calendar-card{padding:15px 16px 14px;border-radius:22px;background:linear-gradient(156deg,#203d75,#0e2045 68%,#152b56);border-color:#6284ce69}
+:root[data-theme="light"] .calendar-card{background:var(--surface);border-color:var(--border)}
+.calendar-grid{gap:5px}
+.weekday{height:26px;align-items:center;color:var(--muted);font-size:10px;font-weight:700}
+.calendar-cell{min-height:61px;padding:5px 1px;gap:4px;background:linear-gradient(155deg,#203864,#172c53);border:1px solid #44659666;border-radius:11px;color:var(--text)}
+:root[data-theme="light"] .calendar-cell{background:var(--soft);border-color:var(--border)}
+.calendar-cell .day-number{font-size:14px;font-weight:760;line-height:1.2}
+.calendar-cell .day-dot{width:5px;height:5px;min-height:5px}
+.calendar-cell .cell-caption{font-size:9px}
+.calendar-cell.outside{opacity:.36}
+.calendar-cell.weekend:not(.office):not(.home):not(.holiday){background:#18264c}
+.calendar-cell.today{background:linear-gradient(140deg,#1a63e5,#2259bc);box-shadow:0 0 0 2px #66c6ff,inset 0 1px 0 #ffffff4b;color:white}
+.calendar-cell.office:not(.today){background:linear-gradient(140deg,#0e665e,#124d66);border-color:#23ccac7d}
+.calendar-cell.home:not(.today){background:linear-gradient(140deg,#245b9c,#1d396e);border-color:#53b1ff77}
+.calendar-cell.leave:not(.today){background:linear-gradient(140deg,#774967,#423561)}
+.calendar-cell.holiday:not(.today){background:linear-gradient(140deg,#7e5c25,#544272);border-color:#f9bf638a;color:#ffe8af}
+.calendar-cell.planned:not(.today){border:1px dashed #6fc8ff}
+.calendar-cell.suggested:not(.today){outline:1px dotted #53ecd7;outline-offset:-4px}
+.calendar-cell:hover:not(:disabled){filter:brightness(1.15);border-color:#78bcff;background-color:#244a86}
+:root[data-theme="light"] .calendar-cell.office:not(.today){background:#d4f6e8;color:#065b42}
+:root[data-theme="light"] .calendar-cell.home:not(.today){background:#e1f1ff;color:#164f96}
+:root[data-theme="light"] .calendar-cell.holiday:not(.today){background:#fff0c9;color:#896020}
+.legend{display:flex;gap:8px 11px;flex-wrap:wrap;padding:11px 1px 0}
+.legend>span{color:var(--muted);font-size:9px;font-weight:670;white-space:nowrap}
+.legend .dot{border:0;box-shadow:0 0 5px #b0daff44}
+.calendar-tip{background:var(--soft);border:1px solid var(--border);color:var(--muted)}
+.calendar-cell .calendar-booking-icon{color:#c3eaff}
+.planner-card{padding:13px 15px;background:linear-gradient(110deg,#0e656b,#1d4287 60%,#494ad2);border:1px solid #57caff7a;border-radius:18px;box-shadow:0 8px 25px #0861dd47}
+.planner-card .disclosure-toggle{min-height:41px}
+.planner-card .disclosure-toggle>span,.planner-card .disclosure-toggle>svg{color:#fff;font-size:15px;font-weight:790}
+.planner-card .disclosure-body{background:color-mix(in srgb,var(--page) 40%,transparent);border-radius:15px;padding:12px}
+.planner-card .planner-metrics strong{color:#fff}
+.planner-card .planner-metrics span,.planner-card .planner-footnote{color:#c4e1ff}
+.planner-card .recommendation,.planner-card .notice,.planner-card .alert{background:var(--surface);color:var(--text);border-radius:12px}
+.planner-card .recommendation p,.planner-card .notice p{color:var(--muted)}
+.summary-card{padding:17px;border-radius:21px;background:linear-gradient(140deg,#142e65,#0b2049);border-color:#5079ae80}
+:root[data-theme="light"] .summary-card{background:var(--surface)}
+.summary-card>h2{color:var(--text);font-size:15px;font-weight:760;margin-bottom:11px}
+.stat-grid{gap:7px}
+.stat-card{border-radius:13px;background:linear-gradient(150deg,color-mix(in srgb,var(--status) 24%,#0a2251),#152c54);border:1px solid color-mix(in srgb,var(--status) 55%,#4473bd);padding:11px 8px;gap:6px;align-items:center}
+:root[data-theme="light"] .stat-card{background:var(--status-soft)}
+.stat-icon{background:color-mix(in srgb,var(--status) 23%,transparent);width:35px;height:35px;border-radius:11px}
+.stat-card strong{color:var(--text);font-size:22px;font-weight:800}
+.stat-card>div>span{color:var(--muted);font-size:10px}
+.target-block{background:linear-gradient(145deg,var(--soft),color-mix(in srgb,var(--soft) 85%,#3958c3));border:1px solid var(--border);margin-top:12px;border-radius:14px;padding:12px}
+.progress-track{height:8px;background:#31486f}
+:root[data-theme="light"] .progress-track{background:var(--border)}
+.progress-track>div{background:linear-gradient(90deg,#2be7bb,#52a8ff)}
+.forecast .progress-track>div{background:linear-gradient(90deg,#52b3ff,#9b77ff)}
+.mark-button{margin-top:13px}
+.quick-actions .disclosure-toggle{color:var(--muted)}
+/* Holidays: preserve verified all-India catalog, source notices and date links. */
+.holidays-card{border-radius:22px;padding:18px}
+.holiday-page-heading{gap:9px}
+.holiday-page-heading h2{font-size:19px}
+.holiday-page-icon{background:linear-gradient(140deg,#114dc1,#139ea3);color:white;border:1px solid #72bcfb77}
+.holiday-page-heading .pill{background:var(--office-soft);color:var(--office)}
+.holiday-spotlight{border-color:#7193ca80;border-radius:18px;background:linear-gradient(110deg,#243e77,#122852)}
+.holiday-spotlight>img{opacity:.98}
+.holiday-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.holiday-row{background:linear-gradient(114deg,#1d386a,#132b55);border-color:#4d6b9d89;border-radius:15px;box-shadow:0 6px 18px #06122a24;min-height:88px}
+:root[data-theme="light"] .holiday-row{background:var(--surface)}
+.holiday-date-tile{background:linear-gradient(140deg,#375b9e,#6f548a);color:#fff;border-radius:12px}
+:root[data-theme="light"] .holiday-date-tile{background:var(--primary-soft);color:var(--primary)}
+.holiday-artwork{width:49px;height:54px;filter:drop-shadow(0 3px 6px #121b4b60)}
+.holiday-description h3{color:var(--text);font-size:12px}
+.holiday-description p{color:var(--muted)}
+.holiday-row .icon-button{color:var(--primary)}
+.holiday-timing{background:var(--primary-soft);color:var(--primary)}
+.holiday-source-links a{color:var(--primary)}
+.holiday-footer{color:var(--muted)}
+.holiday-date-note{background:var(--soft);border:1px solid var(--border);color:var(--text)}
+/* Train reminders preserve sign-in gate and Telegram booking status. */
+.trains-page,.trains-layout{gap:13px}
+.telegram-card{background:linear-gradient(115deg,#173c77,#15325e);border-color:#557fbe9a;border-radius:18px}
+:root[data-theme="light"] .telegram-card{background:var(--surface)}
+.telegram-card h2{color:var(--text)}
+.telegram-card h2 svg{color:#4cb8ff}
+.telegram-card p{color:var(--muted)}
+.train-journey,.train-form-card,.train-empty{border-radius:20px;background:linear-gradient(145deg,#1a376d,#10274e);border-color:#5274ad7a}
+:root[data-theme="light"] .train-journey,:root[data-theme="light"] .train-form-card,:root[data-theme="light"] .train-empty{background:var(--surface)}
+.train-list> .split{color:var(--text)}
+.train-journey h3{font-size:17px;color:var(--text)}
+.train-booking,.train-preview{background:var(--soft);border:1px solid var(--border);border-radius:12px}
+.train-status{background:var(--primary-soft);color:var(--primary);border-radius:999px}
+.train-status-booked{background:var(--office-soft);color:var(--office)}
+.train-status-needs_review{background:var(--holiday-soft);color:var(--holiday)}
+.journey-actions{border-top-color:var(--border)}
+.journey-actions.is-pending>:first-child{background:var(--office-soft);color:var(--office)}
+.train-form input:not([type="checkbox"]),.train-form select{background:var(--soft);color:var(--text);border:1px solid var(--border)}
+.train-empty-art{filter:drop-shadow(0 14px 20px #0d5bed44)}
+/* Settings and account use clear sections, accessible controls and consistent spacing. */
+.settings-layout,.settings-column{gap:12px}
+.settings-card,.privacy-card{padding:17px;border-radius:19px;background:linear-gradient(145deg,#1c3973,#122b57);border:1px solid #5273b188}
+:root[data-theme="light"] .settings-card,:root[data-theme="light"] .privacy-card{background:var(--surface)}
+.settings-card .disclosure-toggle>span{font-size:15px}
+.settings-card .disclosure-toggle>span svg{color:var(--primary)}
+.setting-row{border-bottom-color:var(--border);padding-block:13px}
+.setting-row strong{font-size:12px}
+.setting-row p{font-size:11px;color:var(--muted)}
+.setting-row select,.setting-row input:not([type="checkbox"]),.train-form input,.train-form select,.account-form input{background:var(--soft);color:var(--text);border:1px solid var(--border);border-radius:12px}
+.weekday-picker button{background:var(--soft);color:var(--muted);border-color:var(--border)}
+.weekday-picker button.active{background:linear-gradient(125deg,#16baa9,#2771ee);color:#fff;border-color:#7ce6f4}
+.stepper{background:var(--soft);border-color:var(--border)}
+.stepper button{color:var(--primary)}
+.theme-picker button{background:var(--soft);border-color:var(--border);color:var(--muted)}
+.theme-picker button.active{background:linear-gradient(135deg,#276fec,#5e4cd4);color:#fff;border-color:#82a8ff}
+.setting-action{background:var(--soft);border:1px solid var(--border);border-radius:13px}
+.privacy-card{background:linear-gradient(130deg,#124864,#192f73)}
+:root[data-theme="light"] .privacy-card{background:var(--primary-soft)}
+.dialog-content{background:var(--surface);color:var(--text)}
+dialog{background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:0 30px 90px #020a22a8}
+dialog::backdrop{background:#010815b8;backdrop-filter:blur(9px)}
+.account-form input,dialog textarea{background:var(--soft);color:var(--text);border-color:var(--border)}
+.status-option{border-color:var(--border);background:var(--soft);color:var(--text)}
+.status-option.office{background:var(--office-soft)}
+.status-option.home{background:var(--home-soft)}
+.status-option.leave{background:var(--leave-soft)}
+.status-option.holiday{background:var(--holiday-soft)}
+.disclosure-body,.confirmation-copy{color:var(--text)}
+.toast,.update-banner{background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:0 10px 25px #01091989}
+@media (min-width:901px){.calendar-layout{grid-template-columns:minmax(0,1fr) 325px}.settings-layout{grid-template-columns:repeat(2,minmax(0,1fr))}.trains-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.trains-layout.has-journeys{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.calendar-layout{grid-template-columns:minmax(0,1fr)}.holiday-list{grid-template-columns:1fr}}
+@media (max-width:600px){
+  html{scroll-padding-top:70px}
+  body{background:radial-gradient(ellipse 110% 280px at 50% -80px,#1e56b599,transparent 82%),radial-gradient(ellipse 80% 350px at 120% 105%,#402d94bb,transparent 75%),var(--page);background-attachment:fixed}
+  .header-inner{min-height:62px;padding-inline:15px;gap:6px}
+  .brand{font-size:16px;gap:8px}
+  .brand-mark{width:33px;height:33px;flex-basis:33px}
+  .header-actions .theme-toggle,.header-actions .github-link{display:none}
+  .header-actions .account-button{width:43px;height:43px;min-height:43px;border-radius:50%;background:linear-gradient(135deg,#2c4c92,#26386c);border-color:#658fd088}
+  .header-actions .account-button span{display:none}
+  .app-main{padding:10px 11px calc(85px + env(safe-area-inset-bottom));max-width:580px}
+  .intro{min-height:114px;margin-bottom:11px;padding:19px 17px;border-radius:18px;gap:6px}
+  .intro h1{font-size:26px}
+  .intro .privacy-note{font-size:10px;max-width:22ch}
+  .intro .privacy-note svg{width:12px}
+  .intro .page-subtitle{font-size:10px;max-width:230px}
+  .intro::after{width:55%;height:100%}
+  .app-main[data-page="trains"] .intro::after{width:62%}
+  .calendar-layout{gap:11px}
+  .calendar-card{padding:10px 9px 11px;border-radius:18px}
+  .month-controls{min-height:44px;gap:3px;margin-bottom:8px;padding:3px}
+  .month-controls h2{font-size:14px}
+  .month-controls .icon-button{min-height:34px;flex-basis:34px;min-width:34px;width:34px}
+  .month-controls .today-button{font-size:10px;padding-inline:7px;min-height:34px}
+  .calendar-grid{gap:3px}
+  .weekday{height:24px;font-size:9px}
+  .calendar-cell{min-height:42px;font-size:12px;padding:3px 0;gap:2px;border-radius:9px}
+  .calendar-cell .day-number{font-size:12px}
+  .calendar-cell .day-dot{width:4px;height:4px;min-height:4px}
+  .calendar-cell .cell-caption{display:none}
+  .calendar-cell .calendar-booking-icon{width:10px;height:10px}
+  .legend{gap:4px 9px;padding-top:9px}
+  .legend>span{font-size:8px}
+  .calendar-tip{display:none}
+  .planner-card{padding:9px 12px;border-radius:14px}
+  .planner-card .disclosure-toggle{min-height:39px}
+  .planner-card .disclosure-toggle>span{font-size:13px}
+  .planner-card .disclosure-body{padding:9px}
+  .summary-card{padding:12px;border-radius:18px}
+  .summary-card>h2{font-size:13px;margin-bottom:10px}
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .stat-card{min-height:66px;flex-direction:row;justify-content:flex-start;text-align:left;padding:8px;gap:7px}
+  .stat-icon{width:31px;height:31px}
+  .stat-card>div{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+  .stat-card>div>span{font-size:9px}
+  .stat-card strong{font-size:19px}
+  .target-block{margin-top:10px;padding:10px}
+  .mark-button{margin-top:10px;min-height:42px}
+  .mobile-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));position:fixed;bottom:0;left:0;right:0;z-index:60;min-height:71px;gap:5px;padding:6px max(10px,env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--page) 92%,transparent);border-top:1px solid #4d72ae7d;backdrop-filter:blur(25px);box-shadow:0 -9px 36px #020d2e8c}
+  .mobile-nav button{min-height:54px;border-radius:15px;border:1px solid transparent;background:transparent;color:var(--muted);display:flex;flex-direction:column;gap:3px;justify-content:center;align-items:center}
+  .mobile-nav button.active{background:linear-gradient(145deg,#3b8ff6,#3158c9 65%,#5d55ba);color:white;border-color:#99bfff80;box-shadow:0 7px 20px #276ff34d}
+  .mobile-nav .nav-asset-icon{width:23px;height:23px;filter:brightness(1.55) saturate(.6)}
+  .mobile-nav button.active .nav-asset-icon{filter:brightness(0) invert(1);width:24px;height:24px}
+  .mobile-nav button span{font-size:10px;font-weight:740}
+  .holidays-card{padding:12px}
+  .holiday-list{gap:8px}
+  .holiday-row{min-height:75px;padding:8px;gap:8px}
+  .holiday-spotlight{margin:12px 0}
+  .holiday-page-heading h2{font-size:16px}
+  .holiday-artwork{width:42px;height:47px}
+  .holiday-date-tile{height:48px;width:40px}
+  .holiday-date-tile strong{font-size:20px}
+  .holiday-description h3{font-size:11px}
+  .holiday-description p{font-size:9px}
+  .holiday-row .icon-button{min-width:28px;width:28px}
+  .telegram-card,.train-form-card,.train-journey,.train-empty{padding:13px}
+  .telegram-card{border-radius:16px}
+  .settings-card,.privacy-card{padding:12px;border-radius:17px}
+  .settings-layout,.settings-column{gap:10px}
+  .setting-row{padding-block:11px}
+  .setting-row strong{font-size:11px}
+  dialog{max-height:94dvh;border-radius:24px 24px 0 0}
+  .dialog-content{padding:18px}
+  .phase-controls{gap:13px}
+}
+@media(max-width:355px){.intro{min-height:100px}.intro h1{font-size:23px}.calendar-cell{min-height:38px}.legend>span{font-size:8px}.month-controls h2{font-size:13px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
