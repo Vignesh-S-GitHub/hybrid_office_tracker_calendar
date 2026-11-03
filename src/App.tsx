@@ -1,6 +1,6 @@
 import { Planner } from "./components/Planner";
 import { planMonth } from "./lib/planner";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   CalendarDays,
   Settings as SettingsIcon,
@@ -260,6 +260,7 @@ export default function App() {
       settings={() => navigate("settings")}
     />
   );
+  const pageScene = { calendar: "cityline", holidays: "beach", trains: "train", settings: "settings" }[page];
   const pageSubtitles = {
     calendar: "Track your days. Plan with confidence.",
     holidays: "Verified All India holidays, clearly presented.",
@@ -323,7 +324,7 @@ export default function App() {
         </div>
       </header>
       <main className="app-main" data-page={page} id="main-content">
-        <div className="intro">
+        <div className="intro" style={{ "--page-scene": `url("${import.meta.env.BASE_URL}ui-kit/scenes/${pageScene}.svg")` } as CSSProperties}>
           <h1>{pageTitles[page]}</h1>
           <p className="page-subtitle">{pageSubtitles[page]}</p>
           <span className="privacy-note">
