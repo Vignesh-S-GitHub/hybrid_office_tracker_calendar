@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
-  ChartNoAxesCombined,
-  History,
   Settings as SettingsIcon,
   Moon,
   Sun,
@@ -19,13 +17,10 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 import type { Phase, Settings, Status, TrackerData } from "./types";
 import { useTracker } from "./hooks/useTracker";
 import { CalendarPage } from "./pages/CalendarPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { TrainsPage } from "./pages/TrainsPage";
 import { HolidaysPage } from "./pages/HolidaysPage";
 import { BrandMark } from "./components/BrandMark";
-import { Planner } from "./components/Planner";
 import { Modal } from "./components/ui";
 import { Account } from "./components/Account";
 import { AttendanceEditor } from "./components/AttendanceEditor";
@@ -37,12 +32,9 @@ import {
 } from "./lib/storage";
 import { monthKey, validMonth } from "./lib/dates";
 import { targetFor } from "./lib/statistics";
-import { planMonth } from "./lib/planner";
 
 const pages = [
   { key: "calendar", label: "Calendar", Icon: CalendarDays },
-  { key: "dashboard", label: "Dashboard", Icon: ChartNoAxesCombined },
-  { key: "history", label: "History", Icon: History },
   { key: "holidays", label: "Holidays", Icon: Palmtree },
   { key: "trains", label: "Trains", Icon: TrainFront },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
@@ -175,36 +167,6 @@ export default function App() {
       });
     else save();
   };
-  const apply = (dates: string[]) => {
-    if (locked) return;
-    const eligible = new Set(
-      planMonth(data, month, today).recommendations.map((row) => row.date),
-    );
-    const accepted = dates.filter(
-      (date) => eligible.has(date) && !data.attendance[date],
-    );
-    if (!accepted.length) return;
-    const attendance = { ...data.attendance };
-    accepted.forEach((date) => {
-      attendance[date] = {
-        status: "WFO",
-        phase: "planned",
-        notes: "Office day planned with Smart WFO Planner.",
-        updatedAt: new Date().toISOString(),
-      };
-    });
-    commit({
-      ...data,
-      attendance,
-      monthlyTargets: {
-        ...data.monthlyTargets,
-        [month]: targetFor(data, month),
-      },
-    });
-    setToast(
-      `${accepted.length} office ${accepted.length === 1 ? "day" : "days"} planned. Confirm completion after attending.`,
-    );
-  };
   const exportData = () => {
     try {
       if (locked) downloadBackup(localStorage.getItem(STORAGE_KEY) ?? "", true);
@@ -241,37 +203,10 @@ export default function App() {
       if (fileInput.current) fileInput.current.value = "";
     }
   };
-  const planner = (
-    <Planner
-      data={data}
-      month={month}
-      today={today}
-      apply={apply}
-      reject={(date) =>
-        commit({
-          ...data,
-          rejected: {
-            ...data.rejected,
-            [month]: [...(data.rejected[month] ?? []), date],
-          },
-        })
-      }
-      regenerate={() => {
-        commit({ ...data, rejected: { ...data.rejected, [month]: [] } });
-        setToast(
-          "Plan recalculated with your saved preferences. Excluded suggestions are available again.",
-        );
-      }}
-      edit={edit}
-      settings={() => navigate("settings")}
-    />
-  );
   const pageTitles = {
     trains: "Trains",
     holidays: "Holidays",
     calendar: "Calendar",
-    dashboard: "Dashboard",
-    history: "History",
     settings: "Settings",
   };
   return (
@@ -365,26 +300,6 @@ export default function App() {
             edit={edit}
             exportData={exportData}
             importData={() => fileInput.current?.click()}
-            history={() => navigate("history")}
-          />
-        )}
-        {page === "dashboard" && (
-          <DashboardPage
-            data={data}
-            month={month}
-            today={today}
-            setMonth={setMonth}
-            history={() => navigate("history")}
-            edit={edit}
-          />
-        )}
-        {page === "history" && (
-          <HistoryPage
-            data={data}
-            month={month}
-            today={today}
-            setMonth={setMonth}
-            edit={edit}
           />
         )}
         {page === "trains" && (
@@ -425,7 +340,6 @@ export default function App() {
             }
           />
         )}
-        {page === "dashboard" && planner}
       </main>
       <nav className="mobile-nav" aria-label="Mobile navigation">
         {pages.map(({ key, label, Icon }) => (

@@ -10,7 +10,6 @@ import {
   Sun,
   Moon,
   Monitor,
-  Sparkles,
   Minus,
   Plus,
   Info,
@@ -21,16 +20,6 @@ import type { Settings, TrackerData } from "../types";
 import { localDate } from "../lib/dates";
 import { targetFor } from "../lib/statistics";
 
-const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
-const fullWeekdays = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 function Stepper({
   value,
   onChange,
@@ -72,38 +61,6 @@ function Stepper({
       >
         <Plus size={16} />
       </button>
-    </div>
-  );
-}
-function WeekdayPicker({
-  value,
-  onChange,
-  label,
-}: {
-  value: number[];
-  onChange: (days: number[]) => void;
-  label: string;
-}) {
-  return (
-    <div className="weekday-picker" role="group" aria-label={label}>
-      {weekdays.map((day, index) => (
-        <button
-          key={index}
-          title={fullWeekdays[index]}
-          aria-label={`${label}: ${fullWeekdays[index]}`}
-          aria-pressed={value.includes(index)}
-          className={value.includes(index) ? "active" : ""}
-          onClick={() =>
-            onChange(
-              value.includes(index)
-                ? value.filter((item) => item !== index)
-                : [...value, index].sort(),
-            )
-          }
-        >
-          {day}
-        </button>
-      ))}
     </div>
   );
 }
@@ -191,81 +148,6 @@ export function SettingsPage({
               </button>
             )}
           </div>
-        </Disclosure>
-        <Disclosure
-          className="card settings-card"
-          title={
-            <>
-              <Sparkles size={20} />
-              Smart planner preferences
-            </>
-          }
-        >
-          <div className="setting-stacked">
-            <strong>Working days</strong>
-            <p>Only these weekdays are eligible for recommendations.</p>
-            <WeekdayPicker
-              label="Working days"
-              value={settings.workingDays}
-              onChange={(workingDays) => update({ workingDays })}
-            />
-            {!settings.workingDays.length && (
-              <p className="warning-text">
-                Select at least one working day to receive suggestions.
-              </p>
-            )}
-          </div>
-          <div className="setting-stacked">
-            <strong>Preferred office days</strong>
-            <p>Prioritize these days.</p>
-            <WeekdayPicker
-              label="Preferred office days"
-              value={settings.preferredDays}
-              onChange={(preferredDays) => update({ preferredDays })}
-            />
-          </div>
-          <div className="setting-row">
-            <div>
-              <strong>Maximum office days per week</strong>
-              <p>Monday–Sunday, including saved office days.</p>
-            </div>
-            <Stepper
-              label="Maximum office days per week"
-              value={settings.maxPerWeek}
-              min={1}
-              max={7}
-              onChange={(maxPerWeek) => update({ maxPerWeek })}
-            />
-          </div>
-          <label className="setting-row toggle-row">
-            <div>
-              <strong>Avoid consecutive office days</strong>
-              <p>Space out office days.</p>
-            </div>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={settings.avoidConsecutive}
-              onChange={(event) =>
-                update({ avoidConsecutive: event.target.checked })
-              }
-            />
-          </label>
-          <label className="setting-row toggle-row">
-            <div>
-              <strong>Keep existing WFH plans</strong>
-              <p>
-                Turn off to see optional rescheduling suggestions. Each
-                replacement still needs confirmation.
-              </p>
-            </div>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={settings.protectWFH}
-              onChange={(event) => update({ protectWFH: event.target.checked })}
-            />
-          </label>
         </Disclosure>
         <Disclosure
           className="card settings-card"

@@ -16,23 +16,19 @@
 
 ---
 
-**Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, with optional account login and cross-device SQLite sync.
+**Plan. Track. Stay balanced.** A simple hybrid-work calendar with holidays, train reminders, optional account login, and cross-device SQLite sync.
 
-| Calendar                   | Dashboard                     | Smart planner                 | Your data                  |
-| -------------------------- | ----------------------------- | ----------------------------- | -------------------------- |
-| WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | SQLite sync + JSON backups |
+The app has four pages: **Calendar, Holidays, Trains, and Settings**.
 
 ## ✨ What it does
 
 - Compact, mobile-first layout with consistent card spacing, touch-friendly controls, and fixed bottom navigation. Desktop uses aligned content columns without stretching short panels.
 - Saved train journeys appear first on phones; expand Add a journey when needed. Desktop uses two aligned journey columns with the add form above.
-- Section headings have expand/collapse arrows for secondary details. Calendar focuses on attendance and its monthly summary; Smart WFO Planner is available on Dashboard and train reminders in Trains. Collapsing sections keeps entered values intact.
+- Section headings have expand/collapse arrows for secondary details. Calendar focuses on attendance and its monthly summary; train reminders are in Trains. Collapsing sections keeps entered values intact.
 - Edit any date, attach notes, and save one attendance status per day.
-- Keep **completed**, **planned**, and **suggested** office days separate. Past plans never silently become completed attendance.
+- Keep **completed** and **planned** office days separate. Past plans never silently become completed attendance.
 - Track monthly targets, save month-specific overrides, and review previous months without losing data.
-- Plan office days around working weekdays, preferred weekdays, holidays, leave, weekly limits, and existing commitments.
-- Review clear feasibility alerts, accept or exclude individual suggestions, apply a complete plan, and regenerate suggestions.
-- Filter history by status or search dates and notes.
+- Plan office days directly in Calendar and revisit previous months using the month controls.
 - Choose light, dark, or system appearance; configure calendar week start, weekend visibility, and starting month.
 - Export and restore validated JSON backups, with confirmation before replacement or reset.
 - Install as a PWA and use it offline after the first successful production visit and service-worker activation.
@@ -45,7 +41,7 @@ The initial **2026** catalog contains exactly the 14 holidays in [India Post’s
 
 **One source disagreement is explicit:** Id-ul-Zuha is 28 May 2026 in India Portal’s updated gazetted entry, while India Post lists 27 May. The tracker uses 28 May and preserves the postal date in its source metadata and the Holidays screen notice. The remaining 13 dates agree. Source data is bundled in `src/data/india-holidays.json` for offline use. There are no browser runtime requests or substitutions from other sources. Date differences for every year are rendered from source metadata.
 
-These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. Each yearly Holidays catalog retains its full verified list. History’s individual records and Recent activity remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
+These holidays appear by name in the calendar, contribute to monthly Holiday totals, and remain separate from personal attendance. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. Each yearly Holidays catalog retains its full verified list. The built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
 
 ### Automatic yearly updates from 2027
 
@@ -97,24 +93,16 @@ npm run preview
 
 ## Using the tracker
 
-1. In **Settings**, set the default monthly target and normal working weekdays.
+1. In **Settings**, set the default monthly target.
 2. Set an override for a specific month when its target differs. A month’s target is saved when its first record or accepted plan is added, so later default changes do not alter that month.
 3. Select a calendar date, add optional notes, and choose WFO, WFH, leave, or holiday. Office and home dates in the future are plans.
-4. Review the **Smart WFO Planner** and accept suggestions individually or together.
+4. Plan office days directly by selecting dates in Calendar.
 5. After an office day, open it and explicitly choose **Completed**, then **Work from office**.
 6. Export regular backups from the summary or Settings.
 
-Solid green means completed WFO. Dashed green means an accepted WFO plan. Green outlines with a suggestion marker are unaccepted recommendations. Suggestions are derived from your data, and are never attendance records until accepted.
+Solid green means completed WFO. Dashed green means a planned WFO day. Mark completion explicitly after attending.
 
-## Planning rules and calculations
-
-The scheduler enumerates eligible subsets of each Monday–Sunday week and uses dynamic programming across weeks. It first maximizes the number of days that can be scheduled, then favors preferred weekdays, spacing, and balanced weekly attendance. Identical data, preferences, and local dates produce identical suggestions.
-
-**Hard limits:** no past dates, no dates outside the selected month, configured working weekdays only, no existing attendance records, no rejected suggestions, and the weekly maximum including all saved WFO records in that week, even across month boundaries.
-
-**Flexible preferences:** preferred weekdays and avoiding consecutive office days. When the target cannot be met with those preferences, the planner can suggest other working weekdays or consecutive days and explains the flexibility. It never exceeds the weekly maximum automatically. If hard capacity is insufficient, it shows the capacity and suggests reviewing preferences or unavailable dates.
-
-WFH plans are always excluded from automatic suggestions. Turning off **Keep existing WFH plans** reveals a separate review list. Replacing WFH with WFO requires confirmation. Existing leave and holiday records are never automatically replaced.
+## Progress calculations
 
 | Metric               | Definition                                                                                                        |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -163,7 +151,7 @@ npm run preview
 Remove-Item Env:VITE_BASE_PATH
 ```
 
-For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Dashboard, Holidays, History, or Settings does not need server-side routing.
+For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Holidays, Trains, or Settings does not need server-side routing.
 
 The PWA manifest, icons, service-worker scope, assets, and navigation fallback follow the same base path. Updates display an **Update now** prompt; they do not clear LocalStorage. Android install availability depends on browser support and a valid HTTPS deployment. Downloading a ZIP or opening `index.html` directly does not provide the production app experience.
 
@@ -171,10 +159,10 @@ The PWA manifest, icons, service-worker scope, assets, and navigation fallback f
 
 ```text
 src/
-  components/     Calendar editor, planner, reusable cards and dialogs
+  components/     Calendar editor, reusable cards and dialogs
   hooks/          Persistence, cross-tab updates, local-day refresh
   lib/            Dates, validation/storage, statistics, deterministic planner
-  pages/          Calendar, Dashboard, Holidays, History, Settings
+  pages/          Calendar, Holidays, Trains, Settings
   test/           UI interaction tests and browser mocks
   types.ts        Versioned data model
   App.tsx         Navigation and application actions
@@ -187,7 +175,7 @@ public/           App icons
 
 Automated tests cover leap years, real date validation, month lengths, status replacement, planned/completed separation, target overrides, weekly constraints including month boundaries, preferred weekdays, consecutive-day handling, capacity alerts, replanning, migration, storage failures, corrupt data recovery, backup validation/export, navigation, theme, and reset confirmation.
 
-The planner is a personal aid; it cannot infer employer policies or verify real attendance. Built-in holiday catalogs cover only verified All India lists, starting with 2026; unpublished years are not inferred. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
+The tracker cannot infer employer policies or verify real attendance. Built-in holiday catalogs cover only verified All India lists, starting with 2026; unpublished years are not inferred. Enter personal leave and other custom holidays yourself. Notes are limited to 2,000 characters. Browser support requires a modern browser with LocalStorage and native HTML dialogs. Weekly limits apply Monday–Sunday regardless of the visual calendar week start.
 
 <a id="optional-accounts-and-sqlite-backend"></a>
 

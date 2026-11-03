@@ -5,7 +5,6 @@ import {
   Plus,
   Download,
   Upload,
-  History,
   CalendarCheck2,
   TrainFront,
 } from "lucide-react";
@@ -17,7 +16,6 @@ import { Modal } from "../components/ui";
 import type { TrackerData } from "../types";
 import { calendarDays, dateKey } from "../lib/dates";
 import { statistics } from "../lib/statistics";
-import { planMonth } from "../lib/planner";
 import { MonthControls, StatCards, TargetProgress } from "../components/ui";
 import { statusInfo, statuses } from "../lib/status";
 import {
@@ -35,7 +33,6 @@ export function CalendarPage({
   edit,
   exportData,
   importData,
-  history,
   account,
   userId,
   openTrains,
@@ -48,7 +45,6 @@ export function CalendarPage({
   edit: (date: string) => void;
   exportData: () => void;
   importData: () => void;
-  history: () => void;
   account: TrackerStore;
   userId: string | null;
   openTrains: (officeDate?: string, journeyId?: string) => void;
@@ -60,9 +56,6 @@ export function CalendarPage({
   const [bookingDialog, setBookingDialog] = useState<string | null>(null);
   const stats = statistics(data, month, today);
   const attendance = calendarAttendance(data);
-  const recommended = new Set(
-    planMonth(data, month, today).recommendations.map((row) => row.date),
-  );
   const days = calendarDays(month, data.settings.weekStartsOn).filter(
     (day) => data.settings.showWeekends || !isWeekend(day),
   );
@@ -108,12 +101,9 @@ export function CalendarPage({
                   ? "booked"
                   : "estimate";
               const holiday = holidayFor(key);
-              const suggested = inMonth && recommended.has(key);
               const label = record
                 ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
-                : suggested
-                  ? "Suggested office day"
-                  : "No entry";
+                : "No entry";
               return (
                 <button
                   key={key}
@@ -124,7 +114,7 @@ export function CalendarPage({
                       .filter(Boolean)
                       .join(" · ") || label
                   }
-                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
+                  className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${key === today ? "today" : ""} ${key === selected ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
                   onClick={() =>
                     trainBookings.length ? setBookingDialog(key) : edit(key)
                   }
@@ -139,7 +129,7 @@ export function CalendarPage({
                     )}
                   </span>
                   <span
-                    className={`day-dot ${record ? statusInfo[record.status].className : suggested ? "suggestion-dot" : "unmarked"}`}
+                    className={`day-dot ${record ? statusInfo[record.status].className : "unmarked"}`}
                   />
                   {record && (
                     <span className="cell-caption">
@@ -149,7 +139,6 @@ export function CalendarPage({
                       {record.phase === "planned" ? " · Plan" : ""}
                     </span>
                   )}
-                  {suggested && <span className="cell-caption">Suggested</span>}
                 </button>
               );
             })}
@@ -172,10 +161,6 @@ export function CalendarPage({
             <span>
               <i className="dot planned-dot" />
               Planned
-            </span>
-            <span>
-              <i className="dot suggestion-dot" />
-              Suggested
             </span>
             {!!bookings.length && (
               <span className="calendar-train-legend">
@@ -222,10 +207,6 @@ export function CalendarPage({
             <button onClick={importData}>
               <Upload size={21} />
               <span>Import data</span>
-            </button>
-            <button onClick={history}>
-              <History size={21} />
-              <span>View history</span>
             </button>
           </div>
         </Disclosure>

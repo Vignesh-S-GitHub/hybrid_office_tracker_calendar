@@ -49,24 +49,18 @@ describe("complete attendance flow", () => {
       JSON.parse(localStorage.getItem(STORAGE_KEY)!).attendance["2026-10-15"],
     ).toBeUndefined();
   });
-  it("applies suggestions as planned attendance and requires explicit completion", async () => {
-    const user = userEvent.setup();
+  it("shows only the four supported pages and falls back from retired links", () => {
+    location.hash = "#dashboard";
     render(<App />);
-    const nav = within(screen.getByRole("navigation", { name: "Main navigation" }));
-    await user.click(nav.getByRole("button", { name: "Dashboard" }));
-    await user.click(
-      screen.getByRole("button", { name: "Apply recommended plan" }),
-    );
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
-    await user.click(nav.getByRole("button", { name: "Calendar" }));
+    for (const name of ["Main navigation", "Mobile navigation"]) {
+      const nav = within(screen.getByRole("navigation", { name }));
+      expect(
+        nav.getAllByRole("button").map((button) => button.textContent),
+      ).toEqual(["Calendar", "Holidays", "Trains", "Settings"]);
+    }
     expect(
-      Object.values(saved.attendance).every(
-        (row) => (row as { phase: string }).phase === "planned",
-      ),
-    ).toBe(true);
-    expect(
-      screen.getByText(/Confirm completion after attending/),
-    ).toBeInTheDocument();
+      screen.getByRole("heading", { name: "Calendar" }),
+    ).toBeVisible();
   });
   it("changes month targets and keeps old attendance when navigating months", async () => {
     const data = emptyData();
@@ -126,12 +120,12 @@ describe("complete attendance flow", () => {
     const nav = within(
       screen.getByRole("navigation", { name: "Mobile navigation" }),
     );
-    await user.click(nav.getByRole("button", { name: "Dashboard" }));
-    expect(screen.getByText("Finding your balance")).toBeInTheDocument();
-    await user.click(nav.getByRole("button", { name: "History" }));
+    await user.click(nav.getByRole("button", { name: "Holidays" }));
     expect(
-      screen.getByText("Your story starts with a day"),
-    ).toBeInTheDocument();
+      screen.getByRole("heading", { name: "Holidays" }),
+    ).toBeVisible();
+    await user.click(nav.getByRole("button", { name: "Trains" }));
+    expect(screen.getByText(/Sign in to save journeys/)).toBeVisible();
     await user.click(nav.getByRole("button", { name: "Settings" }));
     await user.click(screen.getByRole("button", { name: "Data management" }));
     await user.click(

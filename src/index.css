@@ -2391,7 +2391,7 @@ dialog::backdrop {
   }
   .mobile-nav {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     position: fixed;
     bottom: 0;
     left: 0;
@@ -3335,7 +3335,7 @@ dialog::backdrop {
 }
 .quick-actions .disclosure-body > div {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 .train-form-toggle:not([hidden]) {
