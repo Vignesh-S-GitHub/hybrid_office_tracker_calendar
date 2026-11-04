@@ -4,7 +4,6 @@ import {
   Plus,
   Download,
   Upload,
-  History,
   CalendarCheck2,
   TrainFront,
 } from "lucide-react";
@@ -37,7 +36,6 @@ export function CalendarPage({
   edit,
   exportData,
   importData,
-  history,
   account,
   userId,
   openTrains,
@@ -50,7 +48,6 @@ export function CalendarPage({
   edit: (date: string) => void;
   exportData: () => void;
   importData: () => void;
-  history: () => void;
   account: TrackerStore;
   userId: string | null;
   openTrains: (officeDate?: string, journeyId?: string) => void;
@@ -237,10 +234,6 @@ export function CalendarPage({
             <button onClick={importData}>
               <Upload size={21} />
               <span>Import data</span>
-            </button>
-            <button onClick={history}>
-              <History size={21} />
-              <span>View history</span>
             </button>
           </div>
         </div>

@@ -113,6 +113,20 @@ describe("complete attendance flow", () => {
       }),
     ).toBeInTheDocument();
   });
+  it("removes Dashboard and History from desktop tabs and old links", () => {
+    location.hash = "#history";
+    const view = render(<App />);
+    expect(screen.getByRole("heading", { name: "Calendar" })).toBeInTheDocument();
+    const desktop = within(screen.getByRole("navigation", { name: "Main navigation" }));
+    expect(desktop.getAllByRole("button").map((button) => button.textContent)).toEqual([
+      "Calendar", "Holidays", "Trains", "Settings",
+    ]);
+    expect(screen.queryByRole("button", { name: "View history" })).toBeNull();
+    view.unmount();
+    location.hash = "#dashboard";
+    render(<App />);
+    expect(screen.getByRole("heading", { name: "Calendar" })).toBeInTheDocument();
+  });
   it("switches theme and supports mobile navigation and reset cancellation", async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -123,12 +137,15 @@ describe("complete attendance flow", () => {
     const nav = within(
       screen.getByRole("navigation", { name: "Mobile navigation" }),
     );
-    await user.click(nav.getByRole("button", { name: "Dashboard" }));
-    expect(screen.getByText("Finding your balance")).toBeInTheDocument();
-    await user.click(nav.getByRole("button", { name: "History" }));
     expect(
-      screen.getByText("Your story starts with a day"),
-    ).toBeInTheDocument();
+      nav.getAllByRole("button").map((button) => button.textContent),
+    ).toEqual(["Calendar", "Holidays", "Trains", "Settings"]);
+    expect(nav.queryByRole("button", { name: "Dashboard" })).toBeNull();
+    expect(nav.queryByRole("button", { name: "History" })).toBeNull();
+    await user.click(nav.getByRole("button", { name: "Holidays" }));
+    expect(screen.getByRole("heading", { name: "Holidays" })).toBeInTheDocument();
+    await user.click(nav.getByRole("button", { name: "Trains" }));
+    expect(screen.getByRole("heading", { name: "Trains" })).toBeInTheDocument();
     await user.click(nav.getByRole("button", { name: "Settings" }));
     await user.click(
       screen.getByRole("button", { name: /Clear calendar data/ }),

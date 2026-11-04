@@ -74,7 +74,6 @@ function CalendarFixture({
       edit={edit}
       exportData={vi.fn()}
       importData={vi.fn()}
-      history={vi.fn()}
     />
   );
 }

@@ -18,7 +18,7 @@
 
 **Plan. Track. Stay balanced.** A private hybrid-work calendar with a deterministic office-day planner, with optional account login and cross-device SQLite sync.
 
-| Calendar                   | Dashboard                     | Smart planner                 | Your data                  |
+| Calendar                   | Monthly summary               | Smart planner                 | Your data                  |
 | -------------------------- | ----------------------------- | ----------------------------- | -------------------------- |
 | WFO, WFH, leave & holidays | Actual and projected progress | Working-day and weekly limits | SQLite sync + JSON backups |
 
@@ -30,7 +30,6 @@
 - Track monthly targets, save month-specific overrides, and review previous months without losing data.
 - Plan office days around working weekdays, preferred weekdays, holidays, leave, weekly limits, and existing commitments.
 - Review clear feasibility alerts, accept or exclude individual suggestions, apply a complete plan, and regenerate suggestions.
-- Filter history by status or search dates and notes.
 - Choose light, dark, or system appearance; configure calendar week start, weekend visibility, and starting month.
 - Export and restore validated JSON backups, with confirmation before replacement or reset.
 - Install as a PWA and use it offline after the first successful production visit and service-worker activation.
@@ -43,7 +42,7 @@ The initial **2026** catalog contains exactly the 14 holidays in [India Post’s
 
 **One source disagreement is explicit:** Id-ul-Zuha is 28 May 2026 in India Portal’s updated gazetted entry, while India Post lists 27 May. The tracker uses 28 May and preserves the postal date in its source metadata and the Holidays screen notice. The remaining 13 dates agree. Source data is bundled in `src/data/india-holidays.json` for offline use. There are no browser runtime requests or substitutions from other sources. Date differences for every year are rendered from source metadata.
 
-These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. Each yearly Holidays catalog retains its full verified list. History’s individual records and Recent activity remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
+These holidays appear by name in the calendar, contribute to monthly Holiday totals, and are excluded from Smart WFO recommendations and WFH rescheduling suggestions. Personal records take precedence over the displayed status: recording WFO on a holiday preserves the actual attendance, and clearing that personal entry restores the official holiday. A date counts only once in monthly statistics. Each yearly Holidays catalog retains its full verified list. Saved personal attendance records remain personal activity; the built-in holiday layer is not saved as user attendance or inserted into JSON backups. Resetting attendance does not remove the official calendar. No storage migration is needed.
 
 ### Automatic yearly updates from 2027
 
@@ -161,7 +160,7 @@ npm run preview
 Remove-Item Env:VITE_BASE_PATH
 ```
 
-For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Dashboard, Holidays, History, or Settings does not need server-side routing.
+For CI overrides, set `VITE_BASE_PATH` in the build step’s `env`. Navigation uses hash fragments, so refreshing Calendar, Holidays, Trains, or Settings does not need server-side routing.
 
 The PWA manifest, icons, service-worker scope, assets, and navigation fallback follow the same base path. Updates display an **Update now** prompt; they do not clear LocalStorage. Android install availability depends on browser support and a valid HTTPS deployment. Downloading a ZIP or opening `index.html` directly does not provide the production app experience.
 
@@ -172,7 +171,7 @@ src/
   components/     Calendar editor, planner, reusable cards and dialogs
   hooks/          Persistence, cross-tab updates, local-day refresh
   lib/            Dates, validation/storage, statistics, deterministic planner
-  pages/          Calendar, Dashboard, Holidays, History, Settings
+  pages/          Calendar, Holidays, Trains, Settings
   test/           UI interaction tests and browser mocks
   types.ts        Versioned data model
   App.tsx         Navigation and application actions
