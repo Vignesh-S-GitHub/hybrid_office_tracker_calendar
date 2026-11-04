@@ -1,8 +1,8 @@
-import { Planner } from "./components/Planner";
-import { planMonth } from "./lib/planner";
 import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
+  ChartNoAxesCombined,
+  History,
   Settings as SettingsIcon,
   Moon,
   Sun,
@@ -19,10 +19,13 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 import type { Phase, Settings, Status, TrackerData } from "./types";
 import { useTracker } from "./hooks/useTracker";
 import { CalendarPage } from "./pages/CalendarPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { TrainsPage } from "./pages/TrainsPage";
 import { HolidaysPage } from "./pages/HolidaysPage";
 import { BrandMark } from "./components/BrandMark";
+import { Planner } from "./components/Planner";
 import { Modal } from "./components/ui";
 import { Account } from "./components/Account";
 import { AttendanceEditor } from "./components/AttendanceEditor";
@@ -34,9 +37,12 @@ import {
 } from "./lib/storage";
 import { monthKey, validMonth } from "./lib/dates";
 import { targetFor } from "./lib/statistics";
+import { planMonth } from "./lib/planner";
 
 const pages = [
   { key: "calendar", label: "Calendar", Icon: CalendarDays },
+  { key: "dashboard", label: "Dashboard", Icon: ChartNoAxesCombined },
+  { key: "history", label: "History", Icon: History },
   { key: "holidays", label: "Holidays", Icon: Palmtree },
   { key: "trains", label: "Trains", Icon: TrainFront },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
@@ -71,22 +77,6 @@ export default function App() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [toast, setToast] = useState("");
   const [isDark, setIsDark] = useState(false);
-  // One-time appearance migration from the previous dark-default release.
-  // Existing attendance, plans, preferences and train reminders are untouched.
-  const lightMigration = useRef(false);
-  useEffect(() => {
-    if (lightMigration.current || locked) return;
-    lightMigration.current = true;
-    try {
-      if (localStorage.getItem("hybrid-white-redesign-2026") === "yes") return;
-      localStorage.setItem("hybrid-white-redesign-2026", "yes");
-    } catch {
-      return;
-    }
-    if (data.settings.theme === "dark") {
-      commit({ ...data, settings: { ...data.settings, theme: "light" } });
-    }
-  }, [commit, data, locked]);
   const fileInput = useRef<HTMLInputElement>(null);
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -251,43 +241,12 @@ export default function App() {
       if (fileInput.current) fileInput.current.value = "";
     }
   };
-  const planner = (
-    <Planner
-      data={data}
-      month={month}
-      today={today}
-      apply={apply}
-      reject={(date) =>
-        commit({
-          ...data,
-          rejected: {
-            ...data.rejected,
-            [month]: [...(data.rejected[month] ?? []), date],
-          },
-        })
-      }
-      regenerate={() => {
-        commit({ ...data, rejected: { ...data.rejected, [month]: [] } });
-        setToast(
-          "Plan recalculated with your saved preferences. Excluded suggestions are available again.",
-        );
-      }}
-      edit={edit}
-      settings={() => navigate("settings")}
-    />
-  );
-  const PageIcon = pages.find((item) => item.key === page)!.Icon;
-  const bannerImage = page === "calendar" ? "office-work.webp" : page === "holidays" ? "india-holidays.webp" : null;
-  const pageSubtitles = {
-    calendar: "Track your days. Plan with confidence.",
-    holidays: "Verified All India holidays, clearly presented.",
-    trains: "Your booking dates and Telegram reminders.",
-    settings: "Make the tracker work your way.",
-  };
   const pageTitles = {
     trains: "Trains",
     holidays: "Holidays",
     calendar: "Calendar",
+    dashboard: "Dashboard",
+    history: "History",
     settings: "Settings",
   };
   return (
@@ -340,26 +299,11 @@ export default function App() {
           </div>
         </div>
       </header>
-      <main className="app-main" data-page={page} id="main-content">
+      <main className="app-main" id="main-content">
         <div className="intro">
-          {bannerImage && (
-            <div className="intro-banner">
-              <img src={`${import.meta.env.BASE_URL}generated/${bannerImage}`} alt="" aria-hidden="true" />
-              <div className="intro-banner-copy">
-                <strong>{page === "calendar" ? "Your hybrid work, beautifully balanced" : "Holidays across India"}</strong>
-                <span>{page === "calendar" ? "Office · Home · Plan · Travel" : "Verified dates, one simple view"}</span>
-              </div>
-            </div>
-          )}
-          <div className="intro-heading">
-            <span className="intro-icon"><PageIcon size={26} aria-hidden="true" /></span>
-            <div>
-              <h1>{pageTitles[page]}</h1>
-              <p className="page-subtitle">{pageSubtitles[page]}</p>
-            </div>
-          </div>
+          <h1>{pageTitles[page]}</h1>
           <span className="privacy-note">
-            <ShieldCheck size={14} />
+            <ShieldCheck size={16} />
             {user ? status : "Saved on this device"}
           </span>
         </div>
@@ -385,7 +329,6 @@ export default function App() {
         {page === "calendar" && (
           <CalendarPage
             key={user?.id ?? "guest"}
-            planner={planner}
             account={account}
             userId={user?.id ?? null}
             openTrains={openTrains}
@@ -397,6 +340,26 @@ export default function App() {
             edit={edit}
             exportData={exportData}
             importData={() => fileInput.current?.click()}
+            history={() => navigate("history")}
+          />
+        )}
+        {page === "dashboard" && (
+          <DashboardPage
+            data={data}
+            month={month}
+            today={today}
+            setMonth={setMonth}
+            history={() => navigate("history")}
+            edit={edit}
+          />
+        )}
+        {page === "history" && (
+          <HistoryPage
+            data={data}
+            month={month}
+            today={today}
+            setMonth={setMonth}
+            edit={edit}
           />
         )}
         {page === "trains" && (
@@ -437,6 +400,31 @@ export default function App() {
             }
           />
         )}
+        {(page === "calendar" || page === "dashboard") && (
+          <Planner
+            data={data}
+            month={month}
+            today={today}
+            apply={apply}
+            reject={(date) =>
+              commit({
+                ...data,
+                rejected: {
+                  ...data.rejected,
+                  [month]: [...(data.rejected[month] ?? []), date],
+                },
+              })
+            }
+            regenerate={() => {
+              commit({ ...data, rejected: { ...data.rejected, [month]: [] } });
+              setToast(
+                "Plan recalculated with your saved preferences. Excluded suggestions are available again.",
+              );
+            }}
+            edit={edit}
+            settings={() => navigate("settings")}
+          />
+        )}
       </main>
       <nav className="mobile-nav" aria-label="Mobile navigation">
         {pages.map(({ key, label, Icon }) => (
@@ -446,7 +434,7 @@ export default function App() {
             key={key}
             onClick={() => navigate(key)}
           >
-            <Icon className="nav-asset-icon" size={24} aria-hidden="true" />
+            <Icon size={21} />
             <span>{label}</span>
           </button>
         ))}

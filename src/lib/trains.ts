@@ -149,15 +149,6 @@ export function reminderJobs(
       : []),
   ].filter((job) => job.due >= now);
 }
-export function beforeBookingJobs(input: TrainInput, now = Date.now()) {
-  const due = bookingAt(input) - 3_600_000;
-  if (due <= now)
-    throw new Error("The reminder time one hour before booking has already passed.");
-  return [
-    { kind: "snooze", due },
-    ...reminderJobs(input, now).filter((job) => job.due > due),
-  ];
-}
 export function officeVisits(data: TrackerData, today: string): string[][] {
   const dates = Object.entries(data.attendance)
     .filter(

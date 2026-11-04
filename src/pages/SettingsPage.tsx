@@ -1,4 +1,3 @@
-import { Disclosure } from "../components/Disclosure";
 import { BrandMark } from "../components/BrandMark";
 import {
   Building2,
@@ -130,16 +129,11 @@ export function SettingsPage({
   return (
     <div className="settings-layout">
       <div className="settings-column">
-        <Disclosure
-          className="card settings-card"
-          title={
-            <>
-              <Building2 size={20} />
-              Work preferences
-            </>
-          }
-          defaultOpen
-        >
+        <section className="card settings-card">
+          <h2>
+            <Building2 size={20} />
+            Work preferences
+          </h2>
           <div className="setting-row">
             <div>
               <strong>Default monthly office target</strong>
@@ -191,16 +185,12 @@ export function SettingsPage({
               </button>
             )}
           </div>
-        </Disclosure>
-        <Disclosure
-          className="card settings-card"
-          title={
-            <>
-              <Sparkles size={20} />
-              Smart planner preferences
-            </>
-          }
-        >
+        </section>
+        <section className="card settings-card">
+          <h2>
+            <Sparkles size={20} />
+            Smart planner preferences
+          </h2>
           <div className="setting-stacked">
             <strong>Working days</strong>
             <p>Only these weekdays are eligible for recommendations.</p>
@@ -240,10 +230,7 @@ export function SettingsPage({
           <label className="setting-row toggle-row">
             <div>
               <strong>Avoid consecutive office days</strong>
-              <p>
-                On: space out office days. Off: fill the earliest weeks up to
-                your weekly limit.
-              </p>
+              <p>Space out office days.</p>
             </div>
             <input
               type="checkbox"
@@ -269,16 +256,12 @@ export function SettingsPage({
               onChange={(event) => update({ protectWFH: event.target.checked })}
             />
           </label>
-        </Disclosure>
-        <Disclosure
-          className="card settings-card"
-          title={
-            <>
-              <CalendarDays size={20} />
-              Calendar preferences
-            </>
-          }
-        >
+        </section>
+        <section className="card settings-card">
+          <h2>
+            <CalendarDays size={20} />
+            Calendar preferences
+          </h2>
           <label className="setting-row">
             <div>
               <strong>Week starts on</strong>
@@ -342,19 +325,14 @@ export function SettingsPage({
               />
             </label>
           )}
-        </Disclosure>
+        </section>
       </div>
       <div className="settings-column">
-        <Disclosure
-          className="card settings-card"
-          title={
-            <>
-              <Sun size={20} />
-              Appearance
-            </>
-          }
-          defaultOpen
-        >
+        <section className="card settings-card">
+          <h2>
+            <Sun size={20} />
+            Appearance
+          </h2>
           <p className="muted small-text">A comfortable view, day or night.</p>
           <div className="theme-picker">
             {(
@@ -375,16 +353,12 @@ export function SettingsPage({
               </button>
             ))}
           </div>
-        </Disclosure>
-        <Disclosure
-          className="card settings-card"
-          title={
-            <>
-              <Download size={20} />
-              Data management
-            </>
-          }
-        >
+        </section>
+        <section className="card settings-card">
+          <h2>
+            <Download size={20} />
+            Data management
+          </h2>
           <button className="setting-action" onClick={exportData}>
             <span className="action-icon">
               <Download size={21} />
@@ -412,7 +386,7 @@ export function SettingsPage({
               <small>Reset records and preferences after confirmation.</small>
             </span>
           </button>
-        </Disclosure>
+        </section>
         <section className="card privacy-card">
           <ShieldCheck size={28} />
           <h2>Your data</h2>
@@ -423,20 +397,16 @@ export function SettingsPage({
             Works offline after the first visit
           </span>
         </section>
-        <Disclosure
-          className="card settings-card about-card"
-          title={
-            <>
-              <Info size={20} />
-              About
-            </>
-          }
-        >
+        <section className="card settings-card about-card">
+          <h2>
+            <Info size={20} />
+            About
+          </h2>
           <strong>
             <BrandMark /> Hybrid Tracker{" "}
             <span className="muted small-text">v1.0.0</span>
           </strong>
-        </Disclosure>
+        </section>
       </div>
     </div>
   );

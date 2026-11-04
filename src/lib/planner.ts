@@ -22,31 +22,6 @@ function schedule(
       .filter(([, row]) => row.status === "WFO")
       .map(([date]) => date),
   );
-  // Without spacing, finish the target in the earliest eligible weeks rather
-  // than letting the balanced-week scoring spread a few days across the month.
-  if (!avoidConsecutive) {
-    const counts = new Map<string, number>();
-    for (const date of fixed) {
-      const week = weekKey(date);
-      counts.set(week, (counts.get(week) ?? 0) + 1);
-    }
-    const picked: string[] = [];
-    for (const date of [...candidates].sort()) {
-      if (picked.length >= wanted) break;
-      if (
-        strict &&
-        preferredDays.length &&
-        !preferredDays.includes(localDate(date).getDay())
-      )
-        continue;
-      const week = weekKey(date);
-      const count = counts.get(week) ?? 0;
-      if (count >= maxPerWeek) continue;
-      picked.push(date);
-      counts.set(week, count + 1);
-    }
-    return picked;
-  }
   const groups = new Map<string, string[]>();
   for (const date of candidates) {
     const key = weekKey(date);
@@ -155,11 +130,9 @@ export function planMonth(
     stats.toSchedule > strictCapacity && stats.toSchedule <= capacity;
   const recommendations: Recommendation[] = suggestions.map((date) => ({
     date,
-    reason: !data.settings.avoidConsecutive
-      ? "Fills the earliest eligible office block within your weekly limit."
-      : data.settings.preferredDays.includes(localDate(date).getDay())
-        ? "A preferred weekday, balanced across your remaining weeks."
-        : "Adds capacity on a working day to help reach your target.",
+    reason: data.settings.preferredDays.includes(localDate(date).getDay())
+      ? "A preferred weekday, balanced across your remaining weeks."
+      : "Adds capacity on a working day to help reach your target.",
   }));
   return {
     ...stats,

@@ -48,11 +48,11 @@ export function StatCards({ stats }: { stats: Stats }) {
   return (
     <div className="stat-grid">
       {statuses.map((status) => {
-        const { short, className, Icon } = statusInfo[status];
+        const { Icon, short, className } = statusInfo[status];
         return (
           <div className={`stat-card ${className}`} key={status}>
             <span className="stat-icon">
-              <Icon size={24} aria-hidden="true" />
+              <Icon size={22} />
             </span>
             <div>
               <span>{short}</span>
