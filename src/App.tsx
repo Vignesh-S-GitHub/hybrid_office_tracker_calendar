@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
-  ChartNoAxesCombined,
-  History,
   Settings as SettingsIcon,
   Moon,
   Sun,
@@ -19,8 +17,6 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 import type { Phase, Settings, Status, TrackerData } from "./types";
 import { useTracker } from "./hooks/useTracker";
 import { CalendarPage } from "./pages/CalendarPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { TrainsPage } from "./pages/TrainsPage";
 import { HolidaysPage } from "./pages/HolidaysPage";
@@ -41,8 +37,6 @@ import { planMonth } from "./lib/planner";
 
 const pages = [
   { key: "calendar", label: "Calendar", Icon: CalendarDays },
-  { key: "dashboard", label: "Dashboard", Icon: ChartNoAxesCombined },
-  { key: "history", label: "History", Icon: History },
   { key: "holidays", label: "Holidays", Icon: Palmtree },
   { key: "trains", label: "Trains", Icon: TrainFront },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
@@ -245,8 +239,6 @@ export default function App() {
     trains: "Trains",
     holidays: "Holidays",
     calendar: "Calendar",
-    dashboard: "Dashboard",
-    history: "History",
     settings: "Settings",
   };
   return (
@@ -340,26 +332,6 @@ export default function App() {
             edit={edit}
             exportData={exportData}
             importData={() => fileInput.current?.click()}
-            history={() => navigate("history")}
-          />
-        )}
-        {page === "dashboard" && (
-          <DashboardPage
-            data={data}
-            month={month}
-            today={today}
-            setMonth={setMonth}
-            history={() => navigate("history")}
-            edit={edit}
-          />
-        )}
-        {page === "history" && (
-          <HistoryPage
-            data={data}
-            month={month}
-            today={today}
-            setMonth={setMonth}
-            edit={edit}
           />
         )}
         {page === "trains" && (
@@ -400,7 +372,7 @@ export default function App() {
             }
           />
         )}
-        {(page === "calendar" || page === "dashboard") && (
+        {page === "calendar" && (
           <Planner
             data={data}
             month={month}
