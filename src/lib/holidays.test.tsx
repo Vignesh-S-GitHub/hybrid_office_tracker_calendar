@@ -183,7 +183,6 @@ describe("All India Holidays - 2026", () => {
         edit={vi.fn()}
         exportData={vi.fn()}
         importData={vi.fn()}
-        history={vi.fn()}
       />,
     );
     expect(
