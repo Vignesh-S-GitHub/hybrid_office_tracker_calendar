@@ -3,7 +3,7 @@ import { dateKey, validDate, validMonth } from "./dates";
 
 export const defaultSettings: Settings = {
   monthlyTarget: 12,
-  theme: "dark",
+  theme: "light",
   weekStartsOn: 0,
   showWeekends: true,
   defaultMonth: "current",

@@ -49,13 +49,7 @@ export function TrainsPage({
     />
   ) : (
     <section className="card train-empty">
-      <img
-        className="train-empty-art"
-        src={`${import.meta.env.BASE_URL}ui-kit/illustrations/no-trains.svg`}
-        alt=""
-        aria-hidden="true"
-      />
-      <TrainFront size={32} className="train-fallback-icon" />
+      <TrainFront size={40} className="train-empty-symbol" />
       <h2>Train reminders</h2>
       <p>Sign in to save journeys and receive Telegram reminders.</p>
     </section>

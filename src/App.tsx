@@ -1,6 +1,6 @@
 import { Planner } from "./components/Planner";
 import { planMonth } from "./lib/planner";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   Settings as SettingsIcon,
@@ -81,6 +81,21 @@ export default function App() {
     window.addEventListener("hashchange", handleHash);
     return () => window.removeEventListener("hashchange", handleHash);
   }, []);
+  // On the white-design rollout, migrate each existing profile's previous
+  // default dark/system setting once. Later user theme choices still persist.
+  useEffect(() => {
+    if (locked) return;
+    const marker = `hybrid-tracker-white-ui-v1:${user?.id ?? "guest"}`;
+    try {
+      if (localStorage.getItem(marker) === "1") return;
+      localStorage.setItem(marker, "1");
+      if (data.settings.theme !== "light") {
+        commit({ ...data, settings: { ...data.settings, theme: "light" } });
+      }
+    } catch {
+      // Storage warnings are already handled by useTracker.
+    }
+  }, [user?.id, locked, data, commit]);
   useEffect(() => {
     const system = matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
@@ -260,7 +275,6 @@ export default function App() {
       settings={() => navigate("settings")}
     />
   );
-  const pageScene = { calendar: "cityline", holidays: "beach", trains: "train", settings: "settings" }[page];
   const pageSubtitles = {
     calendar: "Track your days. Plan with confidence.",
     holidays: "Verified All India holidays, clearly presented.",
@@ -324,7 +338,16 @@ export default function App() {
         </div>
       </header>
       <main className="app-main" data-page={page} id="main-content">
-        <div className="intro" style={{ "--page-scene": `url("${import.meta.env.BASE_URL}ui-kit/scenes/${pageScene}.svg")` } as CSSProperties}>
+        {page === "calendar" && (
+          <section className="welcome-hero" aria-label="Plan, track and balance">
+            <div className="welcome-copy">
+              <strong>Plan · Track · Balance</strong>
+              <p>Your office and home days, beautifully organized.</p>
+            </div>
+            <img src={`${import.meta.env.BASE_URL}imagegen/office.webp`} alt="" aria-hidden="true" />
+          </section>
+        )}
+        <div className="intro">
           <h1>{pageTitles[page]}</h1>
           <p className="page-subtitle">{pageSubtitles[page]}</p>
           <span className="privacy-note">
@@ -408,19 +431,14 @@ export default function App() {
         )}
       </main>
       <nav className="mobile-nav" aria-label="Mobile navigation">
-        {pages.map(({ key, label }) => (
+        {pages.map(({ key, label, Icon }) => (
           <button
             aria-current={page === key ? "page" : undefined}
             className={page === key ? "active" : ""}
             key={key}
             onClick={() => navigate(key)}
           >
-            <img
-              className="nav-asset-icon"
-              src={`${import.meta.env.BASE_URL}ui-kit/navigation/${key}-${page === key ? "active" : "outline"}.svg`}
-              alt=""
-              aria-hidden="true"
-            />
+            <Icon size={22} aria-hidden="true" />
             <span>{label}</span>
           </button>
         ))}
