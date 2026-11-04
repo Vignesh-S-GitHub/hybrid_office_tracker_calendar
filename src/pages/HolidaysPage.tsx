@@ -23,7 +23,6 @@ export function HolidaysPage({
     (holiday) => holiday.date !== holiday.indiaPostDate,
   );
   const upcoming = holidays.filter((holiday) => holiday.date >= today).length;
-  const highlighted = holidays.find((holiday) => holiday.date >= today) ?? holidays.at(-1);
   return (
     <section
       className="card holidays-card"
@@ -84,20 +83,6 @@ export function HolidaysPage({
           </p>
         </div>
       ))}
-      {highlighted && (
-        <div className="holiday-spotlight" aria-label="Featured official holiday">
-          <div className="holiday-spotlight-copy">
-            <span>Next verified holiday</span>
-            <strong>{highlighted.name}</strong>
-            <span className="holiday-spotlight-date">{format(localDate(highlighted.date), "d MMM yyyy")}</span>
-          </div>
-          <img
-            src={`${import.meta.env.BASE_URL}imagegen/holidays.webp`}
-            alt=""
-            loading="lazy"
-          />
-        </div>
-      )}
       <div className="holiday-list">
         {holidays.map((holiday) => (
           <div
@@ -108,7 +93,7 @@ export function HolidaysPage({
               <span>{format(localDate(holiday.date), "MMM")}</span>
               <strong>{format(localDate(holiday.date), "d")}</strong>
             </div>
-            <span className="holiday-item-icon" aria-hidden="true"><Flag size={21} /></span>
+            <span className="holiday-artwork" aria-hidden="true"><CalendarDays size={24} /></span>
             <div className="holiday-description">
               <h3>{holiday.name}</h3>
               <p>{format(localDate(holiday.date), "EEEE, d MMMM yyyy")}</p>

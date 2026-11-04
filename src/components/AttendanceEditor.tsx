@@ -111,7 +111,7 @@ export function AttendanceEditor({
                 )
               }
             >
-              <Icon size={23} aria-hidden="true" />
+              <Icon size={25} aria-hidden="true" />
               <span>{label}</span>
               {record?.status === status && <Check size={18} />}
             </button>

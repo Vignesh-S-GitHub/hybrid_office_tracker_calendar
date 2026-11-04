@@ -38,8 +38,17 @@ export function Planner({
       className="card planner-card"
       title={
         <>
-          <Sparkles size={21} /> Smart WFO Planner
-          <img className="planner-art" src={`${import.meta.env.BASE_URL}imagegen/planner.webp`} alt="" aria-hidden="true" />
+          <Sparkles size={21} />
+          <span className="planner-title-copy">
+            Smart WFO Planner
+            <small>Get suggested office days to meet your target</small>
+          </span>
+          <img
+            className="planner-art"
+            src={`${import.meta.env.BASE_URL}generated/wfo-planner.webp`}
+            alt=""
+            aria-hidden="true"
+          />
         </>
       }
       defaultOpen={false}

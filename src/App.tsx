@@ -71,6 +71,22 @@ export default function App() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [toast, setToast] = useState("");
   const [isDark, setIsDark] = useState(false);
+  // One-time appearance migration from the previous dark-default release.
+  // Existing attendance, plans, preferences and train reminders are untouched.
+  const lightMigration = useRef(false);
+  useEffect(() => {
+    if (lightMigration.current || locked) return;
+    lightMigration.current = true;
+    try {
+      if (localStorage.getItem("hybrid-white-redesign-2026") === "yes") return;
+      localStorage.setItem("hybrid-white-redesign-2026", "yes");
+    } catch {
+      return;
+    }
+    if (data.settings.theme === "dark") {
+      commit({ ...data, settings: { ...data.settings, theme: "light" } });
+    }
+  }, [commit, data, locked]);
   const fileInput = useRef<HTMLInputElement>(null);
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -81,21 +97,6 @@ export default function App() {
     window.addEventListener("hashchange", handleHash);
     return () => window.removeEventListener("hashchange", handleHash);
   }, []);
-  // On the white-design rollout, migrate each existing profile's previous
-  // default dark/system setting once. Later user theme choices still persist.
-  useEffect(() => {
-    if (locked) return;
-    const marker = `hybrid-tracker-white-ui-v1:${user?.id ?? "guest"}`;
-    try {
-      if (localStorage.getItem(marker) === "1") return;
-      localStorage.setItem(marker, "1");
-      if (data.settings.theme !== "light") {
-        commit({ ...data, settings: { ...data.settings, theme: "light" } });
-      }
-    } catch {
-      // Storage warnings are already handled by useTracker.
-    }
-  }, [user?.id, locked, data, commit]);
   useEffect(() => {
     const system = matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
@@ -275,6 +276,8 @@ export default function App() {
       settings={() => navigate("settings")}
     />
   );
+  const PageIcon = pages.find((item) => item.key === page)!.Icon;
+  const bannerImage = page === "calendar" ? "office-work.webp" : page === "holidays" ? "india-holidays.webp" : null;
   const pageSubtitles = {
     calendar: "Track your days. Plan with confidence.",
     holidays: "Verified All India holidays, clearly presented.",
@@ -338,20 +341,25 @@ export default function App() {
         </div>
       </header>
       <main className="app-main" data-page={page} id="main-content">
-        {page === "calendar" && (
-          <section className="welcome-hero" aria-label="Plan, track and balance">
-            <div className="welcome-copy">
-              <strong>Plan · Track · Balance</strong>
-              <p>Your office and home days, beautifully organized.</p>
-            </div>
-            <img src={`${import.meta.env.BASE_URL}imagegen/office.webp`} alt="" aria-hidden="true" />
-          </section>
-        )}
         <div className="intro">
-          <h1>{pageTitles[page]}</h1>
-          <p className="page-subtitle">{pageSubtitles[page]}</p>
+          {bannerImage && (
+            <div className="intro-banner">
+              <img src={`${import.meta.env.BASE_URL}generated/${bannerImage}`} alt="" aria-hidden="true" />
+              <div className="intro-banner-copy">
+                <strong>{page === "calendar" ? "Your hybrid work, beautifully balanced" : "Holidays across India"}</strong>
+                <span>{page === "calendar" ? "Office · Home · Plan · Travel" : "Verified dates, one simple view"}</span>
+              </div>
+            </div>
+          )}
+          <div className="intro-heading">
+            <span className="intro-icon"><PageIcon size={26} aria-hidden="true" /></span>
+            <div>
+              <h1>{pageTitles[page]}</h1>
+              <p className="page-subtitle">{pageSubtitles[page]}</p>
+            </div>
+          </div>
           <span className="privacy-note">
-            <ShieldCheck size={16} />
+            <ShieldCheck size={14} />
             {user ? status : "Saved on this device"}
           </span>
         </div>
@@ -438,7 +446,7 @@ export default function App() {
             key={key}
             onClick={() => navigate(key)}
           >
-            <Icon size={22} aria-hidden="true" />
+            <Icon className="nav-asset-icon" size={24} aria-hidden="true" />
             <span>{label}</span>
           </button>
         ))}
