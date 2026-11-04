@@ -96,7 +96,7 @@ export function AttendanceEditor({
       <p className="eyebrow">SAVE AS</p>
       <div className="status-options">
         {statuses.map((status) => {
-          const { label, className } = statusInfo[status];
+          const { label, className, Icon } = statusInfo[status];
           return (
             <button
               key={status}
@@ -111,13 +111,7 @@ export function AttendanceEditor({
                 )
               }
             >
-              <img
-                src={`${import.meta.env.BASE_URL}ui-kit/attendance/${status.toLowerCase()}.svg`}
-                width="28"
-                height="28"
-                alt=""
-                aria-hidden="true"
-              />
+              <Icon size={23} aria-hidden="true" />
               <span>{label}</span>
               {record?.status === status && <Check size={18} />}
             </button>
