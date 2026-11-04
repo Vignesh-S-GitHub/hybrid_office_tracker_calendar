@@ -357,7 +357,7 @@ try {
   await callback(`s:${id}:1`);
   let row = (await list(token)).find((item) => item.id === id);
   assert.equal(row.revision, 2);
-  assert.equal(row.nextAt, row.bookingAt - 3_600_000);
+  assert.ok(row.nextAt >= Date.now() + 3_590_000);
   await callback(`b:${id}:1`);
   assert.equal(
     (await list(token)).find((item) => item.id === id).status,
@@ -394,7 +394,7 @@ try {
         "SELECT COUNT(*) AS count FROM reminder_deliveries WHERE reminder_id = ? AND revision = 4",
       )
       .get(id).count,
-    Date.parse(`${date(0)}T18:00:00+05:30`) >= Date.now() ? 3 : 2,
+    3,
   );
   // A synced WFO plan is required, and a later attendance change pauses delivery.
   const tracker = {

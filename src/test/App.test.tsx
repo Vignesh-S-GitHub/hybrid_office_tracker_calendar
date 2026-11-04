@@ -49,46 +49,21 @@ describe("complete attendance flow", () => {
       JSON.parse(localStorage.getItem(STORAGE_KEY)!).attendance["2026-10-15"],
     ).toBeUndefined();
   });
-  it("shows only the four supported pages and falls back from retired links", () => {
-    location.hash = "#dashboard";
-    render(<App />);
-    for (const name of ["Main navigation", "Mobile navigation"]) {
-      const nav = within(screen.getByRole("navigation", { name }));
-      expect(
-        nav.getAllByRole("button").map((button) => button.textContent),
-      ).toEqual(["Calendar", "Holidays", "Trains", "Settings"]);
-    }
-    expect(screen.getByRole("heading", { name: "Calendar" })).toBeVisible();
-  });
-  it("restores planner preferences and saves home-page suggestions as plans", async () => {
+  it("applies suggestions as planned attendance and requires explicit completion", async () => {
     const user = userEvent.setup();
     render(<App />);
-    const nav = within(
-      screen.getByRole("navigation", { name: "Main navigation" }),
-    );
-    await user.click(nav.getByRole("button", { name: "Settings" }));
-    await user.click(
-      screen.getByRole("button", { name: "Smart planner preferences" }),
-    );
-    fireEvent.change(
-      screen.getByRole("spinbutton", { name: "Maximum office days per week" }),
-      { target: { value: "2" } },
-    );
-    expect(
-      JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.maxPerWeek,
-    ).toBe(2);
-    await user.click(nav.getByRole("button", { name: "Calendar" }));
-    await user.click(screen.getByRole("button", { name: /Smart WFO Planner/ }));
     await user.click(
       screen.getByRole("button", { name: "Apply recommended plan" }),
     );
-    const rows = Object.values(
-      JSON.parse(localStorage.getItem(STORAGE_KEY)!).attendance,
-    ) as { status: string; phase: string }[];
-    expect(rows.length).toBeGreaterThan(0);
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
     expect(
-      rows.every((row) => row.status === "WFO" && row.phase === "planned"),
+      Object.values(saved.attendance).every(
+        (row) => (row as { phase: string }).phase === "planned",
+      ),
     ).toBe(true);
+    expect(
+      screen.getByText(/Confirm completion after attending/),
+    ).toBeInTheDocument();
   });
   it("changes month targets and keeps old attendance when navigating months", async () => {
     const data = emptyData();
@@ -141,19 +116,20 @@ describe("complete attendance flow", () => {
   it("switches theme and supports mobile navigation and reset cancellation", async () => {
     const user = userEvent.setup();
     render(<App />);
-    // White is the default. The existing theme control must still work.
-    expect(document.documentElement.dataset.theme).toBe("light");
-    await user.click(screen.getByRole("button", { name: "Switch to dark mode" }));
+    await user.click(
+      screen.getByRole("button", { name: "Switch to dark mode" }),
+    );
     expect(document.documentElement.dataset.theme).toBe("dark");
     const nav = within(
       screen.getByRole("navigation", { name: "Mobile navigation" }),
     );
-    await user.click(nav.getByRole("button", { name: "Holidays" }));
-    expect(screen.getByRole("heading", { name: "Holidays" })).toBeVisible();
-    await user.click(nav.getByRole("button", { name: "Trains" }));
-    expect(screen.getByText(/Sign in to save journeys/)).toBeVisible();
+    await user.click(nav.getByRole("button", { name: "Dashboard" }));
+    expect(screen.getByText("Finding your balance")).toBeInTheDocument();
+    await user.click(nav.getByRole("button", { name: "History" }));
+    expect(
+      screen.getByText("Your story starts with a day"),
+    ).toBeInTheDocument();
     await user.click(nav.getByRole("button", { name: "Settings" }));
-    await user.click(screen.getByRole("button", { name: "Data management" }));
     await user.click(
       screen.getByRole("button", { name: /Clear calendar data/ }),
     );
@@ -172,7 +148,7 @@ describe("complete attendance flow", () => {
     await waitFor(() =>
       expect(
         JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.theme,
-      ).toBe("light"),
+      ).toBe("system"),
     );
   });
   it("prevents corruption from being overwritten by edits", async () => {

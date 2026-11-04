@@ -11,7 +11,6 @@ import { format } from "date-fns";
 import type { TrackerData } from "../types";
 import { localDate } from "../lib/dates";
 import { planMonth } from "../lib/planner";
-import { Disclosure } from "./Disclosure";
 
 export function Planner({
   data,
@@ -34,25 +33,17 @@ export function Planner({
 }) {
   const plan = planMonth(data, month, today);
   return (
-    <Disclosure
-      className="card planner-card"
-      title={
-        <>
-          <Sparkles size={21} />
-          <span className="planner-title-copy">
-            Smart WFO Planner
-            <small>Get suggested office days to meet your target</small>
+    <section className="card planner-card" aria-label="Smart WFO Planner">
+      <div className="planner-heading">
+        <div className="flex-row">
+          <span className="planner-icon">
+            <Sparkles size={21} />
           </span>
-          <img
-            className="planner-art"
-            src={`${import.meta.env.BASE_URL}generated/wfo-planner.webp`}
-            alt=""
-            aria-hidden="true"
-          />
-        </>
-      }
-      defaultOpen={false}
-    >
+          <div>
+            <h2>Smart WFO Planner</h2>
+          </div>
+        </div>
+      </div>
       <div className="planner-metrics">
         {[
           ["Target", plan.target],
@@ -70,7 +61,7 @@ export function Planner({
         <p className="notice">
           {plan.overdue} past office{" "}
           {plan.overdue === 1 ? "plan needs" : "plans need"} confirmation.
-          Review them in Calendar; they do not count as completed or projected
+          Review them in History; they do not count as completed or projected
           attendance.
         </p>
       )}
@@ -223,6 +214,6 @@ export function Planner({
         <span className="dot office" />
         Accept suggestions to plan office days.
       </p>
-    </Disclosure>
+    </section>
   );
 }

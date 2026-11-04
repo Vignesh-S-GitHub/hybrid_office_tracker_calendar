@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import {
-  Bell,
-  Check,
-  ChevronDown,
-  ExternalLink,
-  RefreshCw,
-  TrainFront,
-} from "lucide-react";
+import { Bell, Check, ExternalLink, RefreshCw, TrainFront } from "lucide-react";
 import type { TrackerData } from "../types";
 import type { TrackerStore } from "../lib/sync";
 import {
@@ -49,8 +42,7 @@ export function TrainsPage({
     />
   ) : (
     <section className="card train-empty">
-      <span className="train-empty-art" aria-hidden="true"><TrainFront size={56} /></span>
-      <TrainFront size={32} className="train-fallback-icon" />
+      <TrainFront size={32} />
       <h2>Train reminders</h2>
       <p>Sign in to save journeys and receive Telegram reminders.</p>
     </section>
@@ -83,7 +75,6 @@ function AccountTrains({
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [refresh, setRefresh] = useState(0);
-  const [showJourneyForm, setShowJourneyForm] = useState(false);
   const [link, setLink] = useState("");
   const [editing, setEditing] = useState<TrainReminder | null>(null);
   const [confirm, setConfirm] = useState<{
@@ -160,7 +151,7 @@ function AccountTrains({
         }),
       action === "booked"
         ? "Booked. Reminders stopped."
-        : `Reminder set for ${trainTime(item.bookingAt - 3_600_000)} (one hour before booking).`,
+        : "I'll remind you in one hour.",
     );
   return (
     <div className="trains-page">
@@ -259,38 +250,21 @@ function AccountTrains({
           {notice}
         </p>
       )}
-      <div className={`trains-layout ${reminders.length ? "has-journeys" : ""}`}>
+      <div className="trains-layout">
         <section className="card train-form-card">
-          <div className="split train-form-heading">
-            <h2>Add a journey</h2>
-            <button
-              className="icon-button train-form-toggle"
-              aria-label="Toggle journey form"
-              aria-expanded={showJourneyForm || !reminders.length || !!officeDate}
-              aria-controls="new-journey-form"
-              onClick={() => setShowJourneyForm((value) => !value)}
-              hidden={!reminders.length || !!officeDate}
-            >
-              <ChevronDown size={18} />
-            </button>
-          </div>
-          <div
-            id="new-journey-form"
-            className={`train-form-content ${!showJourneyForm && reminders.length && !officeDate ? "is-collapsed" : ""}`}
-          >
-            <p className="muted">Choose travel dates for your office visit.</p>
-            <JourneyForm
-              officeDate={journeyId ? undefined : officeDate}
-              data={data}
-              busy={busy}
-              save={async (journeys) => {
-                return run(
-                  () => account.request("/api/train-reminders", { journeys }),
-                  "Journey saved.",
-                );
-              }}
-            />
-          </div>
+          <h2>Add a journey</h2>
+          <p className="muted">Choose travel dates for your office visit.</p>
+          <JourneyForm
+            officeDate={journeyId ? undefined : officeDate}
+            data={data}
+            busy={busy}
+            save={async (journeys) => {
+              return run(
+                () => account.request("/api/train-reminders", { journeys }),
+                "Journey saved.",
+              );
+            }}
+          />
         </section>
         <section className="train-list" aria-labelledby="journeys-title">
           <div className="split">
@@ -300,8 +274,7 @@ function AccountTrains({
           {loading && <p role="status">Loading journeys…</p>}
           {!loading && reminders.length === 0 && (
             <div className="card train-empty">
-              <span className="train-empty-art" aria-hidden="true"><TrainFront size={56} /></span>
-              <TrainFront size={28} className="train-fallback-icon" />
+              <TrainFront size={28} />
               <p>No journeys yet.</p>
             </div>
           )}
@@ -354,9 +327,7 @@ function AccountTrains({
               {item.deliveryError && item.status === "pending" && (
                 <p className="account-error">{item.deliveryError}</p>
               )}
-              <div
-                className={`train-actions journey-actions ${item.status === "pending" ? "is-pending" : ""}`}
-              >
+              <div className="train-actions">
                 {item.status === "pending" && (
                   <>
                     <button
@@ -371,7 +342,7 @@ function AccountTrains({
                       disabled={busy}
                       onClick={() => void action(item, "snooze")}
                     >
-                      Remind 1h before booking
+                      Remind in 1h
                     </button>
                     <a
                       className="button small"

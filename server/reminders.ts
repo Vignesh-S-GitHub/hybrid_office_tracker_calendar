@@ -1,6 +1,5 @@
 import {
   bookingAt,
-  beforeBookingJobs,
   indiaToday,
   IRCTC_URL,
   parseTrainInput,
@@ -100,13 +99,16 @@ async function changeReminder(
     throw new RequestError(
       "Only upcoming, unbooked journeys can be reminded later.",
     );
-  if (action === "snooze" && bookingAt(data) - 3_600_000 <= now)
-    throw new RequestError("The reminder time one hour before booking has already passed.");
   const jobs =
     status !== "pending"
       ? []
       : action === "snooze"
-        ? beforeBookingJobs(data, now)
+        ? [
+            ...reminderJobs(data, now).filter(
+              (job) => job.due > now + 3_600_000,
+            ),
+            { kind: "snooze", due: now + 3_600_000 },
+          ]
         : reminderJobs(data, now);
   const result = await env.DB.batch([
     env.DB.prepare(
@@ -418,7 +420,7 @@ export async function telegramWebhook(
         text =
           action[1] === "b"
             ? "Marked booked. Reminders stopped."
-            : `Reminder set for ${trainTime(row.booking_at - 3_600_000)} (one hour before booking).`;
+            : "I'll remind you in one hour.";
       } catch (error) {
         if (!(error instanceof RequestError)) throw error;
         text = error.message;
@@ -504,7 +506,7 @@ export async function deliverReminders(
             [
               { text: "Booked", callback_data: `b:${row.id}:${row.revision}` },
               {
-                text: "Remind 1h before booking",
+                text: "Remind in 1 hour",
                 callback_data: `s:${row.id}:${row.revision}`,
               },
             ],

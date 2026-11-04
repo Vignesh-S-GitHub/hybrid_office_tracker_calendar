@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, RefreshCw, UserRound } from "lucide-react";
+import { LogIn, LogOut, RefreshCw } from "lucide-react";
 import { Modal } from "./ui";
 import type { TrackerStore } from "../lib/sync";
 import { downloadBackup } from "../lib/storage";
@@ -31,11 +31,10 @@ export function Account({ store }: { store: TrackerStore }) {
     <>
       <button
         className="button small account-button"
-        aria-label={state.user ? "Open account and sync" : "Sign in or create account"}
         disabled={state.busy}
         onClick={() => setOpen(true)}
       >
-        <UserRound size={21} aria-hidden="true" />
+        <LogIn size={16} />
         <span>{state.user ? "Account" : "Sign in"}</span>
       </button>
       {open && (

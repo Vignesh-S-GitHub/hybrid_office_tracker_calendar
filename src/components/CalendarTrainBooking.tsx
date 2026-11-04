@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { TrainFront } from "lucide-react";
 import { localDate } from "../lib/dates";
 import { trainTime } from "../lib/trains";
 import type { CalendarBooking } from "../lib/calendarTrains";
@@ -74,5 +75,78 @@ export function CalendarBookingRows({
         </div>
       ))}
     </div>
+  );
+}
+export function CalendarTrainBooking({
+  bookings,
+  month,
+  openTrains,
+  showDate,
+  error,
+  loading,
+  refresh,
+  connected,
+}: {
+  bookings: CalendarBooking[];
+  month: string;
+  openTrains: (officeDate?: string, journeyId?: string) => void;
+  showDate: (date: string) => void;
+  error: string;
+  loading: boolean;
+  refresh: () => void;
+  connected: boolean | null;
+}) {
+  const relevant = bookings.filter(
+    (item) =>
+      item.date.startsWith(month) ||
+      item.journeyDate.startsWith(month) ||
+      item.officeDates.some((date) => date.startsWith(month)),
+  );
+  return (
+    <section
+      className="calendar-train-panel"
+      aria-labelledby="calendar-train-title"
+    >
+      <h3 id="calendar-train-title">
+        <TrainFront size={17} /> Train booking
+      </h3>
+      {loading && (
+        <p className="small-text muted" role="status">
+          Loading saved reminders…
+        </p>
+      )}
+      {error && (
+        <p className="small-text muted" role="status">
+          {error}{" "}
+          <button className="text-button" onClick={refresh}>
+            Retry
+          </button>
+        </p>
+      )}
+      {relevant.length ? (
+        <CalendarBookingRows
+          bookings={relevant.slice(0, 2)}
+          openTrains={openTrains}
+          showDate={showDate}
+          connected={connected}
+        />
+      ) : (
+        !loading && (
+          <p className="small-text muted">
+            Plan office days to see their booking dates here.
+          </p>
+        )
+      )}
+      {relevant.length > 2 && (
+        <button className="button small" onClick={() => openTrains()}>
+          All journeys
+        </button>
+      )}
+      {relevant.slice(0, 2).some((item) => item.status === "estimate") && (
+        <p className="calendar-train-help">
+          Confirm travel dates and save in Trains for Telegram reminders.
+        </p>
+      )}
+    </section>
   );
 }

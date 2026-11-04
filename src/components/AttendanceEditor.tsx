@@ -96,7 +96,7 @@ export function AttendanceEditor({
       <p className="eyebrow">SAVE AS</p>
       <div className="status-options">
         {statuses.map((status) => {
-          const { label, className, Icon } = statusInfo[status];
+          const { Icon, label, className } = statusInfo[status];
           return (
             <button
               key={status}
@@ -111,7 +111,7 @@ export function AttendanceEditor({
                 )
               }
             >
-              <Icon size={25} aria-hidden="true" />
+              <Icon size={22} />
               <span>{label}</span>
               {record?.status === status && <Check size={18} />}
             </button>
