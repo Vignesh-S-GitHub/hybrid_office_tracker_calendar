@@ -78,6 +78,7 @@ describe("complete attendance flow", () => {
       JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.maxPerWeek,
     ).toBe(2);
     await user.click(nav.getByRole("button", { name: "Calendar" }));
+    await user.click(screen.getByRole("button", { name: "Smart WFO Planner" }));
     await user.click(
       screen.getByRole("button", { name: "Apply recommended plan" }),
     );
