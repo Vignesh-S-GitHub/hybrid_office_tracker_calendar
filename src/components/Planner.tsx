@@ -42,7 +42,7 @@ export function Planner({
           <img className="planner-art" src={`${import.meta.env.BASE_URL}imagegen/planner.webp`} alt="" aria-hidden="true" />
         </>
       }
-      defaultOpen={plan.toSchedule > 0 || plan.overdue > 0}
+      defaultOpen={false}
     >
       <div className="planner-metrics">
         {[
