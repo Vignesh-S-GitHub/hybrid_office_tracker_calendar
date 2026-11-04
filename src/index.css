@@ -177,9 +177,7 @@
   color: var(--primary);
   font-size: 10px;
 }
-.history-holiday-note {
-  margin-top: 15px;
-}
+
 @media (max-width: 850px) {
   .holiday-list {
     grid-template-columns: 1fr;
@@ -1173,182 +1171,42 @@ strong {
   flex-wrap: wrap;
   gap: 7px;
 }
-.page-month {
-  padding: 18px 23px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.page-month .month-controls {
-  margin-bottom: 0;
-  flex: 1;
-  max-width: 430px;
-}
-.dashboard-layout {
-  display: grid;
-  grid-template-columns: minmax(290px, 0.85fr) minmax(0, 1.4fr);
-  gap: 20px;
-}
-.overview-card {
-  padding: 23px;
-  text-align: center;
-}
-.overview-card > p {
-  font-size: 12px;
-  margin-top: 5px;
-}
-.progress-ring {
-  width: 210px;
-  height: 210px;
-  position: relative;
-  margin: 21px auto 9px;
-}
-.progress-ring svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-.progress-ring circle {
-  fill: none;
-  stroke-width: 12;
-  stroke-linecap: round;
-}
-.ring-track {
-  stroke: var(--border);
-}
-.ring-fill {
-  stroke: var(--office);
-  transition: stroke-dashoffset 0.4s;
-}
-.ring-projected {
-  stroke: var(--office);
-  opacity: 0.25;
-}
-.progress-ring > div {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.progress-ring strong {
-  font-size: 39px;
-  letter-spacing: -1.5px;
-}
-.progress-ring span {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 6px;
-}
-.ring-caption {
-  display: flex;
-  gap: 18px;
-  justify-content: center;
-  font-size: 10px;
-  color: var(--muted);
-  margin-bottom: 23px;
-}
-.ring-caption > span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.overview-card .stat-card {
-  text-align: left;
-}
-.overview-card .target-block {
-  text-align: left;
-}
-.dashboard-side {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.breakdown-card,
-.recent-card {
-  padding: 22px;
-}
-.breakdown-card > p {
-  margin-top: 6px;
-  margin-bottom: 22px;
-}
-.breakdown-row {
-  display: grid;
-  grid-template-columns: 115px 1fr 44px 30px;
-  align-items: center;
-  gap: 12px;
-  font-size: 10px;
-  margin-bottom: 23px;
-}
-.breakdown-row > span {
-  color: var(--muted);
-}
-.breakdown-row > span:nth-of-type(2) {
-  text-align: right;
-}
-.breakdown-row .progress-track {
-  height: 8px;
-}
-.breakdown-row .progress-track > div {
-  background: var(--status);
-}
-.forecast-mini {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--soft);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px 13px;
-  margin-top: 8px;
-}
-.forecast-mini > svg {
-  color: var(--office);
-}
-.forecast-mini > div {
-  flex: 1;
-}
-.forecast-mini strong {
-  font-size: 12px;
-  display: block;
-}
-.forecast-mini > div > span {
-  font-size: 10px;
-  color: var(--muted);
-  display: block;
-  margin-top: 4px;
-}
-.recent-card {
-  flex: 1;
-}
-.activity-list {
-  margin-top: 14px;
-}
-.activity-list > button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--border);
-  padding: 14px 0;
-  text-align: left;
-  font-size: 10px;
-}
-.activity-list > button:last-child {
-  border: 0;
-}
-.activity-notes {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-  flex: 1;
-  color: var(--muted);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -1392,104 +1250,24 @@ strong {
 .empty.compact p {
   font-size: 11px;
 }
-.history-header {
-  padding: 23px;
-  margin-bottom: 20px;
-}
-.history-header .stat-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.history-records {
-  padding: 23px;
-  margin-bottom: 20px;
-}
-.history-tools {
-  margin-bottom: 19px;
-}
-.filter-controls {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-}
-.search-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 11px;
-  background: var(--soft);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--muted);
-}
-.search-field input {
-  background: transparent;
-  border: 0;
-  width: 170px;
-  font-size: 11px;
-  color: var(--text);
-  padding: 10px 0;
-  outline-offset: 0;
-}
-.history-list {
-  display: flex;
-  flex-direction: column;
-}
-.history-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 0;
-  text-align: left;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--border);
-}
-.history-row:last-child {
-  border-bottom: 0;
-}
-.record-icon {
-  width: 39px;
-  height: 41px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: var(--status-soft);
-  color: var(--status);
-  flex-shrink: 0;
-}
-.record-date {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex: 1;
-  min-width: 0;
-}
-.record-date strong {
-  font-size: 12px;
-}
-.record-date > span {
-  font-size: 11px;
-  color: var(--muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.phase-label {
-  font-size: 10px;
-  color: var(--muted);
-  width: 110px;
-}
-.monthly-table {
-  padding: 23px;
-}
-.monthly-table > p {
-  margin-top: 6px;
-}
-.table-scroll {
-  overflow-x: auto;
-  margin-top: 18px;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -2058,10 +1836,7 @@ dialog::backdrop {
     gap: 8px;
     padding: 10px 8px;
   }
-  .breakdown-row {
-    grid-template-columns: 95px 1fr 40px 26px;
-    gap: 7px;
-  }
+
   .planner-metrics > div {
     gap: 8px;
   }
@@ -2163,47 +1938,17 @@ dialog::backdrop {
     width: 30px;
     height: 33px;
   }
-  .page-month > span {
-    display: none;
-  }
-  .dashboard-layout {
-    grid-template-columns: 1fr 1.2fr;
-    gap: 15px;
-  }
-  .overview-card {
-    padding: 18px;
-  }
-  .breakdown-card,
-  .recent-card {
-    padding: 18px;
-  }
-  .breakdown-row {
-    grid-template-columns: 1fr 45px 28px;
-    gap: 7px;
-    margin-bottom: 15px;
-  }
-  .breakdown-row > span:first-child {
-    grid-column: 1 / -1;
-    margin-bottom: -3px;
-  }
-  .history-tools {
-    align-items: flex-start;
-    gap: 13px;
-    flex-wrap: wrap;
-  }
-  .filter-controls {
-    flex: 1;
-    justify-content: flex-end;
-  }
-  .search-field {
-    max-width: 100%;
-  }
-  .history-header .stat-grid {
-    gap: 8px;
-  }
-  .history-header .stat-card {
-    gap: 6px;
-  }
+
+
+
+
+
+
+
+
+
+
+
 }
 @media (max-width: 600px) {
   .app-header {
@@ -2391,7 +2136,7 @@ dialog::backdrop {
   }
   .mobile-nav {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     position: fixed;
     bottom: 0;
     left: 0;
@@ -2540,185 +2285,53 @@ dialog::backdrop {
   .success-banner p {
     font-size: 10px;
   }
-  .page-month {
-    padding: 16px;
-    margin-bottom: 15px;
-    border-radius: 13px;
-  }
-  .page-month .month-controls {
-    max-width: 100%;
-  }
-  .dashboard-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  .overview-card {
-    padding: 21px 16px;
-    border-radius: 13px;
-  }
-  .overview-card > h2 {
-    font-size: 16px;
-  }
-  .overview-card > p {
-    font-size: 11px;
-  }
-  .progress-ring {
-    width: 204px;
-    height: 204px;
-    margin: 17px auto 10px;
-  }
-  .progress-ring strong {
-    font-size: 39px;
-  }
-  .overview-card .stat-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-  }
-  .overview-card .stat-card {
-    flex-direction: column;
-    gap: 7px;
-    padding: 12px 3px;
-    text-align: center;
-  }
-  .overview-card .stat-icon {
-    background: transparent;
-    width: 26px;
-    height: 24px;
-  }
-  .overview-card .stat-card > div > span {
-    font-size: 8px;
-  }
-  .overview-card .stat-card strong {
-    font-size: 20px;
-  }
-  .dashboard-side {
-    gap: 15px;
-  }
-  .breakdown-card,
-  .recent-card {
-    padding: 19px 16px;
-    border-radius: 13px;
-  }
-  .breakdown-row {
-    grid-template-columns: 95px 1fr 37px 26px;
-    gap: 8px;
-    font-size: 9px;
-    margin-bottom: 19px;
-  }
-  .breakdown-row > span:first-child {
-    grid-column: auto;
-    margin: 0;
-  }
-  .breakdown-card > p {
-    font-size: 10px;
-    line-height: 1.8;
-    margin-bottom: 19px;
-  }
-  .activity-list > button {
-    font-size: 9px;
-    gap: 7px;
-    padding: 13px 0;
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   .status-badge {
     font-size: 8px;
     min-width: 37px;
     padding: 3px 7px;
   }
-  .forecast-mini {
-    padding: 13px 10px;
-  }
-  .forecast-mini > div > span {
-    font-size: 9px;
-  }
-  .forecast-mini strong {
-    font-size: 11px;
-  }
-  .history-header {
-    padding: 16px;
-    margin-bottom: 15px;
-  }
-  .history-header .stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-  .history-records,
-  .monthly-table {
-    padding: 18px 15px;
-    margin-bottom: 15px;
-    border-radius: 13px;
-  }
-  .history-tools {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  .history-tools h2 {
-    font-size: 15px;
-  }
-  .filter-controls {
-    width: 100%;
-    gap: 7px;
-    justify-content: stretch;
-  }
-  .search-field {
-    flex: 1;
-    min-width: 0;
-    padding: 0 8px;
-  }
-  .search-field input {
-    min-width: 0;
-    width: 100%;
-    font-size: 10px;
-  }
-  .filter-controls select {
-    font-size: 10px;
-    width: 97px;
-  }
-  .history-row {
-    gap: 9px;
-    flex-wrap: wrap;
-    position: relative;
-    padding: 15px 0;
-  }
-  .record-icon {
-    width: 33px;
-    height: 36px;
-  }
-  .record-date {
-    flex-basis: 50%;
-    gap: 5px;
-  }
-  .record-date strong {
-    font-size: 11px;
-  }
-  .record-date > span {
-    font-size: 10px;
-  }
-  .phase-label {
-    width: auto;
-    position: absolute;
-    right: 0;
-    bottom: 9px;
-    font-size: 8px;
-  }
-  .history-row > .muted {
-    display: none;
-  }
-  .history-row > .status-badge {
-    align-self: flex-start;
-    margin-top: 2px;
-  }
-  .monthly-table h2 {
-    font-size: 15px;
-  }
-  .monthly-table > p {
-    font-size: 10px;
-  }
-  .monthly-table td,
-  .monthly-table th {
-    padding: 11px 9px;
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   .settings-layout {
     display: flex;
     flex-direction: column;
@@ -2886,10 +2499,7 @@ dialog::backdrop {
   .weekday-picker button {
     width: 31px;
   }
-  .breakdown-row {
-    grid-template-columns: 86px 1fr 34px 23px;
-    gap: 6px;
-  }
+
   .settings-card {
     padding-left: 14px;
     padding-right: 14px;
