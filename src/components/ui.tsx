@@ -52,7 +52,7 @@ export function StatCards({ stats }: { stats: Stats }) {
         return (
           <div className={`stat-card ${className}`} key={status}>
             <span className="stat-icon">
-              <Icon size={23} aria-hidden="true" />
+              <Icon size={24} aria-hidden="true" />
             </span>
             <div>
               <span>{short}</span>

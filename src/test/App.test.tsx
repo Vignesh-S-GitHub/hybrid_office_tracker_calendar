@@ -78,7 +78,7 @@ describe("complete attendance flow", () => {
       JSON.parse(localStorage.getItem(STORAGE_KEY)!).settings.maxPerWeek,
     ).toBe(2);
     await user.click(nav.getByRole("button", { name: "Calendar" }));
-    await user.click(screen.getByRole("button", { name: "Smart WFO Planner" }));
+    await user.click(screen.getByRole("button", { name: /Smart WFO Planner/ }));
     await user.click(
       screen.getByRole("button", { name: "Apply recommended plan" }),
     );
@@ -141,7 +141,7 @@ describe("complete attendance flow", () => {
   it("switches theme and supports mobile navigation and reset cancellation", async () => {
     const user = userEvent.setup();
     render(<App />);
-    // New profiles open in light mode while retaining both theme controls.
+    // White is the default. The existing theme control must still work.
     expect(document.documentElement.dataset.theme).toBe("light");
     await user.click(screen.getByRole("button", { name: "Switch to dark mode" }));
     expect(document.documentElement.dataset.theme).toBe("dark");
