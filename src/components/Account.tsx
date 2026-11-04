@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, RefreshCw } from "lucide-react";
+import { LogOut, RefreshCw, UserRound } from "lucide-react";
 import { Modal } from "./ui";
 import type { TrackerStore } from "../lib/sync";
 import { downloadBackup } from "../lib/storage";
@@ -35,12 +35,7 @@ export function Account({ store }: { store: TrackerStore }) {
         disabled={state.busy}
         onClick={() => setOpen(true)}
       >
-        <img
-          className="account-asset-icon"
-          src={`${import.meta.env.BASE_URL}ui-kit/account.svg`}
-          alt=""
-          aria-hidden="true"
-        />
+        <UserRound size={21} aria-hidden="true" />
         <span>{state.user ? "Account" : "Sign in"}</span>
       </button>
       {open && (
