@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { activeHolidayCatalog, type HolidayCatalog } from "../lib/holidays";
 import { localDate } from "../lib/dates";
-import { holidayArtwork } from "../lib/holidayArtwork";
 
 export function HolidaysPage({
   today,
@@ -88,7 +87,7 @@ export function HolidaysPage({
       {highlighted && (
         <div className="holiday-spotlight" aria-label="Featured official holiday">
           <img
-            src={holidayArtwork(highlighted.name, "banner")}
+            src={`${import.meta.env.BASE_URL}imagegen/holidays.webp`}
             alt=""
             loading="lazy"
           />
@@ -107,12 +106,7 @@ export function HolidaysPage({
               <span>{format(localDate(holiday.date), "MMM")}</span>
               <strong>{format(localDate(holiday.date), "d")}</strong>
             </div>
-            <img
-              className="holiday-artwork"
-              src={holidayArtwork(holiday.name, "illustration")}
-              alt=""
-              loading="lazy"
-            />
+            <span className="holiday-item-icon" aria-hidden="true"><Flag size={21} /></span>
             <div className="holiday-description">
               <h3>{holiday.name}</h3>
               <p>{format(localDate(holiday.date), "EEEE, d MMMM yyyy")}</p>
