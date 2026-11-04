@@ -39,6 +39,7 @@ export function Planner({
       title={
         <>
           <Sparkles size={21} /> Smart WFO Planner
+          <img className="planner-art" src={`${import.meta.env.BASE_URL}imagegen/planner.webp`} alt="" aria-hidden="true" />
         </>
       }
       defaultOpen={plan.toSchedule > 0 || plan.overdue > 0}
