@@ -44,7 +44,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .welcome-copy{position:relative;z-index:1;padding:24px;max-width:46%;min-width:230px}
 .welcome-copy strong{display:block;color:#102650;font-size:25px;font-weight:820;letter-spacing:-.04em;line-height:1.12}
 .welcome-copy p{color:#405a7c;font-size:13px;line-height:1.5;margin-top:9px}
-.welcome-hero>img{position:absolute;right:0;top:0;width:52%;height:100%;object-fit:cover;object-position:center}
+.welcome-hero>img{position:absolute;right:0;top:0;width:52%;height:100%;object-fit:cover;object-position:right center;clip-path:inset(0 0 0 22%)}
 .welcome-hero::after{content:"";pointer-events:none;position:absolute;inset:0;background:linear-gradient(90deg,#fff7f8 0%,#fff7f8 44%,transparent 67%)}
 .welcome-copy{z-index:2}
 .intro{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
