@@ -244,3 +244,58 @@ describe("complete attendance flow", () => {
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual(data);
   });
 });
+
+it("restores only the account data and shares one train snapshot across tabs", async () => {
+  const guest = emptyData();
+  guest.settings.monthlyTarget = 27;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(guest));
+  localStorage.setItem(
+    "hybrid-office-session",
+    JSON.stringify({ token: "test-token" }),
+  );
+  const data = emptyData();
+  data.settings.monthlyTarget = 6;
+  const accountRead = Promise.withResolvers<Response>();
+  const fetcher = vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => {
+    switch (new URL(String(url)).pathname) {
+      case "/api/auth/get-session":
+        return Response.json({
+          user: { id: "test-user", email: "test@example.com", name: "Test" },
+        });
+      case "/api/tracker":
+        return accountRead.promise;
+      case "/api/train-reminders":
+        return Response.json({ reminders: [] });
+      case "/api/telegram/status":
+        return Response.json({ configured: true, connected: true, blocked: false });
+      default:
+        throw new Error(`Unexpected request: ${url}`);
+    }
+  });
+  render(<App />);
+  const nav = within(screen.getByRole("navigation", { name: "Main navigation" }));
+  const user = userEvent.setup();
+
+  await user.click(nav.getByRole("button", { name: "Settings" }));
+  expect(screen.getByText("Loading your account…")).toBeInTheDocument();
+  expect(
+    screen.queryByRole("spinbutton", { name: "Default monthly target" }),
+  ).not.toBeInTheDocument();
+  accountRead.resolve(Response.json({ data, revision: 3 }));
+  expect(
+    await screen.findByRole("spinbutton", { name: "Default monthly target" }),
+  ).toHaveValue(6);
+
+  await user.click(nav.getByRole("button", { name: "Trains" }));
+  await screen.findByText("Connected");
+  await user.click(nav.getByRole("button", { name: "Calendar" }));
+  await user.click(nav.getByRole("button", { name: "Trains" }));
+  expect(screen.getByText("Connected")).toBeInTheDocument();
+  expect(screen.queryByText("Loading journeys…")).not.toBeInTheDocument();
+  expect(
+    fetcher.mock.calls.filter(([url]) => String(url).endsWith("/api/train-reminders")),
+  ).toHaveLength(1);
+  expect(
+    fetcher.mock.calls.filter(([url]) => String(url).endsWith("/api/telegram/status")),
+  ).toHaveLength(1);
+});

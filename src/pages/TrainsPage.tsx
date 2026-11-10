@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { format } from "date-fns";
+import { localDate } from "../lib/dates";
 import { Bell, Check, ExternalLink, RefreshCw, TrainFront } from "lucide-react";
 import type { TrackerData } from "../types";
 import type { TrackerStore } from "../lib/sync";
+import type { TrainSnapshot } from "../hooks/useCalendarTrains";
 import {
   bookingAt,
   indiaToday,
@@ -11,7 +14,6 @@ import {
   shiftDate,
   trainTime,
   validTrainDate,
-  type TelegramStatus,
   type TrainInput,
   type TrainReminder,
 } from "../lib/trains";
@@ -24,12 +26,14 @@ export function TrainsPage({
   data,
   account,
   signedIn,
+  saved,
   officeDate,
   journeyId,
 }: {
   data: TrackerData;
   account: TrackerStore;
   signedIn: boolean;
+  saved: TrainSnapshot;
   officeDate?: string;
   journeyId?: string;
 }) {
@@ -37,6 +41,7 @@ export function TrainsPage({
     <AccountTrains
       data={data}
       account={account}
+      saved={saved}
       officeDate={officeDate}
       journeyId={journeyId}
     />
@@ -51,18 +56,18 @@ export function TrainsPage({
 function AccountTrains({
   data,
   account,
+  saved,
   officeDate,
   journeyId,
 }: {
   data: TrackerData;
   account: TrackerStore;
+  saved: TrainSnapshot;
   officeDate?: string;
   journeyId?: string;
 }) {
   const focusedJourney = useRef<HTMLElement>(null);
-  const [reminders, setReminders] = useState<TrainReminder[]>([]);
-  const [telegram, setTelegram] = useState<TelegramStatus | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { reminders, telegram, loading, checkedAt: now, refresh } = saved;
   useEffect(() => {
     if (!loading && journeyId)
       focusedJourney.current?.scrollIntoView?.({
@@ -70,11 +75,9 @@ function AccountTrains({
         block: "center",
       });
   }, [loading, journeyId]);
-  const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
-  const [refresh, setRefresh] = useState(0);
   const [link, setLink] = useState("");
   const [editing, setEditing] = useState<TrainReminder | null>(null);
   const [confirm, setConfirm] = useState<{
@@ -83,44 +86,6 @@ function AccountTrains({
     path: string;
     bodyValue: object;
   } | null>(null);
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      try {
-        const [journeys, connection] = await Promise.all([
-          account.request<{ reminders: TrainReminder[] }>(
-            "/api/train-reminders",
-          ),
-          account.request<TelegramStatus>("/api/telegram/status"),
-        ]);
-        if (active) {
-          setReminders(journeys.reminders);
-          setTelegram(connection);
-          setNow(Date.now());
-        }
-      } catch (error) {
-        if (active)
-          setError(
-            error instanceof Error ? error.message : "Could not load journeys.",
-          );
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    void load();
-    const timer = setInterval(() => {
-      if (document.visibilityState === "visible") void load();
-    }, 30_000);
-    const visible = () => {
-      if (document.visibilityState === "visible") void load();
-    };
-    document.addEventListener("visibilitychange", visible);
-    return () => {
-      active = false;
-      clearInterval(timer);
-      document.removeEventListener("visibilitychange", visible);
-    };
-  }, [account, refresh]);
   const run = async (operation: () => Promise<unknown>, success = "Saved.") => {
     setBusy(true);
     setError("");
@@ -128,7 +93,7 @@ function AccountTrains({
     try {
       await operation();
       setNotice(success);
-      setRefresh((value) => value + 1);
+      refresh();
       return true;
     } catch (error) {
       setError(
@@ -136,7 +101,7 @@ function AccountTrains({
           ? error.message
           : "Could not save. Retry when connected.",
       );
-      setRefresh((value) => value + 1);
+      refresh();
       return false;
     } finally {
       setBusy(false);
@@ -156,35 +121,34 @@ function AccountTrains({
   return (
     <div className="trains-page">
       <section className="card telegram-card" aria-labelledby="telegram-title">
-        <div className="split">
-          <div>
-            <h2 id="telegram-title">
-              <Bell size={19} /> Telegram
-            </h2>
-            <p>
-              {telegram?.connected
-                ? "Connected"
-                : telegram?.blocked
-                  ? "Bot blocked. Unblock it, then reconnect."
-                  : telegram?.configured
-                    ? "Connect to receive reminders."
-                    : loading
-                      ? "Checking connection…"
-                      : "Telegram setup pending."}
-            </p>
-          </div>
+        <div className="telegram-heading">
+          <h2 id="telegram-title"><Bell size={19} /> Telegram</h2>
+          {telegram?.connected && (
+            <span className="pill green-pill telegram-connected">Connected</span>
+          )}
           <button
             className="icon-button"
             aria-label="Refresh journeys"
             onClick={() => {
               setError("");
-              setRefresh((value) => value + 1);
+              refresh();
             }}
             disabled={busy}
           >
             <RefreshCw size={18} />
           </button>
         </div>
+        {!telegram?.connected && (
+          <p>
+            {telegram?.blocked
+              ? "Bot blocked. Unblock it, then reconnect."
+              : telegram?.configured
+                ? "Connect to receive reminders."
+                : loading
+                  ? "Checking connection…"
+                  : saved.telegramError || "Telegram setup pending."}
+          </p>
+        )}
         <div className="train-actions">
           {telegram?.configured && !telegram.connected && (
             <button
@@ -208,8 +172,11 @@ function AccountTrains({
               Open Telegram <ExternalLink size={15} />
             </a>
           )}
-          {telegram?.connected && (
-            <>
+        </div>
+        {telegram?.connected && (
+          <details className="telegram-management">
+            <summary>Manage Telegram</summary>
+            <div className="train-actions">
               <button
                 className="button"
                 disabled={busy}
@@ -236,13 +203,13 @@ function AccountTrains({
               >
                 Disconnect
               </button>
-            </>
-          )}
-        </div>
+            </div>
+          </details>
+        )}
       </section>
-      {error && (
+      {(error || saved.error || (telegram?.connected && saved.telegramError)) && (
         <p role="alert" className="account-error">
-          {error}
+          {error || saved.error || saved.telegramError}
         </p>
       )}
       {notice && (
@@ -266,13 +233,13 @@ function AccountTrains({
             }}
           />
         </section>
-        <section className="train-list" aria-labelledby="journeys-title">
+        <section className="card train-list" aria-labelledby="journeys-title">
           <div className="split">
             <h2 id="journeys-title">Your journeys</h2>
             <span className="muted">{reminders.length}</span>
           </div>
           {loading && <p role="status">Loading journeys…</p>}
-          {!loading && reminders.length === 0 && (
+          {!loading && !saved.error && reminders.length === 0 && (
             <div className="card train-empty">
               <TrainFront size={28} />
               <p>No journeys yet.</p>
@@ -285,6 +252,10 @@ function AccountTrains({
               ref={item.id === journeyId ? focusedJourney : undefined}
             >
               <div className="split">
+                <time className="train-journey-date" dateTime={item.journeyDate}>
+                  {format(localDate(item.journeyDate), "d MMM yyyy")}
+                </time>
+                <span className="muted">{item.leg === "outward" ? "Outward" : "Return"}</span>
                 <span className={`train-status train-status-${item.status}`}>
                   {item.status === "needs_review"
                     ? "Review office dates"
@@ -294,14 +265,10 @@ function AccountTrains({
                         ? "Booked"
                         : "Cancelled"}
                 </span>
-                <span className="muted">
-                  {item.leg === "outward" ? "Outward" : "Return"}
-                </span>
               </div>
               <h3>
                 {item.from} <span aria-label="to">→</span> {item.to}
               </h3>
-              <p>Journey · {item.journeyDate}</p>
               <div className="train-booking">
                 <span>
                   {item.bookingAt <= now ? "Booking open" : "Booking opens"}
@@ -595,25 +562,6 @@ function JourneyForm({
       onSubmit={(event) => void submit(event)}
     >
       <fieldset disabled={busy}>
-        <label>
-          Office visit
-          <select
-            value={visit}
-            onChange={(event) => chooseVisit(event.target.value)}
-          >
-            <option value="">Separate journey</option>
-            {!visitExists && (
-              <option value={visit} disabled>
-                Office dates changed · choose again
-              </option>
-            )}
-            {visits.map((dates) => (
-              <option key={dates[0]} value={dates.join(",")}>
-                {visitLabel(dates)}
-              </option>
-            ))}
-          </select>
-        </label>
         <div className="train-form-grid">
           <label>
             From
@@ -638,17 +586,32 @@ function JourneyForm({
             />
           </label>
         </div>
-        <label>
-          {initial?.leg === "return" ? "Return journey" : "Outward journey"}
-          <input
-            type="date"
-            value={journeyDate}
-            onChange={(event) => setDate(event.target.value)}
-            min={today}
-            max={shiftDate(today, 730)}
-            required
-          />
-        </label>
+        <div className="train-form-grid train-dates">
+          <label>
+            {initial?.leg === "return" ? "Return journey" : "Outward journey"}
+            <input
+              type="date"
+              value={journeyDate}
+              onChange={(event) => setDate(event.target.value)}
+              min={today}
+              max={shiftDate(today, 730)}
+              required
+            />
+          </label>
+          {includeReturn && !initial && (
+            <label>
+              Return journey
+              <input
+                type="date"
+                value={returnDate}
+                onChange={(event) => setReturnDate(event.target.value)}
+                min={journeyDate > today ? journeyDate : today}
+                max={shiftDate(today, 730)}
+                required
+              />
+            </label>
+          )}
+        </div>
         {!initial && (
           <label className="train-check">
             <input
@@ -659,22 +622,28 @@ function JourneyForm({
             Add return journey
           </label>
         )}
-        {includeReturn && !initial && (
-          <label>
-            Return journey
-            <input
-              type="date"
-              value={returnDate}
-              onChange={(event) => setReturnDate(event.target.value)}
-              min={journeyDate > today ? journeyDate : today}
-              max={shiftDate(today, 730)}
-              required
-            />
-          </label>
-        )}
         <details>
-          <summary>Booking settings · {advanceDays} days</summary>
+          <summary>Office visit and booking settings · {advanceDays} days</summary>
           <div className="train-advanced">
+            <label>
+              Office visit
+              <select
+                value={visit}
+                onChange={(event) => chooseVisit(event.target.value)}
+              >
+                <option value="">Separate journey</option>
+                {!visitExists && (
+                  <option value={visit} disabled>
+                    Office dates changed · choose again
+                  </option>
+                )}
+                {visits.map((dates) => (
+                  <option key={dates[0]} value={dates.join(",")}>
+                    {visitLabel(dates)}
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="train-form-grid">
               <label>
                 Advance days
@@ -736,18 +705,18 @@ function JourneyForm({
               Follow up 5 minutes after opening
             </label>
           </div>
+          <div className="train-preview">
+            <span>Booking opens</span>
+            <strong>{preview(input)}</strong>
+            {includeReturn && !initial && (
+              <>
+                <span>Return booking opens</span>
+                <strong>{preview(returnInput)}</strong>
+              </>
+            )}
+            <small>Previous evening + 5 minutes before opening.</small>
+          </div>
         </details>
-        <div className="train-preview">
-          <span>Booking opens</span>
-          <strong>{preview(input)}</strong>
-          {includeReturn && !initial && (
-            <>
-              <span>Return booking opens</span>
-              <strong>{preview(returnInput)}</strong>
-            </>
-          )}
-          <small>Previous evening + 5 minutes before opening.</small>
-        </div>
         {error && (
           <p role="alert" className="account-error">
             {error}

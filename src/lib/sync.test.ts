@@ -328,3 +328,15 @@ it("switches open tabs to the newly verified account", async () => {
   expect(store.getSnapshot().user?.id).toBe("user-two");
   expect(store.getSnapshot().data.settings.monthlyTarget).toBe(2);
 });
+
+it("keeps the same snapshot data when a refresh returns the same revision", async () => {
+  const data = emptyData();
+  mockApi((path) =>
+    path.includes("sign-in") ? session : { data, revision: 2 },
+  );
+  const store = new TrackerStore();
+  await store.authenticate(false, user.email, "long password", "");
+  const before = store.getSnapshot();
+  await store.refresh();
+  expect(store.getSnapshot()).toBe(before);
+});

@@ -85,7 +85,7 @@ function WeekdayPicker({
 }) {
   return (
     <div className="weekday-picker" role="group" aria-label={label}>
-      {weekdays.map((day, index) => (
+      {[1, 2, 3, 4, 5, 6, 0].map((index) => (
         <button
           key={index}
           title={fullWeekdays[index]}
@@ -100,7 +100,7 @@ function WeekdayPicker({
             )
           }
         >
-          {day}
+          {weekdays[index]}
         </button>
       ))}
     </div>
@@ -189,7 +189,7 @@ export function SettingsPage({
         <section className="card settings-card">
           <h2>
             <Sparkles size={20} />
-            Smart planner preferences
+            Smart planner
           </h2>
           <div className="setting-stacked">
             <strong>Working days</strong>
@@ -205,15 +205,6 @@ export function SettingsPage({
               </p>
             )}
           </div>
-          <div className="setting-stacked">
-            <strong>Preferred office days</strong>
-            <p>Prioritize these days.</p>
-            <WeekdayPicker
-              label="Preferred office days"
-              value={settings.preferredDays}
-              onChange={(preferredDays) => update({ preferredDays })}
-            />
-          </div>
           <div className="setting-row">
             <div>
               <strong>Maximum office days per week</strong>
@@ -227,35 +218,47 @@ export function SettingsPage({
               onChange={(maxPerWeek) => update({ maxPerWeek })}
             />
           </div>
-          <label className="setting-row toggle-row">
-            <div>
-              <strong>Avoid consecutive office days</strong>
-              <p>Space out office days.</p>
+          <details className="settings-more">
+            <summary>More planner preferences</summary>
+            <div className="setting-stacked">
+              <strong>Preferred office days</strong>
+              <p>Prioritize these days.</p>
+              <WeekdayPicker
+                label="Preferred office days"
+                value={settings.preferredDays}
+                onChange={(preferredDays) => update({ preferredDays })}
+              />
             </div>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={settings.avoidConsecutive}
-              onChange={(event) =>
-                update({ avoidConsecutive: event.target.checked })
-              }
-            />
-          </label>
-          <label className="setting-row toggle-row">
-            <div>
-              <strong>Keep existing WFH plans</strong>
-              <p>
-                Turn off to see optional rescheduling suggestions. Each
-                replacement still needs confirmation.
-              </p>
-            </div>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={settings.protectWFH}
-              onChange={(event) => update({ protectWFH: event.target.checked })}
-            />
-          </label>
+            <label className="setting-row toggle-row">
+              <div>
+                <strong>Avoid consecutive office days</strong>
+                <p>Space out office days.</p>
+              </div>
+              <input
+                type="checkbox"
+                role="switch"
+                checked={settings.avoidConsecutive}
+                onChange={(event) =>
+                  update({ avoidConsecutive: event.target.checked })
+                }
+              />
+            </label>
+            <label className="setting-row toggle-row">
+              <div>
+                <strong>Keep existing WFH plans</strong>
+                <p>
+                  Turn off to see optional rescheduling suggestions. Each
+                  replacement still needs confirmation.
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                role="switch"
+                checked={settings.protectWFH}
+                onChange={(event) => update({ protectWFH: event.target.checked })}
+              />
+            </label>
+          </details>
         </section>
         <section className="card settings-card">
           <h2>

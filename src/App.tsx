@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
+  CalendarCheck,
   Settings as SettingsIcon,
   Moon,
   Sun,
@@ -10,11 +11,11 @@ import {
   X,
   Download,
   RefreshCw,
-  Palmtree,
   TrainFront,
 } from "lucide-react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import type { Phase, Settings, Status, TrackerData } from "./types";
+import { useCalendarTrains } from "./hooks/useCalendarTrains";
 import { useTracker } from "./hooks/useTracker";
 import { CalendarPage } from "./pages/CalendarPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -31,13 +32,13 @@ import {
   parseBackup,
   STORAGE_KEY,
 } from "./lib/storage";
-import { monthKey, validMonth } from "./lib/dates";
+import { validMonth } from "./lib/dates";
 import { targetFor } from "./lib/statistics";
 import { planMonth } from "./lib/planner";
 
 const pages = [
   { key: "calendar", label: "Calendar", Icon: CalendarDays },
-  { key: "holidays", label: "Holidays", Icon: Palmtree },
+  { key: "holidays", label: "Holidays", Icon: CalendarDays },
   { key: "trains", label: "Trains", Icon: TrainFront },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
 ] as const;
@@ -53,14 +54,17 @@ interface Confirmation {
 }
 
 export default function App() {
-  const { data, commit, today, error, locked, user, status, account } =
+  const { data, commit, today, error, locked, user, status, account, restoring } =
     useTracker();
+  const trainData = useCalendarTrains(account, user?.id ?? null);
+  const owner = user?.id ?? null;
   const [page, setPage] = useState<Page>(readPage);
-  const [month, updateMonth] = useState(() =>
+  const initialMonth =
     data.settings.defaultMonth === "current"
-      ? monthKey(new Date())
-      : data.settings.defaultMonth,
-  );
+      ? today.slice(0, 7)
+      : data.settings.defaultMonth;
+  const [month, updateMonth] = useState(initialMonth);
+  const [monthOwner, setMonthOwner] = useState(owner);
   const [trainShortcut, setTrainShortcut] = useState<{
     owner: string | null;
     officeDate?: string;
@@ -71,6 +75,15 @@ export default function App() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [toast, setToast] = useState("");
   const [isDark, setIsDark] = useState(false);
+  if (monthOwner !== owner) {
+    setMonthOwner(owner);
+    updateMonth(initialMonth);
+    setEditor(null);
+    setSelected(null);
+    setConfirmation(null);
+    setTrainShortcut(null);
+    setToast("");
+  }
   const fileInput = useRef<HTMLInputElement>(null);
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -103,8 +116,8 @@ export default function App() {
   const navigate = (next: Page) => {
     setTrainShortcut(null);
     setPage(next);
-    location.assign(`#${next}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (location.hash !== `#${next}`) location.assign(`#${next}`);
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
   const openTrains = (officeDate?: string, journeyId?: string) => {
     navigate("trains");
@@ -241,6 +254,13 @@ export default function App() {
     calendar: "Calendar",
     settings: "Settings",
   };
+  const MobileTitleIcon =
+    page === "calendar" || page === "holidays"
+      ? CalendarCheck
+      : page === "trains"
+        ? TrainFront
+        : SettingsIcon;
+  const accountContentReady = !restoring || page === "holidays";
   return (
     <>
       <header className="app-header">
@@ -253,6 +273,10 @@ export default function App() {
             <BrandMark />
             <span className="brand-name">Hybrid Tracker</span>
           </a>
+          <div className="mobile-page-title" aria-hidden="true">
+            <MobileTitleIcon aria-hidden="true" />
+            {page === "calendar" ? "Hybrid Office Tracker" : pageTitles[page]}
+          </div>
           <nav className="desktop-nav" aria-label="Main navigation">
             {pages.map(({ key, label, Icon }) => (
               <button
@@ -291,7 +315,17 @@ export default function App() {
           </div>
         </div>
       </header>
-      <main className="app-main" id="main-content">
+      <main
+        className="app-main"
+        id="main-content"
+        data-page={page}
+        aria-busy={!accountContentReady}
+      >
+        {!accountContentReady && (
+          <p className="card account-loading" role="status">
+            Loading your account…
+          </p>
+        )}
         <div className="intro">
           <h1>{pageTitles[page]}</h1>
           <span className="privacy-note">
@@ -299,7 +333,7 @@ export default function App() {
             {user ? status : "Saved on this device"}
           </span>
         </div>
-        {error && (
+        {accountContentReady && error && (
           <div className="storage-warning" role="alert">
             <strong>{error}</strong>
             <button className="button small" onClick={exportData}>
@@ -318,11 +352,10 @@ export default function App() {
             }}
           />
         )}
-        {page === "calendar" && (
+        {accountContentReady && page === "calendar" && (
           <CalendarPage
             key={user?.id ?? "guest"}
-            account={account}
-            userId={user?.id ?? null}
+            saved={trainData}
             openTrains={openTrains}
             data={data}
             month={month}
@@ -334,17 +367,18 @@ export default function App() {
             importData={() => fileInput.current?.click()}
           />
         )}
-        {page === "trains" && (
+        {accountContentReady && page === "trains" && (
           <TrainsPage
             key={`${user?.id ?? "guest"}:${activeTrainShortcut?.officeDate ?? ""}:${activeTrainShortcut?.journeyId ?? ""}`}
             data={data}
             account={account}
             signedIn={!!user}
+            saved={trainData}
             officeDate={activeTrainShortcut?.officeDate}
             journeyId={activeTrainShortcut?.journeyId}
           />
         )}
-        {page === "settings" && (
+        {accountContentReady && page === "settings" && (
           <SettingsPage
             data={data}
             month={month}
@@ -372,7 +406,7 @@ export default function App() {
             }
           />
         )}
-        {page === "calendar" && (
+        {accountContentReady && page === "calendar" && (
           <Planner
             data={data}
             month={month}
@@ -421,7 +455,7 @@ export default function App() {
           void importData(event.target.files?.[0]);
         }}
       />
-      {editor && (
+      {!restoring && editor && (
         <AttendanceEditor
           key={editor}
           date={editor}
@@ -438,7 +472,7 @@ export default function App() {
           }
         />
       )}
-      {confirmation && (
+      {!restoring && confirmation && (
         <Modal title={confirmation.title} onClose={() => setConfirmation(null)}>
           <p className="confirmation-copy">{confirmation.body}</p>
           <div className="dialog-actions">

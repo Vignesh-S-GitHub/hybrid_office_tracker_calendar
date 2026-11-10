@@ -32,6 +32,7 @@ interface Snapshot {
   status: string;
   busy: boolean;
   conflict: boolean;
+  restoring: boolean;
 }
 class ApiError extends Error {
   constructor(
@@ -85,6 +86,7 @@ export class TrackerStore {
       status: "Saved on this device",
       busy: false,
       conflict: false,
+      restoring: this.hasSavedSession(),
     };
   }
   request = async <T>(
@@ -156,6 +158,13 @@ export class TrackerStore {
       throw new Error("Invalid saved session.");
     return session;
   }
+  private hasSavedSession() {
+    try {
+      return !!this.readSession();
+    } catch {
+      return false;
+    }
+  }
   private rememberSession(session: Session) {
     const saved = JSON.stringify({ token: session.token });
     try {
@@ -196,9 +205,17 @@ export class TrackerStore {
     } catch {
       this.forgetSession();
     }
-    if (!session) return;
+    if (!session) {
+      if (this.snapshot.restoring) this.update({ restoring: false });
+      return;
+    }
     const epoch = ++this.generation;
-    this.update({ busy: true, locked: true, status: "Checking your session…" });
+    this.update({
+      busy: true,
+      locked: true,
+      restoring: true,
+      status: "Checking your session…",
+    });
     try {
       const verified = await api<{ user: User } | null>(
         "/api/auth/get-session",
@@ -221,6 +238,7 @@ export class TrackerStore {
             ? error.message
             : "Unable to reconnect. Retry when connected.",
         busy: false,
+        restoring: false,
         locked: !!loadData().error,
       });
     }
@@ -275,6 +293,7 @@ export class TrackerStore {
       locked: conflict,
       conflict,
       busy: false,
+      restoring: false,
       status: conflict
         ? "Newer data exists on another device. Choose which copy to keep."
         : "Synced across devices",
@@ -301,6 +320,7 @@ export class TrackerStore {
       locked: !!initial.error,
       conflict: false,
       busy: false,
+      restoring: this.hasSavedSession(),
       status: "Saved on this device",
     });
     await this.start();
@@ -308,6 +328,7 @@ export class TrackerStore {
   commit = (data: TrackerData, replace = false) => {
     if (
       this.snapshot.busy ||
+      this.snapshot.restoring ||
       (this.snapshot.locked && !replace) ||
       this.snapshot.conflict
     )
@@ -381,9 +402,15 @@ export class TrackerStore {
       if (
         epoch !== this.generation ||
         this.dirty ||
-        previous !== this.snapshot.data
+        previous !== this.snapshot.data ||
+        remote.revision < this.revision
       )
         return;
+      if (remote.revision === this.revision) {
+        if (this.snapshot.status !== "Synced across devices")
+          this.update({ status: "Synced across devices" });
+        return;
+      }
       this.revision = remote.revision;
       this.update({
         data: remote.data ?? emptyData(),
@@ -391,7 +418,11 @@ export class TrackerStore {
       });
       this.cache();
     } catch {
-      if (epoch !== this.generation) return;
+      if (
+        epoch !== this.generation ||
+        this.dirty ||
+        previous !== this.snapshot.data
+      ) return;
       this.update({
         status: "Unable to check for updates. Retry when connected.",
       });
@@ -435,6 +466,7 @@ export class TrackerStore {
       locked: !!initial.error,
       conflict: false,
       busy: false,
+      restoring: false,
       status: "Saved on this device",
     });
     if (token) {

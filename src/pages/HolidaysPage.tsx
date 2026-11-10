@@ -2,9 +2,6 @@ import { format } from "date-fns";
 import {
   ArrowRight,
   CalendarDays,
-  ExternalLink,
-  Flag,
-  ShieldCheck,
 } from "lucide-react";
 import { activeHolidayCatalog, type HolidayCatalog } from "../lib/holidays";
 import { localDate } from "../lib/dates";
@@ -22,42 +19,17 @@ export function HolidaysPage({
   const differences = holidays.filter(
     (holiday) => holiday.date !== holiday.indiaPostDate,
   );
-  const upcoming = holidays.filter((holiday) => holiday.date >= today).length;
   return (
     <section
       className="card holidays-card"
       aria-label={`All India Holidays - ${year}`}
     >
       <div className="holiday-page-heading">
-        <div className="flex-row">
-          <span className="holiday-page-icon">
-            <Flag size={23} />
-          </span>
-          <div>
-            <h2>All India Holidays - {year}</h2>
-            <p className="muted small-text">
-              India · {holidays.length} official holidays · {upcoming} remaining
-            </p>
-          </div>
+        <div>
+          <h2 aria-label={`All India Holidays - ${year}`}>All India Holidays</h2>
+          <p className="muted small-text">{holidays.length} verified holidays</p>
         </div>
-        <span className="pill green-pill">
-          <ShieldCheck size={13} />
-          Official sources
-        </span>
-      </div>
-      <p className="holiday-scope">
-        Only the holidays in India Post’s All India {year} list, cross-checked
-        against India Portal’s central calendar. State, regional, and restricted
-        holidays are excluded.
-      </p>
-      <div className="holiday-source-links">
-        <a href={sources.indiaPortal} target="_blank" rel="noreferrer">
-          India Portal calendar <ExternalLink size={13} />
-        </a>
-        <a href={sources.indiaPost} target="_blank" rel="noreferrer">
-          India Post All India list <ExternalLink size={13} />
-        </a>
-        <span>Verified {format(localDate(verifiedOn), "d MMM yyyy")}</span>
+        <span className="pill holiday-year">{year}</span>
       </div>
       {year !== Number(today.slice(0, 4)) && (
         <div className="notice holiday-date-note" role="status">
@@ -66,26 +38,15 @@ export function HolidaysPage({
           dates apply only to {year}.
         </div>
       )}
-      {differences.map((holiday) => (
-        <div className="notice holiday-date-note" key={holiday.name}>
-          <strong>Source date difference: {holiday.name}</strong>
-          <p>
-            India Portal lists {format(localDate(holiday.date), "d MMMM yyyy")};
-            India Post lists{" "}
-            {format(localDate(holiday.indiaPostDate), "d MMMM yyyy")}. This
-            calendar uses India Portal’s date.
-          </p>
-        </div>
-      ))}
-      <div className="holiday-list">
+      <div className="holiday-list" role="region" aria-label="Verified holiday dates" tabIndex={0}>
         {holidays.map((holiday) => (
           <div
             className={`holiday-row ${holiday.date < today ? "past-holiday" : ""}`}
             key={holiday.name}
           >
             <div className="holiday-date-tile">
+              <strong>{format(localDate(holiday.date), "dd")}</strong>
               <span>{format(localDate(holiday.date), "MMM")}</span>
-              <strong>{format(localDate(holiday.date), "d")}</strong>
             </div>
             <div className="holiday-description">
               <h3>{holiday.name}</h3>
@@ -112,11 +73,36 @@ export function HolidaysPage({
           </div>
         ))}
       </div>
-      <p className="holiday-footer">
-        <CalendarDays size={16} />
-        These dates appear automatically in your calendar and are excluded from
-        Smart WFO suggestions. Your saved attendance stays yours.
+      <p className="holiday-sources-footer">
+        <a aria-label="India Post All India list" href={sources.indiaPost} target="_blank" rel="noreferrer">India Post</a>
+        {" and "}
+        <a aria-label="India Portal calendar" href={sources.indiaPortal} target="_blank" rel="noreferrer">India Portal</a>
       </p>
+      <details className="holiday-details">
+        <summary>About these dates</summary>
+        <p className="holiday-scope">
+          Only the holidays in India Post’s All India {year} list, cross-checked
+          against India Portal’s central calendar. State, regional, and restricted
+          holidays are excluded.
+        </p>
+        {differences.map((holiday) => (
+          <div className="notice holiday-date-note" key={holiday.name}>
+            <strong>Source date difference: {holiday.name}</strong>
+            <p>
+              India Portal lists {format(localDate(holiday.date), "d MMMM yyyy")};
+              India Post lists{" "}
+              {format(localDate(holiday.indiaPostDate), "d MMMM yyyy")}. This
+              calendar uses India Portal’s date.
+            </p>
+          </div>
+        ))}
+        <p className="holiday-verified muted small-text">Verified {format(localDate(verifiedOn), "d MMM yyyy")}</p>
+        <p className="holiday-footer">
+          <CalendarDays size={16} />
+          These dates appear automatically in your calendar and are excluded from
+          Smart WFO suggestions. Your saved attendance stays yours.
+        </p>
+      </details>
     </section>
   );
 }

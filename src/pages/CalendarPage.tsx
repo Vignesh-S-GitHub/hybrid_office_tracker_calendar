@@ -7,9 +7,8 @@ import {
   CalendarCheck2,
   TrainFront,
 } from "lucide-react";
-import type { TrackerStore } from "../lib/sync";
 import { calendarTrainBookings } from "../lib/calendarTrains";
-import { useCalendarTrains } from "../hooks/useCalendarTrains";
+import { guestTrainSnapshot, type TrainSnapshot } from "../hooks/useCalendarTrains";
 import {
   CalendarTrainBooking,
   CalendarBookingRows,
@@ -19,7 +18,7 @@ import type { TrackerData } from "../types";
 import { calendarDays, dateKey } from "../lib/dates";
 import { statistics } from "../lib/statistics";
 import { planMonth } from "../lib/planner";
-import { MonthControls, StatCards, TargetProgress } from "../components/ui";
+import { MonthControls, Progress, StatCards, TargetProgress } from "../components/ui";
 import { statusInfo, statuses } from "../lib/status";
 import {
   calendarAttendance,
@@ -36,8 +35,7 @@ export function CalendarPage({
   edit,
   exportData,
   importData,
-  account,
-  userId,
+  saved = guestTrainSnapshot,
   openTrains,
 }: {
   data: TrackerData;
@@ -48,11 +46,9 @@ export function CalendarPage({
   edit: (date: string) => void;
   exportData: () => void;
   importData: () => void;
-  account: TrackerStore;
-  userId: string | null;
+  saved?: TrainSnapshot;
   openTrains: (officeDate?: string, journeyId?: string) => void;
 }) {
-  const saved = useCalendarTrains(account, userId);
   const bookings = saved.loading
     ? []
     : calendarTrainBookings(data, saved.reminders, today);
@@ -65,6 +61,7 @@ export function CalendarPage({
     calendar.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
   };
   const stats = statistics(data, month, today);
+  const monthName = format(new Date(`${month}-01T12:00:00`), "MMMM yyyy");
   const attendance = calendarAttendance(data);
   const recommended = new Set(
     planMonth(data, month, today).recommendations.map((row) => row.date),
@@ -81,6 +78,21 @@ export function CalendarPage({
   );
   return (
     <div className="calendar-layout">
+      <section className="card mobile-progress" aria-label="Monthly office days">
+        <h2>
+          {month === today.slice(0, 7)
+            ? "Office days this month"
+            : `Office days in ${monthName}`}
+        </h2>
+        <div>
+          <strong>{stats.WFO} / {stats.target}</strong>
+          <span>{stats.planned} planned</span>
+        </div>
+        <Progress
+          value={stats.actualPercent}
+          label="Monthly office days completed"
+        />
+      </section>
       <section className="card calendar-card" ref={calendar}>
         <MonthControls month={month} onChange={setMonth} today={today} />
         <div
@@ -132,7 +144,7 @@ export function CalendarPage({
                 }
               >
                 <span className="day-number">
-                  {format(day, "d")}
+                  <span className="calendar-date-label">{format(day, "d")}</span>
                   {!!trainBookings.length && (
                     <TrainFront
                       className="calendar-booking-icon"
@@ -157,28 +169,16 @@ export function CalendarPage({
           })}
         </div>
         <div className="legend">
-          {statuses.map((status) => (
+          <span><i className="dot office" /> WFO</span>
+          <span><i className="dot planned-dot" /> Planned</span>
+          {statuses.filter((status) => status !== "WFO").map((status) => (
             <span key={status}>
               <i className={`dot ${statusInfo[status].className}`} />
-              {status === "WFO"
-                ? "WFO (Office)"
-                : status === "WFH"
-                  ? "WFH (Home)"
-                  : status}
+              {status}
             </span>
           ))}
-          <span>
-            <i className="dot unmarked" />
-            No entry
-          </span>
-          <span>
-            <i className="dot planned-dot" />
-            Planned
-          </span>
-          <span>
-            <i className="dot suggestion-dot" />
-            Suggested
-          </span>
+          <span className="calendar-extra-legend"><i className="dot unmarked" /> No entry</span>
+          <span className="calendar-extra-legend"><i className="dot suggestion-dot" /> Suggested</span>
           {!!bookings.length && (
             <span className="calendar-train-legend">
               <TrainFront aria-hidden="true" />
@@ -191,8 +191,25 @@ export function CalendarPage({
           <span>Select a date to mark attendance.</span>
         </div>
       </section>
+      <button
+        className="button primary mobile-planner-link"
+        onClick={() => {
+          const planner = document.getElementById("smart-wfo-planner");
+          planner?.focus({ preventScroll: true });
+          planner?.scrollIntoView?.({ block: "start" });
+        }}
+      >
+        <CalendarCheck2 size={20} />
+        Smart WFO Planner
+      </button>
       <aside className="card summary-card">
-        <h2>{format(new Date(`${month}-01T12:00:00`), "MMMM yyyy")} summary</h2>
+        <h2>{monthName} summary</h2>
+        <button
+          className="button small mobile-today"
+          onClick={() => setMonth(today.slice(0, 7))}
+        >
+          Today
+        </button>
         <StatCards stats={stats} />
         <TargetProgress stats={stats} />
         {holidayCatalogForYear(Number(month.slice(0, 4))) && (

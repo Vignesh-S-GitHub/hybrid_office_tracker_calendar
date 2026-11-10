@@ -61,14 +61,14 @@ function CalendarFixture({
   edit?: (date: string) => void;
 }) {
   const [current, setMonth] = useState(month);
+  const saved = useCalendarTrains(account, userId);
   return (
     <CalendarPage
       data={dataWithVisit()}
       month={current}
       today="2026-10-19"
       selected={null}
-      account={account}
-      userId={userId}
+      saved={saved}
       openTrains={openTrains}
       setMonth={setMonth}
       edit={edit}

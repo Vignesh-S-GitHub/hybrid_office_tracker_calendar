@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { useCalendarTrains } from "../hooks/useCalendarTrains";
+import type { ComponentProps } from "react";
 import { TrainsPage } from "../pages/TrainsPage";
 import { TrackerStore } from "../lib/sync";
 import { emptyData } from "../lib/storage";
@@ -18,6 +20,10 @@ function fixture(configured = false) {
   vi.spyOn(account, "request").mockImplementation(request);
   return { account, request };
 }
+function TrainsFixture(props: Omit<ComponentProps<typeof TrainsPage>, "saved">) {
+  const saved = useCalendarTrains(props.account, props.signedIn ? "test-user" : null);
+  return <TrainsPage {...props} saved={saved} />;
+}
 describe("train reminders screen", () => {
   it("prefills both journeys from a Calendar office visit without saving automatically", async () => {
     const { account, request } = fixture();
@@ -32,7 +38,7 @@ describe("train reminders screen", () => {
         updatedAt: new Date().toISOString(),
       };
     render(
-      <TrainsPage data={data} account={account} signedIn officeDate={last} />,
+      <TrainsFixture data={data} account={account} signedIn officeDate={last} />,
     );
     await screen.findByText("Telegram setup pending.");
     expect(screen.getByLabelText("Office visit")).toHaveValue(
@@ -51,7 +57,7 @@ describe("train reminders screen", () => {
   it("keeps guests local and asks them to sign in", () => {
     const { account, request } = fixture();
     render(
-      <TrainsPage data={emptyData()} account={account} signedIn={false} />,
+      <TrainsFixture data={emptyData()} account={account} signedIn={false} />,
     );
     expect(screen.getByText(/Sign in to save journeys/)).toBeVisible();
     expect(request).not.toHaveBeenCalled();
@@ -68,7 +74,7 @@ describe("train reminders screen", () => {
         notes: "",
         updatedAt: new Date().toISOString(),
       };
-    render(<TrainsPage data={data} account={account} signedIn />);
+    render(<TrainsFixture data={data} account={account} signedIn />);
     await screen.findByText("Telegram setup pending.");
     expect(
       screen.queryByRole("button", { name: "Connect Telegram" }),
@@ -116,7 +122,7 @@ describe("train reminders screen", () => {
   });
   it("creates a Telegram connection link only after an explicit click", async () => {
     const { account, request } = fixture(true);
-    render(<TrainsPage data={emptyData()} account={account} signedIn />);
+    render(<TrainsFixture data={emptyData()} account={account} signedIn />);
     const user = userEvent.setup();
     await user.click(
       await screen.findByRole("button", { name: "Connect Telegram" }),

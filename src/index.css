@@ -17,16 +17,6 @@
   justify-content: space-between;
   gap: 16px;
 }
-.holiday-page-icon {
-  width: 46px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  background: var(--holiday-soft);
-  color: var(--holiday);
-  border-radius: 12px;
-  flex-shrink: 0;
-}
 .holiday-page-heading h2 {
   font-size: 21px;
 }
@@ -39,29 +29,6 @@
   line-height: 1.9;
   margin: 19px 0 12px;
   max-width: 800px;
-}
-.holiday-source-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 20px;
-  font-size: 11px;
-  margin-bottom: 20px;
-}
-.holiday-source-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--primary);
-}
-.holiday-source-links a:hover,
-.official-holiday-notice a:hover {
-  text-decoration: underline;
-}
-.holiday-source-links > span {
-  color: var(--muted);
-  margin-left: auto;
-  font-size: 10px;
 }
 .holiday-date-note {
   font-size: 11px;
@@ -153,6 +120,9 @@
   flex-shrink: 0;
   margin-top: 2px;
 }
+.official-holiday-notice a:hover {
+  text-decoration: underline;
+}
 .official-holiday-notice {
   background: var(--holiday-soft);
   border: 1px solid color-mix(in srgb, var(--holiday) 20%, transparent);
@@ -194,34 +164,11 @@
   .holiday-page-heading h2 {
     font-size: 16px;
   }
-  .holiday-page-heading > .pill {
-    display: none;
-  }
-  .holiday-page-heading .flex-row {
-    gap: 9px;
-  }
   .holiday-page-heading p {
     font-size: 10px;
   }
-  .holiday-page-icon {
-    width: 36px;
-    height: 39px;
-    border-radius: 9px;
-  }
-  .holiday-page-icon svg {
-    width: 20px;
-  }
   .holiday-scope {
     font-size: 11px;
-  }
-  .holiday-source-links {
-    font-size: 10px;
-    gap: 11px;
-  }
-  .holiday-source-links > span {
-    margin-left: 0;
-    width: 100%;
-    font-size: 9px;
   }
   .holiday-date-note {
     font-size: 10px;
@@ -2879,4 +2826,574 @@ dialog::backdrop {
 }
 .calendar-card {
   scroll-margin-top: 95px;
+}
+
+/* Shared controls and surfaces for the four-screen mobile layout. */
+.mobile-page-title,
+.mobile-progress,
+.mobile-today,
+.mobile-planner-link.button {
+  display: none;
+}
+.account-loading {
+  padding: 20px;
+}
+#smart-wfo-planner {
+  scroll-margin-top: 96px;
+}
+.holiday-year {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 8px;
+}
+.holiday-sources-footer {
+  padding-top: 14px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+.holiday-sources-footer a:hover {
+  text-decoration: underline;
+}
+.holiday-details,
+.settings-more {
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+  padding-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.holiday-details summary,
+.settings-more summary {
+  cursor: pointer;
+}
+.holiday-verified {
+  margin-top: 12px;
+}
+.telegram-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.telegram-heading h2 {
+  margin-right: auto;
+}
+.telegram-heading h2 svg {
+  color: var(--primary);
+}
+.telegram-connected {
+  color: #126118;
+  background: #e3f4d9;
+}
+.telegram-management {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.telegram-management summary {
+  cursor: pointer;
+}
+.telegram-connected::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.train-list.card {
+  padding: 14px;
+}
+.train-journey-date {
+  font-weight: 700;
+}
+.train-journey > .split {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.train-journey > .split .train-status {
+  margin-left: auto;
+}
+.train-status-pending {
+  color: #7c4107;
+  background: #fff0c5;
+}
+.train-dates > label:only-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 767px) {
+  :root:not([data-theme="dark"]) {
+    --page: #f5f7fb;
+    --soft: #f2f4f9;
+    --header: #f9faff;
+    --text: #0b1022;
+    --muted: #485064;
+    --border: #d7ddef;
+    --primary: #3024e8;
+    --primary-soft: #e0ddff;
+    --office: #392ad8;
+    --office-soft: #dcd8ff;
+    --home: #3f6b33;
+    --home-soft: #d9efcd;
+    --leave: #775310;
+    --leave-soft: #ffe9b6;
+    --holiday: #973c53;
+    --holiday-soft: #ffdade;
+    --shadow: 0 1px 3px #151f3b08;
+  }
+  .app-header {
+    backdrop-filter: none;
+  }
+  .header-inner {
+    min-height: 62px;
+    padding-inline: 16px;
+    gap: 6px;
+  }
+  .header-inner > .brand,
+  .header-inner > .desktop-nav,
+  .header-actions .theme-toggle,
+  .header-actions .github-link {
+    display: none;
+  }
+  .app-main > .intro {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
+  }
+  .mobile-page-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(18px, 5.3vw, 25px);
+    font-weight: 750;
+    letter-spacing: -0.65px;
+    min-width: 0;
+  }
+  .mobile-page-title svg {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    color: var(--primary);
+  }
+  .header-actions {
+    padding: 0;
+    border: 0;
+  }
+  .header-actions .account-button {
+    min-width: 38px;
+    min-height: 42px;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--muted);
+  }
+  .header-actions .account-button > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .app-main {
+    padding: 16px 16px calc(80px + env(safe-area-inset-bottom));
+  }
+  .app-main .card {
+    border-radius: 13px;
+  }
+  :root:not([data-theme="dark"]) .app-main .button.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: none;
+  }
+  .mobile-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    position: fixed;
+    inset: auto 0 0;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    background: var(--header);
+    border-top: 1px solid var(--border);
+    z-index: 30;
+    backdrop-filter: none;
+  }
+  .mobile-nav > button {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 4px;
+    min-height: 54px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .mobile-nav > button.active {
+    color: var(--primary);
+    font-weight: 650;
+  }
+  .mobile-nav > button.active svg {
+    filter: none;
+  }
+
+  .calendar-layout {
+    gap: 14px;
+  }
+  .mobile-progress {
+    display: block;
+    padding: 12px 16px 15px;
+  }
+  .mobile-progress h2 {
+    font-size: 19px;
+    margin-bottom: 3px;
+  }
+  .mobile-progress > div:first-of-type {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .mobile-progress strong {
+    font-size: 38px;
+    font-weight: 760;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  .mobile-progress span {
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .mobile-progress .progress-track {
+    height: 10px;
+    background: var(--border);
+  }
+  .mobile-progress .progress-track > div {
+    background: var(--primary);
+  }
+  .calendar-layout > .calendar-card {
+    padding: 9px 12px 0;
+  }
+  .month-controls {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    margin: 0 0 3px;
+    gap: 0;
+    text-align: center;
+  }
+  .month-controls h2 {
+    font-size: clamp(17px, 5vw, 22px);
+  }
+  .month-controls .icon-button {
+    width: 40px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+  }
+  .month-controls .icon-button svg {
+    width: 19px;
+  }
+  .month-controls .today-button {
+    display: none;
+  }
+  .mobile-today.button {
+    display: inline-flex;
+    margin-bottom: 12px;
+  }
+  .calendar-grid {
+    gap: 0;
+  }
+  .calendar-grid .weekday {
+    height: 28px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .calendar-grid .calendar-cell {
+    min-height: 36px;
+    padding: 2px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: inset 0 0 0 0.5px var(--border);
+    background: var(--surface);
+  }
+  .calendar-grid .calendar-cell .day-number {
+    display: flex;
+    width: 100%;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+  .calendar-grid .calendar-cell.office .day-number { background: var(--office-soft); }
+  .calendar-grid .calendar-cell.home .day-number { background: var(--home-soft); }
+  .calendar-grid .calendar-cell.leave .day-number { background: var(--leave-soft); }
+  .calendar-grid .calendar-cell.holiday .day-number { background: var(--holiday-soft); }
+  .calendar-grid .calendar-cell.planned .day-number {
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1.5px var(--office);
+  }
+  .calendar-grid .calendar-cell.home.planned .day-number {
+    box-shadow: inset 0 0 0 1.5px var(--home);
+  }
+  .calendar-grid .calendar-cell.selected,
+  .calendar-grid .calendar-cell:focus-visible {
+    z-index: 1;
+  }
+  .calendar-grid .calendar-cell.selected .day-number {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+  .calendar-grid .calendar-cell .day-dot,
+  .calendar-grid .calendar-cell .cell-caption,
+  .calendar-card .calendar-tip {
+    display: none;
+  }
+  .calendar-grid .calendar-cell.suggested::before {
+    content: "+";
+    position: absolute;
+    top: 1px;
+    right: 4px;
+    color: var(--office);
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .calendar-grid .calendar-cell.today::after {
+    width: 4px;
+    height: 4px;
+    top: auto;
+    bottom: 3px;
+    right: calc(50% - 2px);
+  }
+  .calendar-card .legend {
+    margin: 12px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+    gap: 5px clamp(6px, 2.4vw, 14px);
+  }
+  .calendar-card .legend > span {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .calendar-card .legend .calendar-extra-legend {
+    display: none;
+  }
+  .calendar-card .legend .dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+  }
+  .calendar-card .legend .dot.office { background: var(--office-soft); }
+  .calendar-card .legend .dot.home { background: var(--home-soft); }
+  .calendar-card .legend .dot.leave { background: var(--leave-soft); }
+  .calendar-card .legend .dot.holiday { background: var(--holiday-soft); }
+  .calendar-card .legend .dot.planned-dot {
+    background: var(--surface);
+    border: 1.5px solid var(--primary);
+  }
+  .mobile-planner-link.button {
+    display: flex;
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 17px;
+  }
+  .calendar-layout > .summary-card {
+    margin-top: 4px;
+  }
+
+  .app-main .holidays-card {
+    padding: 14px;
+  }
+  .holidays-card .holiday-page-heading {
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .holidays-card .holiday-page-heading h2 {
+    font-size: clamp(18px, 5.1vw, 24px);
+  }
+  .holidays-card .holiday-page-heading p {
+    margin-top: 1px;
+    font-size: 15px;
+  }
+  .holidays-card .holiday-year {
+    padding: 7px 12px;
+    font-size: 14px;
+  }
+  .holidays-card .holiday-list {
+    display: block;
+    max-height: 345px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .holidays-card .holiday-row {
+    min-height: 69px;
+    gap: 12px;
+    padding: 7px 0;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+  .holidays-card .holiday-date-tile {
+    width: 65px;
+    height: 49px;
+    background: var(--primary-soft);
+    color: var(--text);
+    border-radius: 8px;
+  }
+  .holidays-card .holiday-date-tile strong {
+    font-size: 20px;
+    line-height: 1.1;
+  }
+  .holidays-card .holiday-date-tile span {
+    font-size: 12px;
+  }
+  .holidays-card .holiday-description h3 {
+    font-size: clamp(13px, 3.6vw, 17px);
+  }
+  .holidays-card .holiday-description p {
+    margin-top: 1px;
+  }
+  .holidays-card .holiday-timing {
+    display: none;
+  }
+  .holidays-card .holiday-row .icon-button {
+    width: 38px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .trains-page,
+  .trains-layout {
+    gap: 14px;
+  }
+  .telegram-card,
+  .train-form-card,
+  .train-journey {
+    padding: 13px 14px;
+  }
+  .telegram-card h2,
+  .train-form-card h2,
+  .train-list h2 {
+    font-size: 20px;
+  }
+  .telegram-card .train-actions {
+    margin-top: 6px;
+  }
+  .telegram-card .train-actions:empty {
+    display: none;
+  }
+  .train-form-card > p {
+    font-size: 12px;
+  }
+  .train-form {
+    margin-top: 8px;
+  }
+  .train-form fieldset {
+    gap: 7px;
+  }
+  .train-form label {
+    gap: 4px;
+  }
+  .train-form .train-form-grid {
+    gap: 8px;
+  }
+  .train-form input:not([type="checkbox"]),
+  .train-form select {
+    padding: 8px;
+    min-height: 38px;
+    border-radius: 8px;
+  }
+  .train-form button[type="submit"] {
+    min-height: 44px;
+    font-size: 15px;
+  }
+
+  .settings-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .settings-layout,
+  .settings-column {
+    gap: 12px;
+  }
+  .settings-layout .settings-card {
+    padding: 12px 14px;
+  }
+  .settings-layout .settings-card > h2 {
+    font-size: 19px;
+    margin-bottom: 3px;
+  }
+  .settings-layout .settings-card > h2 > svg {
+    display: none;
+  }
+  .settings-layout .setting-row {
+    padding-block: 6px;
+    flex-wrap: nowrap;
+  }
+  .settings-layout .setting-row > div:first-child {
+    min-width: 0;
+  }
+  .settings-layout .setting-row strong,
+  .settings-layout .setting-stacked > strong,
+  .settings-layout .month-override strong {
+    font-size: 13px;
+  }
+  .settings-layout .setting-row p,
+  .settings-layout .setting-stacked > p:not(.warning-text),
+  .settings-layout .month-override > .split p {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .settings-layout .month-override {
+    margin-top: 0;
+    padding: 8px 0 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+  }
+  .settings-layout .setting-stacked {
+    padding: 5px 0 8px;
+  }
+  .settings-layout .weekday-picker {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 5px;
+  }
+  .settings-layout .weekday-picker button {
+    width: auto;
+    min-width: 0;
+    height: 35px;
+    border-radius: 7px;
+  }
+  .settings-layout .stepper {
+    min-width: 0;
+    max-width: 42%;
+  }
+  .settings-layout .stepper input {
+    min-width: 0;
+  }
+  .settings-layout .setting-row input[type="checkbox"] {
+    flex-shrink: 0;
+  }
+  .settings-layout .settings-more {
+    margin-top: 5px;
+    padding-top: 6px;
+  }
 }

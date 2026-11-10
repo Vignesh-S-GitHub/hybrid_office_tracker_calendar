@@ -33,7 +33,7 @@ export function Planner({
 }) {
   const plan = planMonth(data, month, today);
   return (
-    <section className="card planner-card" aria-label="Smart WFO Planner">
+    <section id="smart-wfo-planner" tabIndex={-1} className="card planner-card" aria-label="Smart WFO Planner">
       <div className="planner-heading">
         <div className="flex-row">
           <span className="planner-icon">
