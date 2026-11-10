@@ -14,41 +14,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: [
-        "brand-icon-v2-192.png",
-        "brand-icon-v2-512.png",
-        "brand-maskable-v2-512.png",
-        "brand-favicon-v2-32.png",
-        "brand-apple-v2-180.png",
-      ],
-      manifest: {
-        id: base,
-        name: "Hybrid Tracker",
-        short_name: "Hybrid",
-        description: "Office and home days.",
-        theme_color: "#2563eb",
-        background_color: "#f8fafc",
-        display: "standalone",
-        start_url: base,
-        scope: base,
-        icons: [
-          { src: "brand-icon-v2-192.png", sizes: "192x192", type: "image/png" },
-          {
-            src: "brand-icon-v2-512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any",
-          },
-          {
-            src: "brand-maskable-v2-512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "maskable",
-          },
-        ],
-      },
+      manifest: false,
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest}"],
         navigateFallback: "index.html",
       },
       devOptions: { enabled: false },

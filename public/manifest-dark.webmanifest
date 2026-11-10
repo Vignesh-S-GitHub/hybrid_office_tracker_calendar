@@ -1,0 +1,30 @@
+{
+  "id": "./",
+  "name": "Hybrid Tracker",
+  "short_name": "Hybrid",
+  "description": "Office and home days.",
+  "theme_color": "#141f31",
+  "background_color": "#0c1322",
+  "display": "standalone",
+  "start_url": "./",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "brand-icon-dark-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "brand-icon-dark-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "brand-maskable-dark-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

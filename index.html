@@ -2,20 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
+    <link rel="icon" type="image/png" sizes="32x32"
       href="%BASE_URL%brand-favicon-v2-32.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
+      data-theme-dark="%BASE_URL%brand-favicon-dark-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180"
       href="%BASE_URL%brand-apple-v2-180.png"
-    />
+      data-theme-dark="%BASE_URL%brand-apple-dark-180.png" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest"
+      data-theme-dark="%BASE_URL%manifest-dark.webmanifest" />
     <meta name="apple-mobile-web-app-title" content="Hybrid" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#2563eb" />
+    <meta name="theme-color" content="#f9faff" data-theme-dark="#141f31" />
+    <style>
+      html { background: #f5f7fb; color-scheme: light; }
+      html[data-theme="dark"] { background: #0c1322; color-scheme: dark; }
+    </style>
+    <script>
+      (() => {
+        const root = document.documentElement;
+        let preference;
+        try {
+          preference = localStorage.getItem("hybrid-office-theme");
+          if (!preference) {
+            const saved = JSON.parse(localStorage.getItem("hybrid-office-tracker") || "null");
+            preference = saved?.settings?.theme;
+          }
+        } catch {
+          // System appearance still works when storage is unavailable.
+        }
+        const themed = Array.from(document.querySelectorAll("[data-theme-dark]"), (node) => {
+          const attribute = node.tagName === "META" ? "content" : "href";
+          return { node, attribute, light: node.getAttribute(attribute) };
+        });
+        const sync = () => {
+          for (const { node, attribute, light } of themed) {
+            const value = root.dataset.theme === "dark" ? node.dataset.themeDark : light;
+            if (node.getAttribute(attribute) !== value) node.setAttribute(attribute, value);
+          }
+        };
+        root.dataset.theme = preference === "dark" ||
+          (preference !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)
+          ? "dark" : "light";
+        sync();
+        new MutationObserver(sync).observe(root, { attributeFilter: ["data-theme"] });
+      })();
+    </script>
     <meta name="description" content="Track office and home days." />
     <title>Hybrid Tracker</title>
   </head>

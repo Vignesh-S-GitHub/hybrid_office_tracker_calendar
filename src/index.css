@@ -216,31 +216,33 @@
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  color: #0f172a;
-  background: #f6f8fc;
+  color: var(--text);
+  background: var(--page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --page: #f6f8fc;
+  --page: #f5f7fb;
   --surface: #fff;
-  --soft: #f8fafc;
-  --text: #0f172a;
-  --muted: #64748b;
-  --border: #e5ebf3;
-  --primary: #2563eb;
-  --primary-soft: #edf3ff;
-  --office: #10b981;
-  --office-soft: #ecfaf4;
+  --soft: #f2f4f9;
+  --text: #0b1022;
+  --muted: #485064;
+  --border: #d7ddef;
+  --primary: #3024e8;
+  --primary-ink: #fff;
+  --brand-mark: url("/brand-icon-v2-192.png");
+  --primary-soft: #e0ddff;
+  --office: #392ad8;
+  --office-soft: #dcd8ff;
   --office-plan: #c2b6fa;
-  --home: #3b82f6;
-  --home-soft: #eff5ff;
+  --home: #3f6b33;
+  --home-soft: #d9efcd;
   --home-plan: #b9dcab;
-  --leave: #8b5cf6;
-  --leave-soft: #f5f0ff;
-  --holiday: #f97316;
-  --holiday-soft: #fff5ec;
-  --shadow: 0 3px 20px #1e3a5f04;
-  --header: #ffffffed;
+  --leave: #775310;
+  --leave-soft: #ffe9b6;
+  --holiday: #973c53;
+  --holiday-soft: #ffdade;
+  --shadow: 0 1px 3px #151f3b08;
+  --header: #f9faff;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
@@ -250,20 +252,22 @@
   --text: #edf3ff;
   --muted: #a1b0c7;
   --border: #29364c;
-  --primary: #6b9cff;
-  --primary-soft: #20365a;
-  --office: #34d399;
-  --office-soft: #143a33;
+  --primary: #b9adff;
+  --primary-ink: #1c1740;
+  --brand-mark: url("/brand-icon-dark-192.png");
+  --primary-soft: #34305b;
+  --office: #b9adff;
+  --office-soft: #34305b;
   --office-plan: #484176;
-  --home: #6ba5ff;
-  --home-soft: #1e3455;
+  --home: #9bd387;
+  --home-soft: #213e30;
   --home-plan: #2c563b;
   --leave: #b193ff;
   --leave-soft: #30264b;
   --holiday: #ffac6b;
   --holiday-soft: #412d27;
   --shadow: none;
-  --header: #141f31ed;
+  --header: #141f31;
   color-scheme: dark;
 }
 * {
@@ -310,14 +314,24 @@ button,
 input,
 select,
 textarea {
-  outline-offset: 4px;
+  outline-offset: 1px;
 }
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--primary);
+  outline: 2px solid var(--primary);
+}
+input,
+select,
+textarea {
+  accent-color: var(--primary);
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-offset: -2px;
 }
 button {
   transition:
@@ -440,7 +454,7 @@ strong {
 .desktop-nav button.active {
   background: var(--primary-soft);
   color: var(--primary);
-  border-color: #2563eb06;
+  border-color: transparent;
 }
 .header-actions {
   display: flex;
@@ -518,13 +532,12 @@ strong {
   box-shadow: 0 3px 9px #0f172a07;
 }
 .button.primary {
-  background: linear-gradient(110deg, #2563eb, #3475ff);
-  border-color: #2563eb;
-  color: white;
-  box-shadow: 0 4px 10px #2563eb17;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
 }
 .button.primary:hover {
-  background: #1d4ed8;
+  background: color-mix(in srgb, var(--primary) 92%, var(--primary-ink));
   transform: translateY(-1px);
 }
 .button.small {
@@ -625,7 +638,7 @@ strong {
 }
 .calendar-cell:hover {
   border-color: var(--primary);
-  box-shadow: 0 2px 6px #2563eb10;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--primary) 10%, transparent);
 }
 .calendar-cell.outside {
   opacity: 0.42;
@@ -1390,7 +1403,7 @@ td .text-button {
   position: absolute;
   width: 15px;
   height: 15px;
-  background: white;
+  background: var(--surface);
   border-radius: 50%;
   left: 2px;
   top: 2px;
@@ -1398,8 +1411,8 @@ td .text-button {
   transition: transform 0.2s;
 }
 .setting-row input[type="checkbox"]:checked {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 .setting-row input[type="checkbox"]:checked:after {
   transform: translateX(14px);
@@ -1574,7 +1587,7 @@ dialog::backdrop {
   cursor: pointer;
 }
 .phase-controls input {
-  accent-color: #2563eb;
+  accent-color: var(--primary);
 }
 .field {
   font-size: 12px;
@@ -2119,7 +2132,7 @@ dialog::backdrop {
     font-weight: 650;
   }
   .mobile-nav > button.active svg {
-    filter: drop-shadow(0 2px 3px #2563eb1a);
+    filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--primary) 10%, transparent));
   }
   .planner-card {
     padding: 19px 15px;
@@ -2520,7 +2533,7 @@ dialog::backdrop {
   width: 44px;
   height: 44px;
   flex: 0 0 44px;
-  object-fit: contain;
+  background: var(--brand-mark) center / contain no-repeat;
   border-radius: 11px;
 }
 .brand-name {
@@ -2954,25 +2967,6 @@ dialog::backdrop {
 }
 
 @media (max-width: 767px) {
-  :root:not([data-theme="dark"]) {
-    --page: #f5f7fb;
-    --soft: #f2f4f9;
-    --header: #f9faff;
-    --text: #0b1022;
-    --muted: #485064;
-    --border: #d7ddef;
-    --primary: #3024e8;
-    --primary-soft: #e0ddff;
-    --office: #392ad8;
-    --office-soft: #dcd8ff;
-    --home: #3f6b33;
-    --home-soft: #d9efcd;
-    --leave: #775310;
-    --leave-soft: #ffe9b6;
-    --holiday: #973c53;
-    --holiday-soft: #ffdade;
-    --shadow: 0 1px 3px #151f3b08;
-  }
   .app-header {
     backdrop-filter: none;
   }
@@ -3005,6 +2999,11 @@ dialog::backdrop {
     letter-spacing: -0.65px;
     min-width: 0;
   }
+  .mobile-page-title .brand-mark {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
   .mobile-page-title svg {
     flex: none;
     width: 30px;
@@ -3036,11 +3035,6 @@ dialog::backdrop {
   }
   .app-main .card {
     border-radius: 13px;
-  }
-  :root:not([data-theme="dark"]) .app-main .button.primary {
-    background: var(--primary);
-    border-color: var(--primary);
-    box-shadow: none;
   }
   .mobile-nav {
     display: grid;
@@ -3081,12 +3075,6 @@ dialog::backdrop {
     gap: 11px;
     /* Reserve room for the planner button and bottom tabs in six-week months. */
     --calendar-row-height: clamp(36px, calc((100svh - 466px) / 6), 55px);
-  }
-  :root[data-theme="dark"] .calendar-layout {
-    --office: #b9adff;
-    --office-soft: #34305b;
-    --home: #9bd387;
-    --home-soft: #213e30;
   }
   .mobile-progress {
     display: block;

@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   CalendarDays,
-  CalendarCheck,
   Palmtree,
   Settings as SettingsIcon,
   Moon,
@@ -75,7 +74,7 @@ export default function App() {
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [toast, setToast] = useState("");
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.dataset.theme === "dark");
   if (monthOwner !== owner) {
     setMonthOwner(owner);
     updateMonth(initialMonth);
@@ -95,8 +94,14 @@ export default function App() {
     window.addEventListener("hashchange", handleHash);
     return () => window.removeEventListener("hashchange", handleHash);
   }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (restoring) return;
     const system = matchMedia("(prefers-color-scheme: dark)");
+    try {
+      localStorage.setItem("hybrid-office-theme", data.settings.theme);
+    } catch {
+      // The current theme still applies when storage is unavailable.
+    }
     const apply = () => {
       const dark =
         data.settings.theme === "dark" ||
@@ -107,7 +112,7 @@ export default function App() {
     apply();
     system.addEventListener("change", apply);
     return () => system.removeEventListener("change", apply);
-  }, [data.settings.theme]);
+  }, [data.settings.theme, restoring]);
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(""), 4200);
@@ -255,10 +260,7 @@ export default function App() {
     calendar: "Calendar",
     settings: "Settings",
   };
-  const MobileTitleIcon =
-    page === "calendar"
-      ? CalendarCheck
-      : (pages.find(({ key }) => key === page)?.Icon ?? CalendarCheck);
+  const MobileTitleIcon = pages.find(({ key }) => key === page)?.Icon ?? CalendarDays;
   const accountContentReady = !restoring || page === "holidays";
   return (
     <>
@@ -273,7 +275,7 @@ export default function App() {
             <span className="brand-name">Hybrid Tracker</span>
           </a>
           <div className="mobile-page-title" aria-hidden="true">
-            <MobileTitleIcon aria-hidden="true" />
+            {page === "calendar" ? <BrandMark /> : <MobileTitleIcon aria-hidden="true" />}
             {page === "calendar" ? "Hybrid Office Tracker" : pageTitles[page]}
           </div>
           <nav className="desktop-nav" aria-label="Main navigation">
