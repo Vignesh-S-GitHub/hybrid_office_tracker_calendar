@@ -1,4 +1,4 @@
-import { Building2, House, CalendarDays, Palmtree } from "lucide-react";
+import { Building2, House, Luggage, Palmtree } from "lucide-react";
 import type { Status } from "../types";
 
 export const statusInfo = {
@@ -17,7 +17,7 @@ export const statusInfo = {
   Leave: {
     label: "Personal leave",
     short: "Leave Days",
-    Icon: CalendarDays,
+    Icon: Luggage,
     className: "leave",
   },
   Holiday: {

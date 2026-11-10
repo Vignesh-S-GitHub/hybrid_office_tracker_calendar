@@ -5,6 +5,7 @@ import {
   Download,
   Upload,
   CalendarCheck2,
+  Clock3,
   TrainFront,
 } from "lucide-react";
 import { calendarTrainBookings } from "../lib/calendarTrains";
@@ -124,8 +125,9 @@ export function CalendarPage({
                 : "estimate";
             const holiday = holidayFor(key);
             const suggested = inMonth && recommended.has(key);
+            const planned = record?.phase === "planned";
             const label = record
-              ? `${statusInfo[record.status].label}${record.phase === "planned" ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
+              ? `${statusInfo[record.status].label}${planned ? ", planned" : ""}${holiday ? `, ${holiday.name}, All India holiday` : ""}`
               : suggested
                 ? "Suggested office day"
                 : "No entry";
@@ -138,18 +140,20 @@ export function CalendarPage({
                   [holiday?.name, record?.notes].filter(Boolean).join(" · ") ||
                   label
                 }
-                className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${record?.phase === "planned" ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected || key === bookingDay ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
+                className={`calendar-cell ${!inMonth ? "outside" : ""} ${isWeekend(day) ? "weekend" : ""} ${record ? statusInfo[record.status].className : ""} ${planned ? "planned" : ""} ${suggested ? "suggested" : ""} ${key === today ? "today" : ""} ${key === selected || key === bookingDay ? "selected" : ""} ${trainBookings.length ? `booking-${bookingState}` : ""}`}
                 onClick={() =>
                   trainBookings.length ? setBookingDialog(key) : edit(key)
                 }
               >
                 <span className="day-number">
                   <span className="calendar-date-label">{format(day, "d")}</span>
-                  {!!trainBookings.length && (
-                    <TrainFront
-                      className="calendar-booking-icon"
-                      aria-hidden="true"
-                    />
+                  {(planned || trainBookings.length > 0) && (
+                    <span className="calendar-date-icons" aria-hidden="true">
+                      {planned && <Clock3 className="calendar-plan-icon" />}
+                      {trainBookings.length > 0 && (
+                        <TrainFront className="calendar-booking-icon" />
+                      )}
+                    </span>
                   )}
                 </span>
                 <span
@@ -160,7 +164,7 @@ export function CalendarPage({
                     {holiday && !data.attendance[key]
                       ? holiday.name
                       : record.status}
-                    {record.phase === "planned" ? " · Plan" : ""}
+                    {planned ? " · Plan" : ""}
                   </span>
                 )}
                 {suggested && <span className="cell-caption">Suggested</span>}
@@ -169,14 +173,23 @@ export function CalendarPage({
           })}
         </div>
         <div className="legend">
-          <span><i className="dot office" /> WFO</span>
-          <span><i className="dot planned-dot" /> Planned</span>
-          {statuses.filter((status) => status !== "WFO").map((status) => (
-            <span key={status}>
-              <i className={`dot ${statusInfo[status].className}`} />
-              {status}
-            </span>
-          ))}
+          {statuses.map((status) => {
+            const { Icon, className } = statusInfo[status];
+            return (
+              <span key={status}>
+                <Icon className={`attendance-key ${className}`} aria-hidden="true" />
+                {status}
+              </span>
+            );
+          })}
+          <span>
+            <Clock3 className="attendance-key office plan-key" aria-hidden="true" />
+            WFO plan
+          </span>
+          <span>
+            <Clock3 className="attendance-key home plan-key" aria-hidden="true" />
+            WFH plan
+          </span>
           <span className="calendar-extra-legend"><i className="dot unmarked" /> No entry</span>
           <span className="calendar-extra-legend"><i className="dot suggestion-dot" /> Suggested</span>
           {!!bookings.length && (

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   CalendarCheck,
+  Palmtree,
   Settings as SettingsIcon,
   Moon,
   Sun,
@@ -38,7 +39,7 @@ import { planMonth } from "./lib/planner";
 
 const pages = [
   { key: "calendar", label: "Calendar", Icon: CalendarDays },
-  { key: "holidays", label: "Holidays", Icon: CalendarDays },
+  { key: "holidays", label: "Holidays", Icon: Palmtree },
   { key: "trains", label: "Trains", Icon: TrainFront },
   { key: "settings", label: "Settings", Icon: SettingsIcon },
 ] as const;
@@ -255,11 +256,9 @@ export default function App() {
     settings: "Settings",
   };
   const MobileTitleIcon =
-    page === "calendar" || page === "holidays"
+    page === "calendar"
       ? CalendarCheck
-      : page === "trains"
-        ? TrainFront
-        : SettingsIcon;
+      : (pages.find(({ key }) => key === page)?.Icon ?? CalendarCheck);
   const accountContentReady = !restoring || page === "holidays";
   return (
     <>

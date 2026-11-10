@@ -202,9 +202,10 @@
   }
 }
 
-.calendar-cell.selected {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.calendar-cell.selected .calendar-date-label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
 }
 
 :root {
@@ -230,8 +231,10 @@
   --primary-soft: #edf3ff;
   --office: #10b981;
   --office-soft: #ecfaf4;
+  --office-plan: #c2b6fa;
   --home: #3b82f6;
   --home-soft: #eff5ff;
+  --home-plan: #b9dcab;
   --leave: #8b5cf6;
   --leave-soft: #f5f0ff;
   --holiday: #f97316;
@@ -251,8 +254,10 @@
   --primary-soft: #20365a;
   --office: #34d399;
   --office-soft: #143a33;
+  --office-plan: #484176;
   --home: #6ba5ff;
   --home-soft: #1e3455;
+  --home-plan: #2c563b;
   --leave: #b193ff;
   --leave-soft: #30264b;
   --holiday: #ffac6b;
@@ -678,7 +683,11 @@ strong {
 .calendar-cell.planned {
   border: 1px dashed var(--office);
 }
+.calendar-cell.office.planned {
+  background: var(--office-plan);
+}
 .calendar-cell.home.planned {
+  background: var(--home-plan);
   border-color: var(--home);
 }
 .calendar-cell.planned .day-dot {
@@ -741,10 +750,6 @@ strong {
 .suggestion-dot {
   border: 1.5px solid var(--office);
   background: transparent;
-}
-.planned-dot {
-  background: var(--office-soft);
-  border: 1.5px dashed var(--office);
 }
 .legend {
   display: flex;
@@ -2800,17 +2805,43 @@ dialog::backdrop {
   justify-content: center;
   gap: 3px;
 }
+.calendar-date-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.calendar-plan-icon,
 .calendar-booking-icon {
   width: 12px;
   height: 12px;
-  color: var(--primary);
   flex-shrink: 0;
+}
+.calendar-plan-icon {
+  color: var(--text);
+}
+.calendar-booking-icon {
+  color: var(--primary);
 }
 .booking-estimate .calendar-booking-icon {
   color: var(--muted);
 }
 .booking-booked .calendar-booking-icon {
   color: var(--office);
+}
+.calendar-card .attendance-key {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  padding: 2px;
+  border-radius: 5px;
+  color: var(--text);
+  background: var(--status-soft);
+}
+.calendar-card .attendance-key.office.plan-key {
+  background: var(--office-plan);
+}
+.calendar-card .attendance-key.home.plan-key {
+  background: var(--home-plan);
 }
 .calendar-train-legend {
   color: var(--primary);
@@ -3042,25 +3073,37 @@ dialog::backdrop {
     filter: none;
   }
 
+  .app-main[data-page="calendar"] {
+    padding-inline: 10px;
+    padding-top: 12px;
+  }
   .calendar-layout {
-    gap: 14px;
+    gap: 11px;
+    /* Reserve room for the planner button and bottom tabs in six-week months. */
+    --calendar-row-height: clamp(36px, calc((100svh - 466px) / 6), 55px);
+  }
+  :root[data-theme="dark"] .calendar-layout {
+    --office: #b9adff;
+    --office-soft: #34305b;
+    --home: #9bd387;
+    --home-soft: #213e30;
   }
   .mobile-progress {
     display: block;
-    padding: 12px 16px 15px;
+    padding: 10px 14px 12px;
   }
   .mobile-progress h2 {
-    font-size: 19px;
-    margin-bottom: 3px;
+    font-size: 18px;
+    margin-bottom: 2px;
   }
   .mobile-progress > div:first-of-type {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .mobile-progress strong {
-    font-size: 38px;
+    font-size: 32px;
     font-weight: 760;
     line-height: 1.1;
     font-variant-numeric: tabular-nums;
@@ -3069,30 +3112,30 @@ dialog::backdrop {
     padding-left: 12px;
     border-left: 1px solid var(--border);
     color: var(--muted);
-    font-size: 15px;
+    font-size: 14px;
   }
   .mobile-progress .progress-track {
-    height: 10px;
+    height: 8px;
     background: var(--border);
   }
   .mobile-progress .progress-track > div {
     background: var(--primary);
   }
   .calendar-layout > .calendar-card {
-    padding: 9px 12px 0;
+    padding: 5px 8px 0;
   }
   .month-controls {
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) 40px;
-    margin: 0 0 3px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    margin: 0;
     gap: 0;
     text-align: center;
   }
   .month-controls h2 {
-    font-size: clamp(17px, 5vw, 22px);
+    font-size: clamp(17px, 5.3vw, 23px);
   }
   .month-controls .icon-button {
-    width: 40px;
+    width: 44px;
     height: 44px;
     border: 0;
     background: transparent;
@@ -3111,48 +3154,62 @@ dialog::backdrop {
     gap: 0;
   }
   .calendar-grid .weekday {
-    height: 28px;
+    height: 26px;
     align-items: center;
     color: var(--muted);
     font-size: 13px;
   }
   .calendar-grid .calendar-cell {
-    min-height: 36px;
+    min-height: var(--calendar-row-height);
     padding: 2px;
     border: 0;
     border-radius: 0;
     box-shadow: inset 0 0 0 0.5px var(--border);
     background: var(--surface);
   }
+  .calendar-grid .calendar-cell.planned {
+    background: var(--surface);
+  }
   .calendar-grid .calendar-cell .day-number {
+    position: relative;
     display: flex;
+    flex: 1;
     width: 100%;
     min-height: 30px;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    border-radius: 6px;
-    font-size: 15px;
+    border-radius: 8px;
+    font-size: clamp(15px, 4.6vw, 19px);
     font-variant-numeric: tabular-nums;
   }
   .calendar-grid .calendar-cell.office .day-number { background: var(--office-soft); }
   .calendar-grid .calendar-cell.home .day-number { background: var(--home-soft); }
   .calendar-grid .calendar-cell.leave .day-number { background: var(--leave-soft); }
   .calendar-grid .calendar-cell.holiday .day-number { background: var(--holiday-soft); }
-  .calendar-grid .calendar-cell.planned .day-number {
-    background: var(--surface);
-    box-shadow: inset 0 0 0 1.5px var(--office);
+  .calendar-grid .calendar-cell.office.planned .day-number { background: var(--office-plan); }
+  .calendar-grid .calendar-cell.home.planned .day-number { background: var(--home-plan); }
+  .calendar-grid .calendar-cell.selected:not(.office, .home, .leave, .holiday) .day-number {
+    background: var(--soft);
   }
-  .calendar-grid .calendar-cell.home.planned .day-number {
-    box-shadow: inset 0 0 0 1.5px var(--home);
-  }
-  .calendar-grid .calendar-cell.selected,
   .calendar-grid .calendar-cell:focus-visible {
+    outline: none;
     z-index: 1;
   }
-  .calendar-grid .calendar-cell.selected .day-number {
-    outline: 2px solid var(--primary);
+  .calendar-grid .calendar-cell:focus-visible .day-number {
+    outline: 2px dashed var(--text);
     outline-offset: -2px;
+  }
+  .calendar-grid .calendar-date-icons {
+    position: absolute;
+    inset: auto 0 2px;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .calendar-grid .day-number:has(.calendar-date-icons) {
+    padding-bottom: 9px;
+  }
+  .calendar-grid .calendar-plan-icon,
+  .calendar-grid .calendar-booking-icon {
+    width: 11px;
+    height: 11px;
   }
   .calendar-grid .calendar-cell .day-dot,
   .calendar-grid .calendar-cell .cell-caption,
@@ -3162,7 +3219,8 @@ dialog::backdrop {
   .calendar-grid .calendar-cell.suggested::before {
     content: "+";
     position: absolute;
-    top: 1px;
+    z-index: 1;
+    top: 2px;
     right: 4px;
     color: var(--office);
     font-size: 9px;
@@ -3171,35 +3229,28 @@ dialog::backdrop {
   .calendar-grid .calendar-cell.today::after {
     width: 4px;
     height: 4px;
-    top: auto;
-    bottom: 3px;
-    right: calc(50% - 2px);
+    top: 5px;
+    left: 5px;
+    right: auto;
   }
   .calendar-card .legend {
-    margin: 12px 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 7px 0 0;
     border-top: 1px solid var(--border);
-    padding: 10px 0;
-    gap: 5px clamp(6px, 2.4vw, 14px);
+    padding: 8px 0;
+    gap: 5px 3px;
   }
   .calendar-card .legend > span {
-    font-size: 11px;
-    gap: 5px;
+    font-size: clamp(10px, 2.8vw, 12px);
+    gap: 4px;
+    white-space: nowrap;
   }
   .calendar-card .legend .calendar-extra-legend {
     display: none;
   }
-  .calendar-card .legend .dot {
-    width: 15px;
-    height: 15px;
-    border-radius: 4px;
-  }
-  .calendar-card .legend .dot.office { background: var(--office-soft); }
-  .calendar-card .legend .dot.home { background: var(--home-soft); }
-  .calendar-card .legend .dot.leave { background: var(--leave-soft); }
-  .calendar-card .legend .dot.holiday { background: var(--holiday-soft); }
-  .calendar-card .legend .dot.planned-dot {
-    background: var(--surface);
-    border: 1.5px solid var(--primary);
+  .calendar-card .legend .calendar-train-legend {
+    grid-column: span 2;
   }
   .mobile-planner-link.button {
     display: flex;
@@ -3395,5 +3446,27 @@ dialog::backdrop {
   .settings-layout .settings-more {
     margin-top: 5px;
     padding-top: 6px;
+  }
+}
+
+
+@media (max-width: 767px) and (max-height: 680px) {
+  .app-header:has(+ .app-main[data-page="calendar"]) .header-inner {
+    min-height: 52px;
+  }
+  .app-main[data-page="calendar"] {
+    padding-top: 8px;
+  }
+  .calendar-layout {
+    gap: 8px;
+  }
+  .mobile-progress {
+    padding-block: 8px;
+  }
+  .mobile-progress strong {
+    font-size: 27px;
+  }
+  .calendar-card .month-controls .icon-button {
+    height: 40px;
   }
 }
