@@ -140,14 +140,16 @@ async function tick() {
   });
   assert.equal(response.status, 200, await response.text());
 }
+const fixtureIndiaTime = Date.now() + 330 * 60_000;
 const date = (offset) =>
-  new Date(Date.now() + offset * 86_400_000 + 330 * 60_000)
+  new Date(fixtureIndiaTime + offset * 86_400_000)
     .toISOString()
     .slice(0, 10);
 const journey = {
   from: "Chennai",
   to: "Bengaluru",
-  journeyDate: date(61),
+  // Keep the previous-evening alert in the future even if CI runs after 18:00 IST.
+  journeyDate: date(62),
   leg: "outward",
   advanceDays: 60,
   originOffset: 0,
@@ -305,7 +307,7 @@ try {
           leg: "return",
           from: journey.to,
           to: journey.from,
-          journeyDate: date(63),
+          journeyDate: date(64),
         },
       ],
     },
@@ -414,7 +416,7 @@ try {
     monthlyTargets: {},
     rejected: {},
     attendance: {
-      [date(62)]: {
+      [date(63)]: {
         status: "WFO",
         phase: "planned",
         notes: "",
@@ -435,7 +437,7 @@ try {
   );
   create = await request(
     "/api/train-reminders",
-    { journeys: [{ ...journey, officeDates: [date(62)] }] },
+    { journeys: [{ ...journey, officeDates: [date(63)] }] },
     token,
   );
   assert.equal(create.status, 201);
